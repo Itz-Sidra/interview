@@ -66,6 +66,17 @@
             }
         }
 
+                .logo-img {
+    width: 40px;   
+    height: 40px;  
+    object-fit: cover; 
+    border-radius: 8px; 
+}
+        .big{
+    width: 300px;
+    height: 300px;
+    object-fit: cover;
+        }
     </style>
 </head>
 
@@ -77,6 +88,9 @@
             <div class="flex items-center justify-between">
             <!-- Logo -->
             <a href="#" class="flex items-center space-x-2 text-white font-bold text-xl">
+                <div class="logo-icon">
+                <img src="assests/logo.jpg" alt="Evalvate Logo" class="logo-img">
+            </div>
                 <span>Evalvate</span>
             </a>
 
@@ -203,13 +217,18 @@
     </main>
 
     <!-- Footer (from index.html) -->
+    <!-- Footer -->
     <footer class="bg-dark-teal text-white">
         <div class="container mx-auto px-6 py-16">
             <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-12">
                 <!-- About & Newsletter -->
+                 
                 <div class="lg:col-span-2">
+                    
                     <a href="#" class="flex items-center space-x-2 font-bold text-2xl mb-4">
-                        <span>Evalvate</span>
+                       
+                        <span>
+                            Evalvate</span>
                     </a>
                     <p class="text-gray-400 mb-6">Stay Connected & Informed</p>
                     <form class="flex">
@@ -226,6 +245,12 @@
                         <li><a href="#" class="hover:text-light-green">Testimonials</a></li>
                     </ul>
                 </div>
+
+                <div class="big">
+                            <img src="assests/logo.jpg" alt="Evalvate Logo" class="big">
+                </div>
+                <!-- Information -->
+               
             </div>
             <div class="border-t border-gray-700 mt-12 pt-8 flex flex-col md:flex-row justify-between items-center text-sm text-gray-400">
                 <p>Copyright © 2025 — All Right Reserved</p>

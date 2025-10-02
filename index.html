@@ -74,6 +74,18 @@
             opacity: 1;
             transform: translateY(0);
         }
+
+        .logo-img {
+    width: 40px;   
+    height: 40px;  
+    object-fit: cover; 
+    border-radius: 8px; 
+}
+        .big{
+    width: 300px;
+    height: 300px;
+    object-fit: cover;
+        }
     </style>
 </head>
 <body class="bg-white">
@@ -83,7 +95,9 @@
         <div class="container mx-auto px-6 py-4">
             <div class="flex items-center justify-between">
                 <a href="#" class="flex items-center space-x-2 text-white font-bold text-xl">
-                    
+                    <div class="logo-icon">
+                <img src="assests/logo.jpg" alt="Evalvate Logo" class="logo-img">
+            </div>
                     <span>Evalvate</span>
                 </a>
                 <nav class="hidden md:flex items-center space-x-8 text-white">
@@ -116,9 +130,12 @@
                 <div class="grid md:grid-cols-2 gap-12 items-center">
                     <div class="space-y-6 text-center md:text-left">
                         <h1 class="text-5xl md:text-7xl font-extrabold leading-tight reveal">Take the guesswork out of your interviews.</h1>
+                        <!--
                         <p class="text-lg text-gray-300 reveal" style="transition-delay: 0.2s;">At Evalvate, we help students practice smarter, track real progress, and walk into interviews fully prepared to succeed.</p>
+                    
+                        -->
                         <div class="flex flex-wrap gap-4 justify-center md:justify-start reveal" style="transition-delay: 0.4s;">
-                            <a href="interview.html" class="bg-light-green text-black font-semibold px-6 py-3 rounded-lg hover:bg-opacity-90 transition-all transform hover:scale-105">Get Started</a>
+                            <a href="preview1.html" class="bg-light-green text-black font-semibold px-6 py-3 rounded-lg hover:bg-opacity-90 transition-all transform hover:scale-105">Get Started</a>
                             <a href="#" class="bg-gray-700 bg-opacity-50 text-white font-semibold px-6 py-3 rounded-lg hover:bg-opacity-75 transition-all transform hover:scale-105">Learn more</a>
                         </div>
                     </div>
@@ -481,7 +498,7 @@
                 <div class="bg-dark-teal text-white rounded-3xl p-10 md:p-20 text-center hero-grid reveal">
                     <h2 class="text-4xl md:text-5xl font-bold">Ready to improve your skills and unlock new growth?</h2>
                     <p class="text-lg text-gray-300 mt-4">Evaluate your Skills and Elevate your Career.</p>
-                    <a href="#" class="mt-8 inline-block bg-light-green text-black font-semibold px-8 py-3 rounded-lg hover:bg-opacity-90 transition-all transform hover:scale-105">Get Started</a>
+                    <a href="preview1.html" class="mt-8 inline-block bg-light-green text-black font-semibold px-8 py-3 rounded-lg hover:bg-opacity-90 transition-all transform hover:scale-105">Get Started</a>
                 </div>
             </div>
         </section>
@@ -492,10 +509,13 @@
         <div class="container mx-auto px-6 py-16">
             <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-12">
                 <!-- About & Newsletter -->
+                 
                 <div class="lg:col-span-2">
+                    
                     <a href="#" class="flex items-center space-x-2 font-bold text-2xl mb-4">
                        
-                        <span>Evalvate</span>
+                        <span>
+                            Evalvate</span>
                     </a>
                     <p class="text-gray-400 mb-6">Stay Connected & Informed</p>
                     <form class="flex">
@@ -511,6 +531,10 @@
                         <li><a href="#" class="hover:text-light-green">Team</a></li>
                         <li><a href="#" class="hover:text-light-green">Testimonials</a></li>
                     </ul>
+                </div>
+
+                <div class="big">
+                            <img src="assests/logo.jpg" alt="Evalvate Logo" class="big">
                 </div>
                 <!-- Information -->
                

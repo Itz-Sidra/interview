@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Evalvate - Skills & Role</title>
+    <link rel="stylesheet" href="preview.css">
+</head>
+<body>
+    <header class="header">
+        <div class="logo-container">
+            <div class="logo-icon">
+                <img src="assests/logo.jpg" alt="Evalvate Logo" class="logo-img">
+            </div>
+            <div>
+                <h1 class="logo-title">Evalvate</h1>
+                <p class="logo-subtitle">Configure Your Interview</p>
+            </div>
+        </div>
+        <button class="theme-toggle" id="themeToggle" aria-label="Toggle theme">
+            <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
+                <path d="M10 2.5a.75.75 0 01.75.75v1.5a.75.75 0 01-1.5 0v-1.5A.75.75 0 0110 2.5zM10 15.25a.75.75 0 01.75.75v1.5a.75.75 0 01-1.5 0V16a.75.75 0 01.75-.75zM3.75 10a.75.75 0 01-.75.75h-1.5a.75.75 0 010-1.5H3a.75.75 0 01.75.75zM17.5 10a.75.75 0 01-.75.75h-1.5a.75.75 0 010-1.5h1.5a.75.75 0 01.75.75zM5.99 4.929a.75.75 0 011.06 0l1.061 1.06a.75.75 0 11-1.06 1.061L5.99 5.99a.75.75 0 010-1.06zM13.94 12.879a.75.75 0 011.06 0l1.061 1.06a.75.75 0 11-1.06 1.061l-1.061-1.06a.75.75 0 010-1.061zM4.929 14.06a.75.75 0 011.061-1.06l1.06 1.06a.75.75 0 11-1.06 1.061l-1.061-1.06zM12.879 6.111a.75.75 0 011.061-1.06l1.06 1.06a.75.75 0 11-1.06 1.061l-1.061-1.06zM10 7a3 3 0 100 6 3 3 0 000-6z"/>
+            </svg>
+        </button>
+    </header>
+
+    <main class="main-container">
+        <div class="content-wrapper">
+            <div class="left-panel">
+                <div class="stepper">
+                    <div class="step completed">
+                        <div class="step-circle">
+                            <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
+                                <path d="M13.854 3.646a.5.5 0 0 1 0 .708l-7 7a.5.5 0 0 1-.708 0l-3.5-3.5a.5.5 0 1 1 .708-.708L6.5 10.293l6.646-6.647a.5.5 0 0 1 .708 0z"/>
+                            </svg>
+                        </div>
+                        <div class="step-info">
+                            <div class="step-title">Basics</div>
+                            <div class="step-subtitle">Duration & difficulty</div>
+                        </div>
+                    </div>
+                    <div class="step-line completed"></div>
+                    <div class="step active">
+                        <div class="step-circle">
+                            <span class="step-number">2</span>
+                        </div>
+                        <div class="step-info">
+                            <div class="step-title">Skills</div>
+                            <div class="step-subtitle">Role & expertise</div>
+                        </div>
+                    </div>
+                    <div class="step-line"></div>
+                    <div class="step">
+                        <div class="step-circle">
+                            <span class="step-number">3</span>
+                        </div>
+                        <div class="step-info">
+                            <div class="step-title">Technical</div>
+                            <div class="step-subtitle">Coding & setup</div>
+                        </div>
+                    </div>
+                    <div class="step-line"></div>
+                    <div class="step">
+                        <div class="step-circle">
+                            <span class="step-number">4</span>
+                        </div>
+                        <div class="step-info">
+                            <div class="step-title">Review</div>
+                            <div class="step-subtitle">Finalize & start</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="page-content">
+                    <h2 class="page-title">Skills & Role</h2>
+                    <p class="page-description">Define the role and skills to focus on during the interview</p>
+
+                    <div class="form-section">
+                        <div class="form-group">
+                            <label for="targetRole">Target Role</label>
+                            <input type="text" id="targetRole" class="text-input" placeholder="e.g., Senior Frontend Developer">
+                            <p class="help-text">The specific position you're interviewing for</p>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="keySkills">Key Skills</label>
+                            <div class="skill-input-group">
+                                <input type="text" id="keySkills" class="text-input" placeholder="Add a skill (e.g., React, TypeScript)">
+                                <button class="btn-add" id="addSkillBtn">
+                                    <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
+                                        <path d="M10 5a1 1 0 011 1v3h3a1 1 0 110 2h-3v3a1 1 0 11-2 0v-3H6a1 1 0 110-2h3V6a1 1 0 011-1z"/>
+                                    </svg>
+                                </button>
+                            </div>
+                            <div class="skills-list" id="skillsList"></div>
+                        </div>
+                    </div>
+
+                    <div class="button-group">
+                        <button class="btn btn-secondary" onclick="window.location.href='preview1.html'">
+                            <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
+                                <path d="M12.5 15l-5-5 5-5" stroke="currentColor" stroke-width="2" fill="none"/>
+                            </svg>
+                            Back
+                        </button>
+                        <button class="btn btn-primary" onclick="window.location.href='preview3.html'">
+                            Continue
+                            <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
+                                <path d="M7.5 15l5-5-5-5" stroke="currentColor" stroke-width="2" fill="none"/>
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="right-panel">
+                <div class="summary-card">
+                    <h3 class="summary-title">
+                        <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
+                            <path d="M10 2L3 7v6c0 3.5 2.5 6.5 7 8 4.5-1.5 7-4.5 7-8V7l-7-5z"/>
+                        </svg>
+                        Interview Summary
+                    </h3>
+                    
+                    <div class="summary-item">
+                        <div class="summary-label">
+                            <svg width="18" height="18" viewBox="0 0 20 20" fill="currentColor">
+                                <path d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-13a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V5z"/>
+                            </svg>
+                            Duration
+                        </div>
+                        <div class="summary-value">45 minutes</div>
+                    </div>
+
+                    <div class="summary-item">
+                        <div class="summary-label">Difficulty</div>
+                        <div class="summary-badge">Intermediate</div>
+                    </div>
+
+                    <div class="summary-item">
+                        <div class="summary-label">Type</div>
+                        <div class="summary-badge">Technical</div>
+                    </div>
+
+                    <div class="summary-item">
+                        <div class="summary-label">
+                            <svg width="18" height="18" viewBox="0 0 20 20" fill="currentColor">
+                                <path d="M2 6a2 2 0 012-2h6a2 2 0 012 2v8a2 2 0 01-2 2H4a2 2 0 01-2-2V6zm12.553 1.106A1 1 0 0014 8v4a1 1 0 00.553.894l2 1A1 1 0 0018 13V7a1 1 0 00-1.447-.894l-2 1z"/>
+                            </svg>
+                            Recording enabled
+                        </div>
+                    </div>
+                </div>
+
+                <div class="cost-card">
+                    <div class="cost-header">
+                        <span>Interview Cost</span>
+                        <span class="cost-amount">1 Credit</span>
+                    </div>
+                    <p class="cost-description">One interview will be consumed from your plan</p>
+                </div>
+
+                <!--
+                <button class="btn btn-start">
+                    <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
+                        <path d="M6.3 2.841A1.5 1.5 0 004 4.11V15.89a1.5 1.5 0 002.3 1.269l9.344-5.89a1.5 1.5 0 000-2.538L6.3 2.84z"/>
+                    </svg>
+                    Start Interview Now
+                </button>
+                -->
+                
+            </div>
+        </div>
+    </main>
+
+    <script src="script.js"></script>
+    <script>
+        // Skills management
+        const addSkillBtn = document.getElementById('addSkillBtn');
+        const keySkillsInput = document.getElementById('keySkills');
+        const skillsList = document.getElementById('skillsList');
+
+        addSkillBtn.addEventListener('click', addSkill);
+        keySkillsInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                addSkill();
+            }
+        });
+
+        function addSkill() {
+            const skillValue = keySkillsInput.value.trim();
+            if (skillValue) {
+                const skillTag = document.createElement('div');
+                skillTag.className = 'skill-tag';
+                skillTag.innerHTML = `
+                    ${skillValue}
+                    <button class="skill-remove" onclick="this.parentElement.remove()">
+                        <svg width="14" height="14" viewBox="0 0 14 14" fill="currentColor">
+                            <path d="M11 3L3 11M3 3l8 8" stroke="currentColor" stroke-width="2" fill="none"/>
+                        </svg>
+                    </button>
+                `;
+                skillsList.appendChild(skillTag);
+                keySkillsInput.value = '';
+            }
+        }
+    </script>
+</body>
+</html>
