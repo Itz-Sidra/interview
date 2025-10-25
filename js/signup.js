@@ -1,233 +1,336 @@
-/**
- * Premium Auth System - Signup Script
- * Combines functionality from user's original script with premium UI enhancements.
- */
+const API_BASE_URL = 'http://localhost:3000';
+
 document.addEventListener('DOMContentLoaded', () => {
+    const signupForm = document.getElementById('signupForm');
+    const fullNameInput = document.getElementById('fullName');
+    const emailInput = document.getElementById('email');
+    const passwordInput = document.getElementById('password');
+    const confirmPasswordInput = document.getElementById('confirmPassword');
+    const submitBtn = document.getElementById('submitBtn');
 
-    // --- Element Selection (using original IDs) ---
-    const form = document.getElementById("signupForm");
-    const submitBtn = document.getElementById("submitBtn");
-    const inputs = {
-        fullName: document.getElementById("fullName"),
-        email: document.getElementById("email"),
-        password: document.getElementById("password"),
-        confirmPassword: document.getElementById("confirmPassword"),
-    };
+    const fullNameError = document.getElementById('fullNameError');
+    const emailError = document.getElementById('emailError');
+    const passwordError = document.getElementById('passwordError');
+    const confirmPasswordError = document.getElementById('confirmPasswordError');
 
-    // --- Premium UI Initializations ---
-    initializeCustomCursor();
-    initializePasswordToggles();
-    initializeStaggeredAnimations();
+    const passwordStrength = document.getElementById('passwordStrength');
+    const strengthFill = passwordStrength?.querySelector('.strength-fill');
+    const strengthText = passwordStrength?.querySelector('.strength-text');
 
-    // --- Event Listeners ---
-    if (form) form.addEventListener("submit", handleFormSubmit);
+    const customCursor = document.getElementById('customCursor');
 
-    // Real-time validation listeners
-    Object.values(inputs).forEach(input => {
-        if (input) {
-            input.addEventListener("input", () => validateField(input));
-            input.addEventListener("blur", () => validateField(input, true));
+    if (customCursor) {
+        document.addEventListener('mousemove', (e) => {
+            customCursor.style.left = e.clientX + 'px';
+            customCursor.style.top = e.clientY + 'px';
+        });
+
+        document.querySelectorAll('a, button, input').forEach(el => {
+            el.addEventListener('mouseenter', () => customCursor.classList.add('cursor-hover'));
+            el.addEventListener('mouseleave', () => customCursor.classList.remove('cursor-hover'));
+        });
+    }
+
+    document.querySelectorAll('.password-toggle').forEach(btn => {
+        btn.addEventListener('click', function() {
+            const input = this.parentElement.querySelector('input');
+            const type = input.type === 'password' ? 'text' : 'password';
+            input.type = type;
+            this.setAttribute('aria-pressed', type === 'text');
+        });
+    });
+
+    if (passwordInput && strengthFill && strengthText) {
+        passwordInput.addEventListener('input', function() {
+            const password = this.value;
+            const strength = calculatePasswordStrength(password);
+            updatePasswordStrength(strength);
+        });
+    }
+
+    function calculatePasswordStrength(password) {
+        let strength = 0;
+        
+        if (password.length >= 8) strength += 25;
+        if (password.length >= 12) strength += 25;
+        if (/[a-z]/.test(password) && /[A-Z]/.test(password)) strength += 20;
+        if (/\d/.test(password)) strength += 15;
+        if (/[^a-zA-Z0-9]/.test(password)) strength += 15;
+        
+        return strength;
+    }
+
+    function updatePasswordStrength(strength) {
+        if (!strengthFill || !strengthText) return;
+
+        strengthFill.style.width = strength + '%';
+        
+        if (strength === 0) {
+            strengthFill.style.background = 'transparent';
+            strengthText.textContent = '';
+        } else if (strength < 40) {
+            strengthFill.style.background = '#ef4444';
+            strengthText.textContent = 'Weak';
+            strengthText.style.color = '#ef4444';
+        } else if (strength < 70) {
+            strengthFill.style.background = '#f59e0b';
+            strengthText.textContent = 'Medium';
+            strengthText.style.color = '#f59e0b';
+        } else {
+            strengthFill.style.background = '#10b981';
+            strengthText.textContent = 'Strong';
+            strengthText.style.color = '#10b981';
+        }
+    }
+
+    function validateFullName() {
+        const name = fullNameInput.value.trim();
+        
+        if (name === '') {
+            showError(fullNameError, fullNameInput, 'Full name is required');
+            return false;
+        }
+        
+        if (name.length < 2) {
+            showError(fullNameError, fullNameInput, 'Name must be at least 2 characters');
+            return false;
+        }
+        
+        hideError(fullNameError, fullNameInput);
+        return true;
+    }
+
+    function validateEmail() {
+        const email = emailInput.value.trim();
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        
+        if (email === '') {
+            showError(emailError, emailInput, 'Email is required');
+            return false;
+        }
+        
+        if (!emailRegex.test(email)) {
+            showError(emailError, emailInput, 'Please enter a valid email address');
+            return false;
+        }
+        
+        hideError(emailError, emailInput);
+        return true;
+    }
+
+    function validatePassword() {
+        const password = passwordInput.value;
+        
+        if (password === '') {
+            showError(passwordError, passwordInput, 'Password is required');
+            return false;
+        }
+        
+        if (password.length < 8) {
+            showError(passwordError, passwordInput, 'Password must be at least 8 characters');
+            return false;
+        }
+        
+        hideError(passwordError, passwordInput);
+        return true;
+    }
+
+    function validateConfirmPassword() {
+        const password = passwordInput.value;
+        const confirmPassword = confirmPasswordInput.value;
+        
+        if (confirmPassword === '') {
+            showError(confirmPasswordError, confirmPasswordInput, 'Please confirm your password');
+            return false;
+        }
+        
+        if (password !== confirmPassword) {
+            showError(confirmPasswordError, confirmPasswordInput, 'Passwords do not match');
+            return false;
+        }
+        
+        hideError(confirmPasswordError, confirmPasswordInput);
+        return true;
+    }
+
+    function showError(errorElement, inputElement, message) {
+        if (errorElement) {
+            errorElement.textContent = message;
+            errorElement.classList.add('show');
+        }
+        if (inputElement) {
+            inputElement.classList.add('error');
+            inputElement.classList.remove('success');
+        }
+    }
+
+    function hideError(errorElement, inputElement) {
+        if (errorElement) {
+            errorElement.textContent = '';
+            errorElement.classList.remove('show');
+        }
+        if (inputElement) {
+            inputElement.classList.remove('error');
+        }
+    }
+
+    fullNameInput?.addEventListener('blur', validateFullName);
+    emailInput?.addEventListener('blur', validateEmail);
+    passwordInput?.addEventListener('blur', validatePassword);
+    confirmPasswordInput?.addEventListener('blur', validateConfirmPassword);
+
+    signupForm?.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        
+        const isFullNameValid = validateFullName();
+        const isEmailValid = validateEmail();
+        const isPasswordValid = validatePassword();
+        const isConfirmPasswordValid = validateConfirmPassword();
+        
+        if (!isFullNameValid || !isEmailValid || !isPasswordValid || !isConfirmPasswordValid) {
+            return;
+        }
+        
+        const formData = {
+            name: fullNameInput.value.trim(),
+            email: emailInput.value.trim(),
+            password: passwordInput.value
+        };
+        
+        submitBtn.disabled = true;
+        const originalText = submitBtn.textContent;
+        submitBtn.textContent = 'Creating Account...';
+        
+        try {
+            console.log('Sending request to:', `${API_BASE_URL}/auth/signup`);
+            console.log('Payload:', { ...formData, password: '***' });
+            
+            const response = await fetch(`${API_BASE_URL}/auth/signup`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(formData)
+            });
+            
+            console.log('Response status:', response.status);
+            
+            let data;
+            try {
+                data = await response.json();
+                console.log('Response data:', data);
+            } catch (parseError) {
+                console.error('Failed to parse response:', parseError);
+                data = {};
+            }
+            
+            if (response.ok) {
+                showSuccessMessage('Account created successfully! Redirecting to login...');
+                
+                setTimeout(() => {
+                    window.location.href = 'login.html';
+                }, 2000);
+            } else if (response.status === 400) {
+                const errorMessage = data.message || data.error || data.detail || '';
+                
+                if (errorMessage.toLowerCase().includes('email already exists') || 
+                    errorMessage.toLowerCase().includes('email already registered') ||
+                    errorMessage.toLowerCase().includes('user already exists')) {
+                    
+                    showError(emailError, emailInput, 'This email is already registered. Please use a different email or login.');
+                    emailInput.focus();
+                } else {
+                    showGlobalError(errorMessage || 'Please check your information and try again.');
+                }
+                
+                submitBtn.disabled = false;
+                submitBtn.textContent = originalText;
+            } else if (response.status === 500) {
+                showGlobalError('Server error. Please try again later.');
+                
+                submitBtn.disabled = false;
+                submitBtn.textContent = originalText;
+            } else {
+                const errorMessage = data.message || data.error || data.detail || 'An unexpected error occurred';
+                showGlobalError(errorMessage);
+                
+                submitBtn.disabled = false;
+                submitBtn.textContent = originalText;
+            }
+        } catch (error) {
+            console.error('Signup error:', error);
+            showGlobalError('Cannot connect to server. Please check your connection and make sure the backend is running on port 3000.');
+            
+            submitBtn.disabled = false;
+            submitBtn.textContent = originalText;
         }
     });
 
-    // --- Core Logic ---
-    async function handleFormSubmit(e) {
-        e.preventDefault();
-
-        let isFormValid = true;
-        Object.values(inputs).forEach(input => {
-            if (!validateField(input, true)) {
-                isFormValid = false;
-            }
-        });
-
-        if (!isFormValid) return;
-
-        const originalBtnHTML = submitBtn.innerHTML;
-        setButtonLoading(submitBtn, "Creating Account...");
-
-        try {
-            const payload = {
-                name: inputs.fullName.value.trim(),
-                email: inputs.email.value.trim(),
-                password: inputs.password.value,
-            };
-
-            // This fetch logic is preserved from your original script
-            const response = await fetch("http://127.0.0.1:8001/signup", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify(payload),
-            });
-            const data = await response.json();
-
-            if (response.ok) {
-                alert("Account created successfully! Redirecting to login...");
-                window.location.href = "login.html";
-            } else {
-                if (data.detail === "Email already exists") {
-                    showError(inputs.email, "An account with this email already exists.");
-                } else {
-                    alert(`An unexpected error occurred: ${data.detail || 'Unknown error'}`);
-                }
-                resetButton(submitBtn, originalBtnHTML);
-            }
-        } catch (error) {
-            console.error("Signup error:", error);
-            alert("Could not connect to the server. Please try again later.");
-            resetButton(submitBtn, originalBtnHTML);
-        }
+    function showSuccessMessage(message) {
+        const successDiv = document.createElement('div');
+        successDiv.className = 'success-message';
+        successDiv.textContent = message;
+        successDiv.style.cssText = `
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: #10b981;
+            color: white;
+            padding: 16px 24px;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            z-index: 10000;
+            font-family: 'Inter', sans-serif;
+            animation: slideIn 0.3s ease-out;
+        `;
+        
+        document.body.appendChild(successDiv);
+        
+        setTimeout(() => {
+            successDiv.remove();
+        }, 3000);
     }
 
-    // --- Validation Logic ---
-    function validateField(input, forceShow = false) {
-        if (!input) return true;
-        const value = input.value;
-        let isValid = true;
-        let errorMessage = "";
+    function showGlobalError(message) {
+        const errorDiv = document.createElement('div');
+        errorDiv.className = 'global-error-message';
+        errorDiv.textContent = message;
+        errorDiv.style.cssText = `
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: #ef4444;
+            color: white;
+            padding: 16px 24px;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            z-index: 10000;
+            font-family: 'Inter', sans-serif;
+            animation: slideIn 0.3s ease-out;
+            cursor: pointer;
+        `;
+        
+        errorDiv.addEventListener('click', () => errorDiv.remove());
+        
+        document.body.appendChild(errorDiv);
+        
+        setTimeout(() => {
+            errorDiv.remove();
+        }, 5000);
+    }
 
-        switch (input.id) {
-            case 'fullName':
-                if (!value.trim()) errorMessage = "Full name is required";
-                else if (value.trim().length < 2) errorMessage = "Name must be at least 2 characters";
-                else if (!/^[a-zA-Z\s]+$/.test(value.trim())) errorMessage = "Please enter a valid name";
-                break;
-            case 'email':
-                const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-                if (!value.trim()) errorMessage = "Email is required";
-                else if (!emailRegex.test(value.trim())) errorMessage = "Please enter a valid email address";
-                break;
-            case 'password':
-                updatePasswordStrength(value);
-                if (!value) errorMessage = "Password is required";
-                else if (!/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{8,}$/.test(value)) {
-                    errorMessage = "Must be 8+ chars with uppercase, lowercase, and a number.";
-                }
-                break;
-            case 'confirmPassword':
-                if (!value) errorMessage = "Please confirm your password";
-                else if (value !== inputs.password.value) errorMessage = "Passwords do not match";
-                break;
-        }
-
-        if (errorMessage) {
-            isValid = false;
-            // Show error only on blur or if user is typing and it's invalid
-            if (forceShow || (value.length > 0 && input.type !== 'password')) {
-                showError(input, errorMessage);
+    const style = document.createElement('style');
+    style.textContent = `
+        @keyframes slideIn {
+            from {
+                transform: translateX(100%);
+                opacity: 0;
             }
-        } else {
-            clearError(input);
-            if (value.trim()) {
-                input.classList.add('success');
+            to {
+                transform: translateX(0);
+                opacity: 1;
             }
         }
-        return isValid;
-    }
-
-    function updatePasswordStrength(password) {
-        const strengthIndicator = document.getElementById("passwordStrength");
-        if (!strengthIndicator) return;
-
-        const strengthText = strengthIndicator.querySelector(".strength-text");
-        let score = 0;
-        let feedback = "";
-
-        if (password.length >= 8) score++;
-        if (/[A-Z]/.test(password)) score++;
-        if (/[a-z]/.test(password)) score++;
-        if (/[0-9]/.test(password)) score++;
-
-        strengthIndicator.className = 'password-strength'; // Reset
-        if (password.length === 0) {
-            feedback = "";
-        } else if (score < 3) {
-            feedback = "Weak";
-            strengthIndicator.classList.add("strength-weak");
-        } else if (score < 4) {
-            feedback = "Medium";
-            strengthIndicator.classList.add("strength-medium");
-        } else {
-            feedback = "Strong";
-            strengthIndicator.classList.add("strength-strong");
-        }
-        strengthText.textContent = feedback;
-    }
-
-    function showError(input, message) {
-        input.classList.remove('success');
-        input.classList.add("error");
-        const errorDiv = document.getElementById(input.id + "Error");
-        if (errorDiv) {
-            errorDiv.textContent = message;
-            errorDiv.classList.add("show");
-        }
-    }
-
-    function clearError(input) {
-        input.classList.remove("error");
-        const errorDiv = document.getElementById(input.id + "Error");
-        if (errorDiv) {
-            errorDiv.textContent = "";
-            errorDiv.classList.remove("show");
-        }
-    }
-
-    // --- UI Helpers ---
-    function setButtonLoading(button, text) {
-        button.disabled = true;
-        button.innerHTML = `<span class="loading-spinner"></span> ${text}`;
-    }
-
-    function resetButton(button, originalHTML) {
-        button.disabled = false;
-        button.innerHTML = originalHTML;
-    }
-
-    function initializePasswordToggles() {
-        document.querySelectorAll('.password-toggle').forEach(toggle => {
-            toggle.addEventListener('click', () => {
-                const input = toggle.parentElement.querySelector('input');
-                const isVisible = input.type === 'text';
-                input.type = isVisible ? 'password' : 'text';
-                toggle.setAttribute('aria-pressed', !isVisible);
-                const eyeIcon = toggle.querySelector('.eye-icon');
-                eyeIcon.innerHTML = isVisible
-                    ? `<path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" /><circle cx="12" cy="12" r="3" />`
-                    : `<path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/>`;
-            });
-        });
-    }
-
-    function initializeCustomCursor() {
-        const cursor = document.getElementById('customCursor');
-        if (!cursor) return;
-        if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
-            cursor.style.display = 'none';
-            return;
-        }
-
-        document.addEventListener('mousemove', e => {
-            cursor.style.left = e.clientX + 'px';
-            cursor.style.top = e.clientY + 'px';
-            cursor.classList.add('visible');
-        });
-
-        document.addEventListener('mouseleave', () => cursor.classList.remove('visible'));
-
-        const interactiveElements = 'a, button, input, .checkbox-wrapper';
-        document.querySelectorAll(interactiveElements).forEach(el => {
-            el.addEventListener('mouseenter', () => cursor.classList.add('hover'));
-            el.addEventListener('mouseleave', () => cursor.classList.remove('hover'));
-            el.addEventListener('mousedown', () => cursor.classList.add('click'));
-            el.addEventListener('mouseup', () => cursor.classList.remove('click'));
-        });
-    }
-
-    function initializeStaggeredAnimations() {
-        const elements = document.querySelectorAll('.form-group, .btn, .auth-footer');
-        elements.forEach((el, index) => {
-            el.style.animationDelay = `${index * 100}ms`;
-        });
-    }
+    `;
+    document.head.appendChild(style);
 });

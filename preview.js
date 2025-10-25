@@ -1,13 +1,10 @@
-// Theme toggle functionality
 const themeToggle = document.getElementById('themeToggle');
 if (themeToggle) {
     themeToggle.addEventListener('click', () => {
-        // Theme toggle logic would go here
         console.log('Theme toggle clicked');
     });
 }
 
-// Duration slider update
 const durationSlider = document.getElementById('duration');
 const durationValue = document.getElementById('durationValue');
 const summaryDuration = document.getElementById('summaryDuration');
@@ -24,7 +21,6 @@ if (durationSlider) {
     });
 }
 
-// Difficulty select update
 const difficultySelect = document.getElementById('difficulty');
 const summaryDifficulty = document.getElementById('summaryDifficulty');
 
@@ -38,7 +34,6 @@ if (difficultySelect) {
     });
 }
 
-// Interview type select update
 const interviewTypeSelect = document.getElementById('interviewType');
 const summaryType = document.getElementById('summaryType');
 
@@ -52,7 +47,6 @@ if (interviewTypeSelect) {
     });
 }
 
-// Store configuration in localStorage
 function saveConfig() {
     const config = {
         duration: durationSlider ? durationSlider.value : 45,
@@ -62,7 +56,6 @@ function saveConfig() {
     localStorage.setItem('interviewConfig', JSON.stringify(config));
 }
 
-// Load configuration from localStorage
 function loadConfig() {
     const savedConfig = localStorage.getItem('interviewConfig');
     if (savedConfig) {
@@ -71,15 +64,12 @@ function loadConfig() {
         if (difficultySelect) difficultySelect.value = config.difficulty;
         if (interviewTypeSelect) interviewTypeSelect.value = config.interviewType;
         
-        // Trigger change events to update UI
         if (durationSlider) durationSlider.dispatchEvent(new Event('input'));
         if (difficultySelect) difficultySelect.dispatchEvent(new Event('change'));
         if (interviewTypeSelect) interviewTypeSelect.dispatchEvent(new Event('change'));
     }
 }
 
-// Save config on page unload
 window.addEventListener('beforeunload', saveConfig);
 
-// Load config on page load
 window.addEventListener('DOMContentLoaded', loadConfig);

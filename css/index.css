@@ -1,31 +1,16 @@
-/*
-  ========================================
-  Evalvate - Main Stylesheet (Light Theme Redesign - CORRECTED)
-  ========================================
-*/
-
-/* --- Root Variables --- */
 :root {
     --primary-color: #2563eb;
-    /* Blue 600 */
     --primary-dark: #1d4ed8;
-    /* Blue 700 */
     --text-dark: #1e293b;
-    /* Slate 800 */
     --text-medium: #475569;
-    /* Slate 600 */
     --text-light: #f8fafc;
-    /* Slate 50 */
     --background-light: #ffffff;
     --background-offwhite: #f1f5f9;
-    /* Slate 100 */
     --border-color: #e2e8f0;
-    /* Slate 200 */
     --border-radius: 12px;
     --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-/* --- Global Styles & Reset --- */
 * {
     margin: 0;
     padding: 0;
@@ -42,7 +27,6 @@ body {
     color: var(--text-medium);
     background: var(--background-light);
     overflow-x: hidden;
-    /* Prevents horizontal scroll */
 }
 
 .container {
@@ -56,7 +40,6 @@ body {
     padding: 100px 0;
 }
 
-/* --- Header & Navigation --- */
 .header {
     background: rgba(255, 255, 255, 0.8);
     backdrop-filter: blur(10px);
@@ -108,7 +91,6 @@ body {
     color: var(--primary-color);
 }
 
-/* --- Buttons --- */
 .auth-buttons {
     display: flex;
     gap: 12px;
@@ -145,10 +127,8 @@ body {
 
 .btn-primary:hover {
     background: #334155;
-    /* Slate 700 */
 }
 
-/* --- Hero Section --- */
 .hero {
     padding-top: 120px;
     padding-bottom: 80px;
@@ -229,8 +209,6 @@ body {
     transform: translateY(-1px);
 }
 
-/* Hero Visualization Container - Card Layout */
-
 .hero-visualization-container {
     position: relative;
     width: 100%;
@@ -243,9 +221,6 @@ body {
     padding: 40px 20px;
 }
 
-
-
-/* Top Row - Metric Cards */
 .metric-cards {
     display: flex;
     gap: 16px;
@@ -282,7 +257,6 @@ body {
     line-height: 1.2;
 }
 
-/* Middle Card - AI Assistant */
 .ai-assistant-card {
     background: white;
     border: 1px solid #e2e8f0;
@@ -349,7 +323,6 @@ body {
     line-height: 1.3;
 }
 
-/* Bottom Row - Feature Cards */
 .feature-cards {
     display: flex;
     gap: 16px;
@@ -399,7 +372,6 @@ body {
     line-height: 1.2;
 }
 
-/* Analysis Nodes */
 .analysis-nodes {
     position: absolute;
     top: 0;
@@ -434,7 +406,6 @@ body {
     border-color: var(--primary-color);
 }
 
-/* Analysis Report Panel - Centered */
 .analysis-report-panel {
     position: absolute;
     top: 50%;
@@ -449,7 +420,6 @@ body {
     z-index: 20;
 }
 
-/* Analysis Nodes - Positioned around the center report */
 .analysis-node[data-type="facial"] {
     top: 15%;
     left: 20%;
@@ -495,7 +465,6 @@ body {
     color: var(--primary-color);
 }
 
-/* Central AI Brain */
 .central-brain {
     position: absolute;
     top: 50%;
@@ -527,7 +496,6 @@ body {
     line-height: 1;
 }
 
-/* Analysis Report Panel */
 .analysis-report-panel {
     position: absolute;
     top: 50%;
@@ -663,7 +631,6 @@ body {
     background: #e2e8f0;
 }
 
-/* Practice Stats */
 .practice-stats {
     position: absolute;
     bottom: 20px;
@@ -701,7 +668,6 @@ body {
     line-height: 1.2;
 }
 
-/* Neural Network Container */
 #neural-network {
     width: 100%;
     height: 100%;
@@ -739,7 +705,6 @@ body {
     }
 }
 
-/* Analysis Nodes Animation */
 .analysis-node {
     position: absolute;
     background: rgba(0, 127, 255, 0.2);
@@ -777,7 +742,6 @@ body {
     }
 }
 
-/* Neural Connections */
 .neural-connection {
     position: absolute;
     background: linear-gradient(90deg, transparent, rgba(0, 127, 255, 0.6), transparent);
@@ -803,7 +767,6 @@ body {
     }
 }
 
-/* --- Company Logos Section --- */
 .company-logos-section {
     padding: 45px 0;
     background: var(--background-offwhite);
@@ -834,16 +797,11 @@ body {
 
 .logo-track img {
     width: 150px;
-    /* Uniform logo box width (slightly larger) */
     height: 50px;
-    /* Uniform logo box height (slightly larger) */
     object-fit: contain;
-    /* Keep aspect ratio, fit inside box */
     object-position: center;
     margin: 0 40px;
-    /* Space between logos */
     filter: none;
-    /* ensure clarity */
 }
 
 @keyframes scroll {
@@ -866,7 +824,6 @@ body {
     }
 }
 
-/* --- Generic Section Styles --- */
 .section-title-left {
     margin-bottom: 40px;
 }
@@ -894,7 +851,6 @@ body {
     margin-right: auto;
 }
 
-/* --- Large Feature Cards --- */
 .large-features-grid {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
@@ -935,52 +891,38 @@ body {
 
 .dark-card {
     background: #121212;
-    /* Very dark gray */
     color: #FFFFFF;
-    /* Primary text white */
 }
 
 .dark-card h3 {
     color: #FFFFFF;
-    /* Ensure headings are white */
 }
 
 .light-blue-card {
     background: #D6E6F9;
-    /* Soft pastel blue */
     color: #1A1A1A;
-    /* Dark text for readability */
 }
 
-/* Blue 50 */
 .white-card {
     background: #F5FAFF;
-    /* Very light sky blue */
     color: #1A1A1A;
-    /* Strong readable text */
 }
 
-/* Secondary text tone inside dark first card */
 .dark-card p {
     color: #B0B0B0;
-    /* Light gray for secondary text */
 }
 
-/* Optional accent utilities for the third card (if used) */
 .white-card .accent-primary,
 .white-card .btn,
 .white-card a {
     color: #3B71F3;
-    /* Primary accent blue */
 }
 
 .white-card .muted,
 .white-card .secondary-text {
     color: #8A8A8A;
-    /* Neutral gray for secondary info */
 }
 
-/* --- Insights Section --- */
 .insights-section {
     background: var(--background-offwhite);
 }
@@ -1051,7 +993,6 @@ body {
     color: var(--primary-color);
 }
 
-/* --- Testimonials Section --- */
 .testimonials-grid {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
@@ -1116,7 +1057,6 @@ body {
     transform: scale(1.02);
 }
 
-/* Custom thumbnails for each video */
 .video-placeholder[data-video="saanya-kankaria-testimonial"] {
     background-image: url('../assests/SaanyaKankaria.jpeg');
 }
@@ -1195,7 +1135,6 @@ body {
     margin: 0;
 }
 
-/* --- Final CTA Section --- */
 .final-cta-section {
     background: var(--background-offwhite);
     text-align: center;
@@ -1229,7 +1168,6 @@ body {
     box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
 }
 
-/* --- Footer --- */
 .footer {
     background: var(--text-dark);
     color: #cbd5e1;
@@ -1304,15 +1242,11 @@ body {
 
 .footer-container {
     max-width: 1200px;
-    /* or any preferred width */
     margin: 0 auto;
-    /* centers it horizontally */
     padding: 0 20px;
-    /* prevents text from touching edges */
 }
 
 
-/* --- Mobile Menu --- */
 .mobile-menu-button {
     display: none;
 }
@@ -1321,7 +1255,6 @@ body {
     display: none;
 }
 
-/* --- Responsive Design --- */
 @media (max-width: 992px) {
 
     .nav-links,
@@ -1340,7 +1273,6 @@ body {
 
     .mobile-menu {
         display: none;
-        /* Initially hidden */
         flex-direction: column;
         width: 100%;
         background: var(--background-light);
@@ -1489,7 +1421,6 @@ body {
         gap: 20px;
     }
 
-    /* Neural network adjustments for mobile */
     .analysis-node {
         width: 80px !important;
         height: 80px !important;
@@ -1507,7 +1438,6 @@ body {
         font-size: 0.7rem !important;
     }
 
-    /* Testimonials responsive adjustments */
     .testimonials-grid {
         grid-template-columns: 1fr;
         gap: 16px;
@@ -1551,7 +1481,6 @@ body {
         font-size: 1.8rem;
     }
 
-    /* Testimonials mobile adjustments */
     .testimonials-grid {
         grid-template-columns: 1fr;
         gap: 12px;
@@ -1609,9 +1538,6 @@ body {
     }
 }
 
-
-/* --- NEW: Hero Pre-Registration Form --- */
-/* This container will hold the card on the right side of the hero grid */
 .hero-form-container {
     display: flex;
     justify-content: center;
@@ -1619,7 +1545,6 @@ body {
     width: 100%;
 }
 
-/* The main white card for the form */
 .registration-card {
     background: var(--background-light);
     border-radius: var(--border-radius);
@@ -1627,10 +1552,9 @@ body {
     box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
     width: 100%;
     max-width: 400px;
-    text-align: left; /* Aligns text to the left as per the new screenshot */
+    text-align: left;
 }
 
-/* Clearer styles for the card content based on the broken screenshot */
 .card-content p {
     color: var(--text-medium);
     margin-bottom: 24px;
@@ -1638,13 +1562,11 @@ body {
     line-height: 1.6;
 }
 
-/* Container for the input field and icon */
 .input-group {
     position: relative;
     margin-bottom: 16px;
 }
 
-/* Envelope icon inside the input field */
 .input-group i {
     position: absolute;
     left: 15px;
@@ -1654,7 +1576,6 @@ body {
     opacity: 0.6;
 }
 
-/* Email input field */
 .input-group input {
     width: 100%;
     padding: 12px 12px 12px 40px;
@@ -1672,7 +1593,6 @@ body {
     box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.2);
 }
 
-/* Blue registration button */
 .btn-register {
     width: 100%;
     padding: 14px;
@@ -1690,12 +1610,9 @@ body {
     background: var(--primary-dark);
 }
 
-
-/* --- NEW: Responsive Adjustments for Form --- */
-/* Add this inside your existing @media (max-width: 992px) query */
 @media (max-width: 992px) {
     .hero-form-container {
         margin-top: 40px;
-        order: 1; /* Makes the form appear below the text on mobile */
+        order: 1;
     }
 }

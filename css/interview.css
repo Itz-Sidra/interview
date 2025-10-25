@@ -7,7 +7,6 @@
   --error-color: #ef4444;
   --warning-color: #f59e0b;
 
-  /* Light Mode Variables */
   --bg-primary: #ffffff;
   --bg-secondary: #f8fafc;
   --text-primary: #1f2937;
@@ -23,7 +22,6 @@
 }
 
 body.dark-mode {
-  /* Dark Mode Variables */
   --bg-primary: #1f2937;
   --bg-secondary: #111827;
   --text-primary: #f9fafb;
@@ -48,8 +46,6 @@ body {
   transition: background-color 0.3s, color 0.3s;
 }
 
-/* Header */
-/* Header */
 .header {
   background: var(--bg-primary);
   border-bottom: 1px solid var(--border-color);
@@ -164,7 +160,6 @@ body {
   transition: var(--transition);
 }
 
-/* Main Layout */
 .main-container {
   flex: 1;
   display: grid;
@@ -176,7 +171,6 @@ body {
   width: 100%;
 }
 
-/* Sidebar */
 .sidebar {
   background: var(--bg-primary);
   border-radius: var(--border-radius);
@@ -251,7 +245,6 @@ body {
   color: white;
 }
 
-/* Chat Interface */
 .interview-area {
   display: flex;
   flex-direction: column;

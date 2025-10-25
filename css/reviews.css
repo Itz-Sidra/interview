@@ -1,13 +1,5 @@
-/*
-  ========================================
-  Evalvate - Reviews Page Stylesheet (Corrected)
-  ========================================
-*/
-
-/* --- Main Page Layout --- */
 .reviews-page {
     padding-top: calc(var(--spacing-4xl) + 72px);
-    /* Header height + padding */
     padding-bottom: var(--spacing-4xl);
     background-color: var(--color-background);
 }
@@ -18,22 +10,16 @@
     font-size: 1.1rem;
 }
 
-/* --- Reviews Grid --- */
 .reviews-grid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
     gap: 40px;
-    /* Explicit spacing between cards to match design */
     margin-bottom: 48px;
-    /* Space after last row of videos */
 }
 
-/* --- Individual Review Card --- */
 .review-card {
-    /* The main container for the card */
     border-radius: var(--border-radius);
     overflow: hidden;
-    /* This is crucial to make inner elements respect the rounded corners */
     transition: var(--transition-fast);
     box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
     border: 1px solid var(--color-border);
@@ -49,7 +35,6 @@
     text-decoration: none;
 }
 
-/* New video container to mirror screenshot style */
 .video-container {
     width: 100%;
     aspect-ratio: 16 / 9;
@@ -71,12 +56,10 @@
     background-color: var(--color-dark);
     display: flex;
     flex-direction: column;
-    /* Stack icon and text vertically */
     justify-content: center;
     align-items: center;
     color: #fff;
     gap: var(--spacing-md);
-    /* Space between icon and text */
 }
 
 .video-placeholder i {
@@ -97,7 +80,6 @@
 }
 
 .review-content {
-    /* This is the light grey area for text */
     background-color: var(--color-background-offset);
     padding: var(--spacing-lg);
 }
@@ -116,7 +98,6 @@
     line-height: 1.5;
 }
 
-/* --- Page-specific bottom breathing room --- */
 .footer {
     padding-bottom: 16px;
 }

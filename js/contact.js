@@ -1,12 +1,5 @@
-/*
-  ========================================
-  Evalvate - Contact Page Scripts
-  ========================================
-*/
-
 document.addEventListener('DOMContentLoaded', () => {
 
-    // --- Header scroll effect ---
     window.addEventListener('scroll', () => {
         const header = document.querySelector('.header');
         if (window.scrollY > 50) {
@@ -16,7 +9,6 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    // --- Mobile Menu Toggle ---
     const mobileMenuButton = document.getElementById('mobile-menu-button');
     const mobileMenu = document.getElementById('mobile-menu');
 
@@ -25,7 +17,6 @@ document.addEventListener('DOMContentLoaded', () => {
             mobileMenu.classList.toggle('active');
         });
 
-        // Close menu when clicking outside
         document.addEventListener('click', (e) => {
             if (!mobileMenuButton.contains(e.target) && !mobileMenu.contains(e.target)) {
                 mobileMenu.classList.remove('active');
@@ -33,21 +24,16 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // --- Contact Form Submission Logic ---
     const contactForm = document.getElementById('contact-form');
     const formStatus = document.getElementById('form-status');
 
     if (contactForm) {
         contactForm.addEventListener('submit', (e) => {
-            e.preventDefault(); // Prevent the default form submission
+            e.preventDefault(); 
 
-            // In a real application, you would send the form data to a server here.
-            // For this static example, we'll just show a success message.
-
-            formStatus.style.color = '#6ee7b7'; // Success color
+            formStatus.style.color = '#6ee7b7'; 
             formStatus.textContent = 'Thank you! Your message has been sent successfully.';
 
-            // Clear the form fields after a short delay
             setTimeout(() => {
                 contactForm.reset();
                 formStatus.textContent = '';

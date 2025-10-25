@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Evalvate - Technical Setup</title>
+    <title>Evalvate - Resume Upload</title>
     <link rel="stylesheet" href="preview.css">
 </head>
 <body>
@@ -57,8 +57,8 @@
                             <span class="step-number">3</span>
                         </div>
                         <div class="step-info">
-                            <div class="step-title">Technical</div>
-                            <div class="step-subtitle">Coding & setup</div>
+                            <div class="step-title">Resume</div>
+                            <div class="step-subtitle">Upload document</div>
                         </div>
                     </div>
                     <div class="step-line"></div>
@@ -74,41 +74,46 @@
                 </div>
 
                 <div class="page-content">
-                    <h2 class="page-title">Technical Setup</h2>
-                    <p class="page-description">Configure coding environment and recording preferences</p>
+                    <h2 class="page-title">Resume Upload</h2>
+                    <p class="page-description">Upload your resume to personalize interview questions</p>
 
                     <div class="form-section">
-                        <div class="toggle-card">
-                            <div class="toggle-icon">
-                                <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
-                                    <path d="M8 3a1 1 0 011-1h6a1 1 0 011 1h3a2 2 0 012 2v14a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h3zm1 1a1 1 0 000 2h6a1 1 0 100-2H9z"/>
-                                    <path d="M9 9h6M9 13h6M9 17h3"/>
-                                </svg>
-                            </div>
-                            <div class="toggle-content">
-                                <div class="toggle-title">Enable Coding Environment</div>
-                                <div class="toggle-description">Live code editor with syntax highlighting</div>
-                            </div>
-                            <label class="toggle-switch">
-                                <input type="checkbox" id="codingToggle">
-                                <span class="toggle-slider"></span>
-                            </label>
+                        <div class="upload-area" id="uploadArea">
+                            <input type="file" id="fileInput" class="file-input" accept=".pdf,.doc,.docx" />
+                            <svg class="upload-icon" viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M32 42V22M22 32L32 22L42 32M52 42V52H12V42"/>
+                                <rect x="12" y="12" width="40" height="40" rx="4"/>
+                            </svg>
+                            <div class="upload-title">Click to upload or drag and drop</div>
+                            <div class="upload-subtitle">Upload your resume to help us tailor the interview</div>
+                            <div class="upload-formats">PDF, DOC, or DOCX (Max 10MB)</div>
                         </div>
 
-                        <div class="toggle-card">
-                            <div class="toggle-icon">
+                        <div id="uploadedFile" class="uploaded-file" style="display: none;">
+                            <div class="file-icon">
                                 <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
-                                    <path d="M4 6a2 2 0 012-2h4a2 2 0 012 2v4a2 2 0 01-2 2H6a2 2 0 01-2-2V6zm10 0a2 2 0 012-2h4a2 2 0 012 2v4a2 2 0 01-2 2h-4a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h4a2 2 0 012 2v4a2 2 0 01-2 2H6a2 2 0 01-2-2v-4zm10 0a2 2 0 012-2h4a2 2 0 012 2v4a2 2 0 01-2 2h-4a2 2 0 01-2-2v-4z"/>
+                                    <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8l-6-6z"/>
+                                    <path d="M14 2v6h6M16 13H8M16 17H8M10 9H8"/>
                                 </svg>
                             </div>
-                            <div class="toggle-content">
-                                <div class="toggle-title">Enable Video Recording</div>
-                                <div class="toggle-description">Record video and audio during the interview</div>
+                            <div class="file-info">
+                                <div class="file-name" id="fileName">Resume.pdf</div>
+                                <div class="file-size" id="fileSize">2.4 MB</div>
                             </div>
-                            <label class="toggle-switch">
-                                <input type="checkbox" id="recordingToggle" checked>
-                                <span class="toggle-slider"></span>
-                            </label>
+                            <button class="file-remove" id="removeFile" aria-label="Remove file">
+                                <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
+                                    <path d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z"/>
+                                </svg>
+                            </button>
+                        </div>
+
+                        <div class="info-box">
+                            <svg class="info-icon" viewBox="0 0 20 20" fill="currentColor">
+                                <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z"/>
+                            </svg>
+                            <div class="info-text">
+                                Your resume helps us create personalized interview questions based on your experience and skills. This is optional but highly recommended.
+                            </div>
                         </div>
                     </div>
 
@@ -175,20 +180,83 @@
                     </div>
                     <p class="cost-description">One interview will be consumed from your plan</p>
                 </div>
-
-                <!--
-                <button class="btn btn-start">
-                    <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
-                        <path d="M6.3 2.841A1.5 1.5 0 004 4.11V15.89a1.5 1.5 0 002.3 1.269l9.344-5.89a1.5 1.5 0 000-2.538L6.3 2.84z"/>
-                    </svg>
-                    Start Interview Now
-                </button>
-                -->
-                
             </div>
         </div>
     </main>
 
     <script src="preview.js"></script>
+    <script>
+        const uploadArea = document.getElementById('uploadArea');
+        const fileInput = document.getElementById('fileInput');
+        const uploadedFile = document.getElementById('uploadedFile');
+        const fileName = document.getElementById('fileName');
+        const fileSize = document.getElementById('fileSize');
+        const removeFile = document.getElementById('removeFile');
+
+        // Click to upload
+        uploadArea.addEventListener('click', () => fileInput.click());
+
+        // Drag and drop
+        uploadArea.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            uploadArea.classList.add('drag-over');
+        });
+
+        uploadArea.addEventListener('dragleave', () => {
+            uploadArea.classList.remove('drag-over');
+        });
+
+        uploadArea.addEventListener('drop', (e) => {
+            e.preventDefault();
+            uploadArea.classList.remove('drag-over');
+            const files = e.dataTransfer.files;
+            if (files.length > 0) {
+                handleFile(files[0]);
+            }
+        });
+
+        // File input change
+        fileInput.addEventListener('change', (e) => {
+            if (e.target.files.length > 0) {
+                handleFile(e.target.files[0]);
+            }
+        });
+
+        // Remove file
+        removeFile.addEventListener('click', (e) => {
+            e.stopPropagation();
+            fileInput.value = '';
+            uploadArea.style.display = 'block';
+            uploadedFile.style.display = 'none';
+        });
+
+        function handleFile(file) {
+            const validTypes = ['application/pdf', 'application/msword', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'];
+            const maxSize = 10 * 1024 * 1024; // 10MB
+
+            if (!validTypes.includes(file.type)) {
+                alert('Please upload a PDF, DOC, or DOCX file');
+                return;
+            }
+
+            if (file.size > maxSize) {
+                alert('File size must be less than 10MB');
+                return;
+            }
+
+            fileName.textContent = file.name;
+            fileSize.textContent = formatFileSize(file.size);
+            uploadArea.style.display = 'none';
+            uploadedFile.style.display = 'flex';
+        }
+
+        function formatFileSize(bytes) {
+            if (bytes === 0) return '0 Bytes';
+            const k = 1024;
+            const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+            const i = Math.floor(Math.log(bytes) / Math.log(k));
+            return Math.round(bytes / Math.pow(k, i) * 100) / 100 + ' ' + sizes[i];
+        }
+    </script>
 </body>
 </html>

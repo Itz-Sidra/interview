@@ -16,7 +16,6 @@ body {
     padding: 20px;
 }
 
-/* Header */
 .dashboard-header {
     display: flex;
     justify-content: space-between;
@@ -101,14 +100,12 @@ body {
     border-color: rgba(255, 255, 255, 0.2);
 }
 
-/* Main Content */
 .main-content {
     display: grid;
     grid-template-columns: 1fr 400px;
     gap: 30px;
 }
 
-/* Performance Card */
 .performance-card {
     background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
     border: 1px solid rgba(255, 255, 255, 0.1);
@@ -195,7 +192,6 @@ body {
     color: #6b7280;
 }
 
-/* Metrics Grid */
 .metrics-grid {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
@@ -245,7 +241,6 @@ body {
     color: #3b82f6;
 }
 
-/* Video Container */
 .video-container {
     position: relative;
     background: #000;
@@ -298,7 +293,6 @@ body {
     transform: scale(1.1);
 }
 
-/* Upload Section */
 .upload-section {
     background: rgba(59, 130, 246, 0.1);
     border: 2px dashed rgba(59, 130, 246, 0.3);
@@ -334,7 +328,6 @@ body {
     font-size: 14px;
 }
 
-/* Right Column */
 .right-column {
     display: flex;
     flex-direction: column;
@@ -361,7 +354,6 @@ body {
     color: #e4e4e7;
 }
 
-/* Issue Cards */
 .issue-card {
     background: rgba(255, 255, 255, 0.05);
     border-left: 3px solid;
@@ -416,7 +408,6 @@ body {
     font-size: 13px;
 }
 
-/* Assessment Items */
 .assessment-item {
     margin-bottom: 20px;
     padding-bottom: 20px;
@@ -476,7 +467,6 @@ body {
     border-color: rgba(59, 130, 246, 0.5);
 }
 
-/* Actions Grid */
 .actions-grid {
     display: grid;
     grid-template-columns: 1fr 1fr;
@@ -500,7 +490,6 @@ body {
     transform: translateY(-2px);
 }
 
-/* Responsive Design */
 @media (max-width: 1200px) {
     .main-content {
         grid-template-columns: 1fr;

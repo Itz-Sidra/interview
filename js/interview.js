@@ -60,7 +60,6 @@ class InterviewBot {
                 this.uploadArea.addEventListener('dragover', (e) => this.handleDragOver(e));
                 this.uploadArea.addEventListener('drop', (e) => this.handleDrop(e));
 
-                //this.micToggleBtn.addEventListener('click', () => this.toggleMicrophone());
                 this.micToggleBtn.addEventListener('click', () => this.toggleRecording());
 
                 this.chatInputForm.addEventListener('submit', (e) => this.handleChatSubmit(e));
@@ -160,7 +159,6 @@ class InterviewBot {
                 this.fileInfo.style.display = 'block';
                 this.fileName.textContent = `${file.name} uploaded successfully!`;
                 
-                //this.addMessage('bot', 'Great! I\'ve received your resume. I can now ask more targeted questions based on your experience. When you\'re ready, just tell me what position you\'re interviewing for!');
                 this.uploadResumeToServer(file);
             }
 
@@ -601,9 +599,7 @@ class InterviewBot {
                 this.askAgainBtn.disabled = false;
                 
                 this.startTimer();
-                
-                // this.addMessage('bot', "Great! Let's begin the interview. I'll ask you a series of questions, and you can respond naturally. Take your time with each answer.");
-
+   
                 setTimeout(async () => {
                     const question = await this.fetchFirstQuestion();
                     if (question) {

@@ -6,24 +6,19 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Terms of Service - Evalvate</title>
 
-    <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
 
-    <!-- Google Fonts: Inter -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 
-    <!-- Lucide Icons -->
     <script src="https://unpkg.com/lucide@latest"></script>
 
     <style>
-        /* Custom Styles */
         body {
             font-family: 'Inter', sans-serif;
         }
 
-        /* Custom scrollbar for better dark mode aesthetics */
         ::-webkit-scrollbar {
             width: 8px;
         }
@@ -39,7 +34,6 @@
 
         html.dark ::-webkit-scrollbar-track {
             background-color: #0f172a;
-            /* Darker track */
         }
 
         html.dark ::-webkit-scrollbar-thumb {
@@ -67,7 +61,7 @@
         }
         
         .prose a {
-            color: #6366f1; /* indigo-500 */
+            color: #6366f1;
             text-decoration: none;
         }
         .prose a:hover {
@@ -75,23 +69,21 @@
         }
 
         html.dark .prose a {
-             color: #818cf8; /* indigo-400 */
+             color: #818cf8; 
         }
         
         html.dark .prose h2 {
-            border-color: #334155; /* slate-700 */
+            border-color: #334155; 
         }
     </style>
 </head>
 
 <body class="bg-slate-100 dark:bg-slate-900 text-slate-600 dark:text-slate-400 transition-colors duration-300">
 
-    <!-- Header -->
     <header
         class="bg-white/80 dark:bg-slate-800/50 backdrop-blur-lg border-b border-slate-200 dark:border-slate-700/50 sticky top-0 z-40">
         <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="relative flex items-center justify-center h-16">
-                <!-- Centered Content -->
                 <div class="flex items-center gap-6">
                     <a href="#" class="flex items-center gap-4">
                         <i data-lucide="bot" class="h-8 w-8 text-indigo-500"></i>
@@ -100,7 +92,6 @@
                     <a href="index.html" class="text-sm font-medium text-slate-600 dark:text-slate-300 hover:text-indigo-500 dark:hover:text-indigo-400">Home</a>
                 </div>
 
-                <!-- Right Aligned Theme Toggle -->
                 <div class="absolute right-0 top-1/2 -translate-y-1/2">
                     <button id="theme-toggle" class="p-2 rounded-full hover:bg-slate-200 dark:hover:bg-slate-700">
                         <i data-lucide="moon" class="h-6 w-6 text-slate-600"></i>
@@ -111,7 +102,6 @@
         </div>
     </header>
 
-    <!-- Main Content -->
     <main class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-12 md:py-16">
         <div class="bg-white dark:bg-slate-800/50 p-8 md:p-12 rounded-xl shadow-md border border-slate-200 dark:border-slate-700">
             <div class="prose prose-slate dark:prose-invert max-w-none">
@@ -171,7 +161,6 @@
 
     <script>
         document.addEventListener('DOMContentLoaded', () => {
-            // --- THEME MANAGEMENT ---
             function updateThemeIcons(theme) {
                 const moonIcon = document.querySelector('#theme-toggle [data-lucide="moon"]');
                 const sunIcon = document.querySelector('#theme-toggle [data-lucide="sun"]');
@@ -205,14 +194,11 @@
                 applyTheme(newTheme);
             }
 
-            // --- INITIALIZATION ---
             lucide.createIcons();
 
-            // Set initial theme from local storage or system preference
             const savedTheme = localStorage.getItem('theme') || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
             applyTheme(savedTheme);
             
-            // Add event listener for the theme toggle button
             document.getElementById('theme-toggle').addEventListener('click', handleThemeToggle);
         });
     </script>

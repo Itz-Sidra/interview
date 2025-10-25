@@ -1,31 +1,16 @@
-/*
-  ========================================
-  Evalvate - Contact Page Stylesheet (Light Theme)
-  ========================================
-*/
-
-/* --- Root Variables (Matched with index.css) --- */
 :root {
     --primary-color: #2563eb;
-    /* Blue 600 */
     --primary-dark: #1d4ed8;
-    /* Blue 700 */
     --text-dark: #1e293b;
-    /* Slate 800 */
     --text-medium: #475569;
-    /* Slate 600 */
     --text-light: #f8fafc;
-    /* Slate 50 */
     --background-light: #ffffff;
     --background-offwhite: #f1f5f9;
-    /* Slate 100 */
     --border-color: #e2e8f0;
-    /* Slate 200 */
     --border-radius: 12px;
     --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-/* --- Global Styles --- */
 * {
     margin: 0;
     padding: 0;
@@ -44,7 +29,6 @@ body {
     overflow-x: hidden;
 }
 
-/* --- Layout & Containers --- */
 .container {
     max-width: 1200px;
     margin: 0 auto;
@@ -75,7 +59,6 @@ body {
     margin: 0 auto;
 }
 
-/* --- Header & Navigation (Consistent with other pages) --- */
 .header {
     background: rgba(255, 255, 255, 0.8);
     backdrop-filter: blur(10px);
@@ -172,7 +155,6 @@ body {
     background: #334155;
 }
 
-/* --- Contact Page Specific Styles --- */
 .contact-section {
     padding-top: 150px;
     background: var(--background-offwhite);
@@ -301,7 +283,6 @@ body {
     border: none;
 }
 
-/* --- Footer (Aligned with index.css) --- */
 .footer {
     background: var(--text-dark);
     color: #cbd5e1;
@@ -378,7 +359,6 @@ body {
     color: var(--background-light);
 }
 
-/* --- Mobile Menu --- */
 .mobile-menu-button {
     display: none;
 }
@@ -387,7 +367,6 @@ body {
     display: none;
 }
 
-/* --- Responsive Design --- */
 @media (max-width: 992px) {
 
     .nav-links,

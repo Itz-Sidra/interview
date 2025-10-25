@@ -6,34 +6,27 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Evalvate - Subscription Plans</title>
 
-    <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
 
-    <!-- Google Fonts: Inter -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     
-    <!-- Font Awesome for Icons -->
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
 
-    <!-- Custom Styles and Tailwind Config -->
     <style>
-        /* Basic Setup */
         body {
             font-family: 'Inter', sans-serif;
-            background-color: #f8f9fa; /* Light grey background for sections */
+            background-color: #f8f9fa; 
             color: #1a202c;
             overflow-x: hidden;
         }
 
-        /* Custom Colors from index.html theme */
         .bg-dark-teal { background-color: #0F2D28; }
         .text-light-green { color: #2DCC7F; }
         .bg-light-green { background-color: #2DCC7F; }
         .border-light-green { border-color: #2DCC7F; }
         
-        /* Hero Grid Background from index.html theme */
         .hero-grid {
             background-image:
                 linear-gradient(rgba(255,255,255,0.07) 1px, transparent 1px),
@@ -41,7 +34,6 @@
             background-size: 40px 40px;
         }
 
-        /* --- Pricing Page Specific Styles --- */
         .pricing-toggle .toggle-label.active {
             color: #1a202c;
             font-weight: 600;
@@ -82,11 +74,9 @@
 
 <body class="bg-white">
 
-    <!-- Header (from index.html) -->
     <header id="header" class="fixed top-0 left-0 right-0 z-50 transition-all duration-300 bg-dark-teal shadow-lg">
         <div class="container mx-auto px-6 py-4">
             <div class="flex items-center justify-between">
-            <!-- Logo -->
             <a href="#" class="flex items-center space-x-2 text-white font-bold text-xl">
                 <div class="logo-icon">
                 <img src="assests/logo.jpg" alt="Evalvate Logo" class="logo-img">
@@ -94,7 +84,6 @@
                 <span>Evalvate</span>
             </a>
 
-            <!-- Desktop Nav -->
             <nav class="hidden md:flex items-center space-x-8 text-white">
                 <a href="index.html" class="hover:text-light-green transition-colors">Home</a>
                 <a href="report.html" class="hover:text-light-green transition-colors">Dashboard</a>
@@ -102,7 +91,6 @@
                 <a href="blogs.html" class="hover:text-light-green transition-colors">Blogs</a>
             </nav>
 
-            <!-- Signup + Login (grouped with gap) -->
             <div class="hidden md:flex items-center gap-2">
                 <a href="signup.html" class="bg-light-green text-black font-semibold px-5 py-2 rounded-lg hover:bg-opacity-90 transition-all">
                 Signup
@@ -112,7 +100,6 @@
                 </a>
             </div>
 
-            <!-- Mobile Menu Button -->
             <button id="mobile-menu-button" class="md:hidden text-white">
                 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
                     viewBox="0 0 24 24" fill="none" stroke="currentColor"
@@ -125,14 +112,12 @@
             </div>
         </div>
 
-        <!-- Mobile Menu -->
         <div id="mobile-menu" class="hidden md:hidden bg-dark-teal/95 backdrop-blur-sm">
             <a href="index.html" class="block text-white text-center py-3 hover:bg-light-green/20 transition-colors">Home</a>
             <a href="report.html" class="block text-white text-center py-3 hover:bg-light-green/20 transition-colors">Dashboard</a>
             <a href="Subscription.html" class="block text-white text-center py-3 hover:bg-light-green/20 transition-colors">Pricing</a>
             <a href="blogs.html" class="block text-white text-center py-3 hover:bg-light-green/20 transition-colors">Blogs</a>
 
-            <!-- Signup/Login in mobile menu -->
             <div class="flex justify-center gap-2 py-4">
             <a href="signup.html" class="bg-light-green text-black font-semibold px-5 py-2 rounded-lg hover:bg-opacity-90 transition-all">
                 Signup
@@ -162,7 +147,6 @@
             </div>
 
             <section class="pricing-grid grid lg:grid-cols-3 gap-8 items-center max-w-5xl mx-auto">
-                <!-- Card 1: Demo -->
                 <div class="pricing-card free-card bg-white p-8 rounded-2xl shadow-lg border border-gray-200 text-left transition duration-300 hover:-translate-y-2">
                     <h3 class="plan-name text-xl font-bold mb-5">Evalvate Demo</h3>
                     <div class="price text-5xl font-extrabold mb-2">
@@ -178,7 +162,6 @@
                     <a href="#" class="cta-button block w-full text-center bg-gray-100 text-gray-800 font-semibold py-3 px-6 rounded-lg hover:bg-gray-200 transition">Start Free Demo</a>
                 </div>
 
-                <!-- Card 2: Standard (Most Popular) -->
                 <div class="pricing-card standard-card paid-plan bg-dark-teal text-white p-8 rounded-2xl shadow-2xl border-2 border-light-green text-left relative transition duration-300 hover:-translate-y-2">
                     <div class="popular-badge absolute -top-4 left-1/2 -translate-x-1/2 bg-light-green text-black font-bold text-xs py-1 px-4 rounded-full uppercase tracking-wider">Most Popular</div>
                     <h3 class="plan-name text-xl font-bold mb-5">Evalvate Standard</h3>
@@ -196,7 +179,6 @@
                     <a href="#" class="cta-button block w-full text-center bg-light-green text-black font-semibold py-3 px-6 rounded-lg hover:bg-opacity-90 transition transform hover:scale-105">Choose Standard</a>
                 </div>
 
-                <!-- Card 3: Signature -->
                 <div class="pricing-card signature-card paid-plan bg-white p-8 rounded-2xl shadow-lg border border-gray-200 text-left transition duration-300 hover:-translate-y-2">
                     <h3 class="plan-name text-xl font-bold mb-5">Evalvate Signature</h3>
                     <div class="price" data-monthly="1,999" data-yearly="19,999">
@@ -216,13 +198,9 @@
         </div>
     </main>
 
-    <!-- Footer (from index.html) -->
-    <!-- Footer -->
     <footer class="bg-dark-teal text-white">
         <div class="container mx-auto px-6 py-16">
             <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-12">
-                <!-- About & Newsletter -->
-                 
                 <div class="lg:col-span-2">
                     
                     <a href="#" class="flex items-center space-x-2 font-bold text-2xl mb-4">
@@ -236,7 +214,6 @@
                         <button class="bg-light-green text-black font-semibold px-5 py-2 rounded-r-lg hover:bg-opacity-90 transition-all">Get Notified</button>
                     </form>
                 </div>
-                <!-- Sections -->
                 <div>
                     <h4 class="font-bold text-lg mb-4">Sections</h4>
                     <ul class="space-y-2 text-gray-400">
@@ -249,8 +226,6 @@
                 <div class="big">
                             <img src="assests/logo.jpg" alt="Evalvate Logo" class="big">
                 </div>
-                <!-- Information -->
-               
             </div>
             <div class="border-t border-gray-700 mt-12 pt-8 flex flex-col md:flex-row justify-between items-center text-sm text-gray-400">
                 <p>Copyright © 2025 — All Right Reserved</p>
@@ -261,7 +236,6 @@
 
     <script>
         document.addEventListener('DOMContentLoaded', () => {
-            // --- Mobile Menu Toggle ---
             const mobileMenuButton = document.getElementById('mobile-menu-button');
             const mobileMenu = document.getElementById('mobile-menu');
 
@@ -271,7 +245,6 @@
                 });
             }
 
-            // --- Pricing Toggle Logic ---
             const toggle = document.getElementById('price-toggle');
             const monthlyLabel = document.getElementById('monthly-label');
             const yearlyLabel = document.getElementById('yearly-label');

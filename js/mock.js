@@ -6,7 +6,6 @@ class InterviewBot {
         this.uploadedResume = null;
         this.mockQuestionIndex = 0;
 
-        // Mock data
         this.mockQuestions = [
             "Tell me about yourself.",
             "Why do you want this role?",
@@ -48,9 +47,6 @@ class InterviewBot {
         ];
     }
 
-    /* -------------------
-       UI Helper Functions
-    ------------------- */
     addMessage(sender, text) {
         const chat = document.getElementById("chatMessages");
         const msg = document.createElement("div");
@@ -76,9 +72,6 @@ class InterviewBot {
         }
     }
 
-    /* -------------------
-       Interview Flow
-    ------------------- */
     startInterview() {
         this.interviewActive = true;
         this.currentInterviewId = "fake123"; // mock id
@@ -108,7 +101,6 @@ class InterviewBot {
         setTimeout(() => {
             this.hideTypingIndicator();
 
-            // Either next prepared question or random follow-up
             this.mockQuestionIndex++;
             let nextQ;
             if (this.mockQuestionIndex < this.mockQuestions.length) {
@@ -124,9 +116,6 @@ class InterviewBot {
         }, 1000);
     }
 
-    /* -------------------
-       Resume Handling
-    ------------------- */
     processUploadedFile(file) {
         this.uploadedResume = file;
         document.getElementById("uploadArea").style.display = "none";
@@ -135,9 +124,6 @@ class InterviewBot {
         this.addMessage("bot", "Great! I’ve scanned your resume and will ask questions relevant to your experience.");
     }
 
-    /* -------------------
-       Fake Report
-    ------------------- */
     generateReport() {
         const report = this.mockReports[
             Math.floor(Math.random() * this.mockReports.length)
@@ -196,9 +182,6 @@ document.getElementById("reportBtn").addEventListener("click", () => {
 });
 
 
-/* -------------------
-   Webcam Setup
-------------------- */
 async function initWebcam() {
     const video = document.getElementById("webcamPreview");
     const placeholder = document.getElementById("webcamPlaceholder");
@@ -206,13 +189,12 @@ async function initWebcam() {
     try {
         const stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: false });
         video.srcObject = stream;
-        video.style.display = "block";     // show video
-        placeholder.style.display = "none"; // hide placeholder
+        video.style.display = "block";    
+        placeholder.style.display = "none"; 
     } catch (err) {
         console.error("Webcam access denied:", err);
         bot.addMessage("bot", "⚠️ I couldn’t access your webcam. Please allow camera permissions.");
     }
 }
 
-// Run immediately on page load
 initWebcam();

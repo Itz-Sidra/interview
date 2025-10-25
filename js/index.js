@@ -1,12 +1,5 @@
-/*
-  ========================================
-  Evalvate - Clean & Simple Interactive Scripts (UPDATED)
-  ========================================
-*/
-
 document.addEventListener('DOMContentLoaded', () => {
 
-    // --- Header scroll effect ---
     window.addEventListener('scroll', () => {
         const header = document.querySelector('.header');
         if (window.scrollY > 20) {
@@ -18,7 +11,6 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    // --- Mobile Menu Toggle ---
     const mobileMenuButton = document.getElementById('mobile-menu-button');
     const mobileMenu = document.getElementById('mobile-menu');
     if (mobileMenuButton && mobileMenu) {
@@ -27,15 +19,12 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // --- NEW: Hero Pre-Registration Form Logic ---
     const waitlistForm = document.getElementById('waitlist-form');
     const cardContent = document.querySelector('.registration-card .card-content');
     const successMessage = document.querySelector('.registration-card .success-message');
     const typingElement = document.querySelector('.typing-effect');
 
-    // 1. Typing Effect for the Headline
     if (typingElement) {
-        // Use <br> to create the line break seen in the design
         const textToType = "Be the First to Use Evalvate";
         let index = 0;
 
@@ -43,35 +32,27 @@ document.addEventListener('DOMContentLoaded', () => {
             if (index < textToType.length) {
                 typingElement.innerHTML += textToType.charAt(index);
                 index++;
-                setTimeout(type, 90); // Adjust typing speed here (in ms)
+                setTimeout(type, 90); 
             }
         }
-        // Start typing after a short delay for better effect
         setTimeout(type, 500);
     }
 
-    // 2. Form Submission Logic
     if (waitlistForm) {
         waitlistForm.addEventListener('submit', (event) => {
-            // Prevent the form from refreshing the page
             event.preventDefault(); 
             const emailInput = document.getElementById('email-input');
             
-            // Check if the email field is valid
             if (emailInput.value && emailInput.checkValidity()) {
-                // Hide the form and show the success message
                 cardContent.style.display = 'none';
                 successMessage.style.display = 'block';
             } else {
-                // If email is invalid, you could add visual feedback
-                emailInput.style.borderColor = '#ef4444'; // Example: Red border
-                setTimeout(() => { emailInput.style.borderColor = '' }, 2000); // Reset border after 2s
+                emailInput.style.borderColor = '#ef4444'; 
+                setTimeout(() => { emailInput.style.borderColor = '' }, 2000); 
             }
         });
     }
 
-
-    // --- Dynamic Company Logo Marquee ---
     const companies = [
         { name: "Accenture", filename: "Accenture.webp" },
         { name: "Adobe", filename: "adobe.svg" },
@@ -107,20 +88,6 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // --- Analysis Nodes Interaction ---
-    // Note: Calling this function, assuming it's defined elsewhere or will be.
-    // If not, you may comment this out.
-    // setupAnalysisNodes();
-
-    // --- Analysis Report Charts ---
-    // if (typeof Chart !== 'undefined') {
-    //     createAnalysisCharts();
-    // }
-
-    // --- Report Action Buttons ---
-    // setupReportActions();
-
-    // --- Scroll-triggered Animations ---
     const observerOptions = {
         threshold: 0.1,
         rootMargin: '0px 0px -50px 0px'
@@ -161,75 +128,8 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     `;
     document.head.appendChild(style);
-
-    // --- Placeholder function calls from your original file ---
-    // If these functions are not defined, they might cause errors.
-    // I've commented them out for safety.
-    // setupCardInteractions();
-    // setupChatInterface();
 });
 
-// The placeholder functions below are from your original file.
-// If they are not fully implemented, they may cause errors.
-// I have commented them out to ensure the page loads correctly.
-
-/*
-// --- Setup Analysis Nodes ---
-function setupAnalysisNodes() {
-    const analysisNodes = document.querySelectorAll('.analysis-node');
-    analysisNodes.forEach(node => {
-        node.addEventListener('click', () => {
-            const nodeType = node.getAttribute('data-type');
-            const nodeScore = node.querySelector('.node-score').textContent;
-            showNodeDetails(nodeType, nodeScore);
-        });
-    });
-}
-
-// --- Show Node Details ---
-function showNodeDetails(nodeType, nodeScore) {
-    const scoreNumber = document.querySelector('.score-number');
-    if (scoreNumber) {
-        scoreNumber.textContent = nodeScore.replace('%', '');
-    }
-    const detailItems = document.querySelectorAll('.detail-item');
-    detailItems.forEach(item => {
-        const label = item.querySelector('.detail-label');
-        if (label && label.textContent.toLowerCase().includes(nodeType)) {
-            detailItems.forEach(i => {
-                i.style.background = 'transparent';
-            });
-            item.style.background = 'rgba(37, 99, 235, 0.1)';
-            setTimeout(() => {
-                item.style.background = 'transparent';
-            }, 2000);
-        }
-    });
-}
-
-// --- Analysis Charts Creation ---
-function createAnalysisCharts() {
-    // Chart creation logic...
-}
-
-// --- Setup Report Actions ---
-function setupReportActions() {
-    const viewRecordingBtn = document.querySelector('.btn-view-recording');
-    if (viewRecordingBtn) {
-        viewRecordingBtn.addEventListener('click', () => {
-            alert('Opening interview recording player...');
-        });
-    }
-    const downloadReportBtn = document.querySelector('.btn-download-report');
-    if (downloadReportBtn) {
-        downloadReportBtn.addEventListener('click', () => {
-            alert('Downloading detailed analysis report...');
-        });
-    }
-}
-*/
-
-// --- Video Testimonial Functionality ---
 function playVideo(videoId) {
     const videoContainer = document.querySelector(`[data-video-id="${videoId}"]`);
     if (!videoContainer) return;
