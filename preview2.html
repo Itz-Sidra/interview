@@ -103,7 +103,7 @@
                             </svg>
                             Back
                         </button>
-                        <button class="btn btn-primary" onclick="window.location.href='preview3.html'">
+                        <button class="btn btn-primary" onclick="handleSkillsContinue(event)">
                             Continue
                             <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
                                 <path d="M7.5 15l5-5-5-5" stroke="currentColor" stroke-width="2" fill="none"/>
@@ -129,17 +129,17 @@
                             </svg>
                             Duration
                         </div>
-                        <div class="summary-value">45 minutes</div>
+                        <div class="summary-value" id="summaryDuration">45 minutes</div>
                     </div>
 
                     <div class="summary-item">
                         <div class="summary-label">Difficulty</div>
-                        <div class="summary-badge">Intermediate</div>
+                        <div class="summary-badge" id="summaryDifficulty">Intermediate</div>
                     </div>
 
                     <div class="summary-item">
                         <div class="summary-label">Type</div>
-                        <div class="summary-badge">Technical</div>
+                        <div class="summary-badge" id="summaryType">Technical</div>
                     </div>
 
                     <div class="summary-item">
@@ -164,38 +164,6 @@
         </div>
     </main>
 
-    <script src="script.js"></script>
-    <script>
-        // Skills management
-        const addSkillBtn = document.getElementById('addSkillBtn');
-        const keySkillsInput = document.getElementById('keySkills');
-        const skillsList = document.getElementById('skillsList');
-
-        addSkillBtn.addEventListener('click', addSkill);
-        keySkillsInput.addEventListener('keypress', (e) => {
-            if (e.key === 'Enter') {
-                e.preventDefault();
-                addSkill();
-            }
-        });
-
-        function addSkill() {
-            const skillValue = keySkillsInput.value.trim();
-            if (skillValue) {
-                const skillTag = document.createElement('div');
-                skillTag.className = 'skill-tag';
-                skillTag.innerHTML = `
-                    ${skillValue}
-                    <button class="skill-remove" onclick="this.parentElement.remove()">
-                        <svg width="14" height="14" viewBox="0 0 14 14" fill="currentColor">
-                            <path d="M11 3L3 11M3 3l8 8" stroke="currentColor" stroke-width="2" fill="none"/>
-                        </svg>
-                    </button>
-                `;
-                skillsList.appendChild(skillTag);
-                keySkillsInput.value = '';
-            }
-        }
-    </script>
+    <script src="preview.js"></script>
 </body>
 </html>

@@ -127,7 +127,6 @@
                     <p class="footer-text">Ready to start? Click "Start Interview Now" →</p>
                 </div>
             </div>
-
             <div class="right-panel">
                 <div class="summary-card">
                     <h3 class="summary-title">
@@ -144,17 +143,17 @@
                             </svg>
                             Duration
                         </div>
-                        <div class="summary-value">45 minutes</div>
+                        <div class="summary-value" id="summaryDuration">45 minutes</div>
                     </div>
 
                     <div class="summary-item">
                         <div class="summary-label">Difficulty</div>
-                        <div class="summary-badge">Intermediate</div>
+                        <div class="summary-badge" id="summaryDifficulty">Intermediate</div>
                     </div>
 
                     <div class="summary-item">
                         <div class="summary-label">Type</div>
-                        <div class="summary-badge">Technical</div>
+                        <div class="summary-badge" id="summaryType">Technical</div>
                     </div>
 
                     <div class="summary-item">
@@ -174,14 +173,12 @@
                     </div>
                     <p class="cost-description">One interview will be consumed from your plan</p>
                 </div>
-                <a href="interview.html">
-                <button class="btn btn-start">
+                <button class="btn btn-start" onclick="handleStartInterview(event)">
                     <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
                         <path d="M6.3 2.841A1.5 1.5 0 004 4.11V15.89a1.5 1.5 0 002.3 1.269l9.344-5.89a1.5 1.5 0 000-2.538L6.3 2.84z"/>
                     </svg>
                     Start Interview Now
-                </button>
-                </a>
+        </button>
             </div>
         </div>
     </main>
