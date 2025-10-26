@@ -135,7 +135,7 @@ document.addEventListener('DOMContentLoaded', () => {
         
         submitBtn.disabled = true;
         const originalText = submitBtn.innerHTML;
-        submitBtn.innerHTML = '<span class="loading-spinner"></span> Signing In...';
+        submitBtn.innerHTML = '<span class="loading-spinner"></span> Logging In...';
         
         try {
             console.log('Sending request to:', `${API_BASE_URL}/auth/login`);
