@@ -45,7 +45,7 @@ model User {
   updatedAt        DateTime          @updatedAt
   resumes          Resume[]
   interviewConfigs InterviewConfig[]
-  interviews       Interview[] // ✅ opposite of Interview.user
+  interviews       Interview[]
 
   refreshTokens RefreshToken[]
 }
@@ -54,11 +54,11 @@ model Resume {
   id               String            @id @default(uuid())
   user             User              @relation(fields: [userId], references: [id])
   userId           String
-  s3Key            String
+  s3Key            String?
   textExtract      String            @db.Text
   parsedJson       Json?
   createdAt        DateTime          @default(now())
-  interviewConfigs InterviewConfig[] // ✅ opposite of InterviewConfig.Resume
+  interviewConfigs InterviewConfig[]
 }
 
 model InterviewConfig {
@@ -75,13 +75,13 @@ model InterviewConfig {
   resumeId String?
   Resume   Resume? @relation(fields: [resumeId], references: [id])
 
-  interviews Interview[] // ✅ opposite of Interview.config
+  interviews Interview[]
 }
 
 model Interview {
   id     String @id @default(uuid())
   user   User   @relation(fields: [userId], references: [id])
-  userId String // ✅ added userId for relation with User
+  userId String
 
   config   InterviewConfig @relation(fields: [configId], references: [id])
   configId String
@@ -96,7 +96,7 @@ model Interview {
   transcripts Transcript[]
   report      AnalysisReport?
   issues      FlaggedIssue[]
-  questions   Question[] // ✅ opposite of Question.interview
+  questions   Question[]
 
   interviewerModel String?
   consentRecording Boolean @default(false)

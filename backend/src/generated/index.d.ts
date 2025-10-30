@@ -3345,7 +3345,7 @@ export namespace Prisma {
   export type ResumeGroupByOutputType = {
     id: string
     userId: string
-    s3Key: string
+    s3Key: string | null
     textExtract: string
     parsedJson: JsonValue | null
     createdAt: Date
@@ -3431,7 +3431,7 @@ export namespace Prisma {
     scalars: $Extensions.GetPayloadResult<{
       id: string
       userId: string
-      s3Key: string
+      s3Key: string | null
       textExtract: string
       parsedJson: Prisma.JsonValue | null
       createdAt: Date
@@ -15036,7 +15036,7 @@ export namespace Prisma {
     NOT?: ResumeWhereInput | ResumeWhereInput[]
     id?: StringFilter<"Resume"> | string
     userId?: StringFilter<"Resume"> | string
-    s3Key?: StringFilter<"Resume"> | string
+    s3Key?: StringNullableFilter<"Resume"> | string | null
     textExtract?: StringFilter<"Resume"> | string
     parsedJson?: JsonNullableFilter<"Resume">
     createdAt?: DateTimeFilter<"Resume"> | Date | string
@@ -15047,7 +15047,7 @@ export namespace Prisma {
   export type ResumeOrderByWithRelationInput = {
     id?: SortOrder
     userId?: SortOrder
-    s3Key?: SortOrder
+    s3Key?: SortOrderInput | SortOrder
     textExtract?: SortOrder
     parsedJson?: SortOrderInput | SortOrder
     createdAt?: SortOrder
@@ -15061,7 +15061,7 @@ export namespace Prisma {
     OR?: ResumeWhereInput[]
     NOT?: ResumeWhereInput | ResumeWhereInput[]
     userId?: StringFilter<"Resume"> | string
-    s3Key?: StringFilter<"Resume"> | string
+    s3Key?: StringNullableFilter<"Resume"> | string | null
     textExtract?: StringFilter<"Resume"> | string
     parsedJson?: JsonNullableFilter<"Resume">
     createdAt?: DateTimeFilter<"Resume"> | Date | string
@@ -15072,7 +15072,7 @@ export namespace Prisma {
   export type ResumeOrderByWithAggregationInput = {
     id?: SortOrder
     userId?: SortOrder
-    s3Key?: SortOrder
+    s3Key?: SortOrderInput | SortOrder
     textExtract?: SortOrder
     parsedJson?: SortOrderInput | SortOrder
     createdAt?: SortOrder
@@ -15087,7 +15087,7 @@ export namespace Prisma {
     NOT?: ResumeScalarWhereWithAggregatesInput | ResumeScalarWhereWithAggregatesInput[]
     id?: StringWithAggregatesFilter<"Resume"> | string
     userId?: StringWithAggregatesFilter<"Resume"> | string
-    s3Key?: StringWithAggregatesFilter<"Resume"> | string
+    s3Key?: StringNullableWithAggregatesFilter<"Resume"> | string | null
     textExtract?: StringWithAggregatesFilter<"Resume"> | string
     parsedJson?: JsonNullableWithAggregatesFilter<"Resume">
     createdAt?: DateTimeWithAggregatesFilter<"Resume"> | Date | string
@@ -15830,7 +15830,7 @@ export namespace Prisma {
 
   export type ResumeCreateInput = {
     id?: string
-    s3Key: string
+    s3Key?: string | null
     textExtract: string
     parsedJson?: NullableJsonNullValueInput | InputJsonValue
     createdAt?: Date | string
@@ -15841,7 +15841,7 @@ export namespace Prisma {
   export type ResumeUncheckedCreateInput = {
     id?: string
     userId: string
-    s3Key: string
+    s3Key?: string | null
     textExtract: string
     parsedJson?: NullableJsonNullValueInput | InputJsonValue
     createdAt?: Date | string
@@ -15850,7 +15850,7 @@ export namespace Prisma {
 
   export type ResumeUpdateInput = {
     id?: StringFieldUpdateOperationsInput | string
-    s3Key?: StringFieldUpdateOperationsInput | string
+    s3Key?: NullableStringFieldUpdateOperationsInput | string | null
     textExtract?: StringFieldUpdateOperationsInput | string
     parsedJson?: NullableJsonNullValueInput | InputJsonValue
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -15861,7 +15861,7 @@ export namespace Prisma {
   export type ResumeUncheckedUpdateInput = {
     id?: StringFieldUpdateOperationsInput | string
     userId?: StringFieldUpdateOperationsInput | string
-    s3Key?: StringFieldUpdateOperationsInput | string
+    s3Key?: NullableStringFieldUpdateOperationsInput | string | null
     textExtract?: StringFieldUpdateOperationsInput | string
     parsedJson?: NullableJsonNullValueInput | InputJsonValue
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -15871,7 +15871,7 @@ export namespace Prisma {
   export type ResumeCreateManyInput = {
     id?: string
     userId: string
-    s3Key: string
+    s3Key?: string | null
     textExtract: string
     parsedJson?: NullableJsonNullValueInput | InputJsonValue
     createdAt?: Date | string
@@ -15879,7 +15879,7 @@ export namespace Prisma {
 
   export type ResumeUpdateManyMutationInput = {
     id?: StringFieldUpdateOperationsInput | string
-    s3Key?: StringFieldUpdateOperationsInput | string
+    s3Key?: NullableStringFieldUpdateOperationsInput | string | null
     textExtract?: StringFieldUpdateOperationsInput | string
     parsedJson?: NullableJsonNullValueInput | InputJsonValue
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -15888,7 +15888,7 @@ export namespace Prisma {
   export type ResumeUncheckedUpdateManyInput = {
     id?: StringFieldUpdateOperationsInput | string
     userId?: StringFieldUpdateOperationsInput | string
-    s3Key?: StringFieldUpdateOperationsInput | string
+    s3Key?: NullableStringFieldUpdateOperationsInput | string | null
     textExtract?: StringFieldUpdateOperationsInput | string
     parsedJson?: NullableJsonNullValueInput | InputJsonValue
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -16707,6 +16707,21 @@ export namespace Prisma {
     _min?: NestedDateTimeFilter<$PrismaModel>
     _max?: NestedDateTimeFilter<$PrismaModel>
   }
+
+  export type StringNullableFilter<$PrismaModel = never> = {
+    equals?: string | StringFieldRefInput<$PrismaModel> | null
+    in?: string[] | ListStringFieldRefInput<$PrismaModel> | null
+    notIn?: string[] | ListStringFieldRefInput<$PrismaModel> | null
+    lt?: string | StringFieldRefInput<$PrismaModel>
+    lte?: string | StringFieldRefInput<$PrismaModel>
+    gt?: string | StringFieldRefInput<$PrismaModel>
+    gte?: string | StringFieldRefInput<$PrismaModel>
+    contains?: string | StringFieldRefInput<$PrismaModel>
+    startsWith?: string | StringFieldRefInput<$PrismaModel>
+    endsWith?: string | StringFieldRefInput<$PrismaModel>
+    mode?: QueryMode
+    not?: NestedStringNullableFilter<$PrismaModel> | string | null
+  }
   export type JsonNullableFilter<$PrismaModel = never> =
     | PatchUndefined<
         Either<Required<JsonNullableFilterBase<$PrismaModel>>, Exclude<keyof Required<JsonNullableFilterBase<$PrismaModel>>, 'path'>>,
@@ -16764,6 +16779,24 @@ export namespace Prisma {
     s3Key?: SortOrder
     textExtract?: SortOrder
     createdAt?: SortOrder
+  }
+
+  export type StringNullableWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: string | StringFieldRefInput<$PrismaModel> | null
+    in?: string[] | ListStringFieldRefInput<$PrismaModel> | null
+    notIn?: string[] | ListStringFieldRefInput<$PrismaModel> | null
+    lt?: string | StringFieldRefInput<$PrismaModel>
+    lte?: string | StringFieldRefInput<$PrismaModel>
+    gt?: string | StringFieldRefInput<$PrismaModel>
+    gte?: string | StringFieldRefInput<$PrismaModel>
+    contains?: string | StringFieldRefInput<$PrismaModel>
+    startsWith?: string | StringFieldRefInput<$PrismaModel>
+    endsWith?: string | StringFieldRefInput<$PrismaModel>
+    mode?: QueryMode
+    not?: NestedStringNullableWithAggregatesFilter<$PrismaModel> | string | null
+    _count?: NestedIntNullableFilter<$PrismaModel>
+    _min?: NestedStringNullableFilter<$PrismaModel>
+    _max?: NestedStringNullableFilter<$PrismaModel>
   }
   export type JsonNullableWithAggregatesFilter<$PrismaModel = never> =
     | PatchUndefined<
@@ -16823,21 +16856,6 @@ export namespace Prisma {
     in?: $Enums.InterviewType[] | ListEnumInterviewTypeFieldRefInput<$PrismaModel>
     notIn?: $Enums.InterviewType[] | ListEnumInterviewTypeFieldRefInput<$PrismaModel>
     not?: NestedEnumInterviewTypeFilter<$PrismaModel> | $Enums.InterviewType
-  }
-
-  export type StringNullableFilter<$PrismaModel = never> = {
-    equals?: string | StringFieldRefInput<$PrismaModel> | null
-    in?: string[] | ListStringFieldRefInput<$PrismaModel> | null
-    notIn?: string[] | ListStringFieldRefInput<$PrismaModel> | null
-    lt?: string | StringFieldRefInput<$PrismaModel>
-    lte?: string | StringFieldRefInput<$PrismaModel>
-    gt?: string | StringFieldRefInput<$PrismaModel>
-    gte?: string | StringFieldRefInput<$PrismaModel>
-    contains?: string | StringFieldRefInput<$PrismaModel>
-    startsWith?: string | StringFieldRefInput<$PrismaModel>
-    endsWith?: string | StringFieldRefInput<$PrismaModel>
-    mode?: QueryMode
-    not?: NestedStringNullableFilter<$PrismaModel> | string | null
   }
 
   export type ResumeNullableScalarRelationFilter = {
@@ -16921,24 +16939,6 @@ export namespace Prisma {
     _count?: NestedIntFilter<$PrismaModel>
     _min?: NestedEnumInterviewTypeFilter<$PrismaModel>
     _max?: NestedEnumInterviewTypeFilter<$PrismaModel>
-  }
-
-  export type StringNullableWithAggregatesFilter<$PrismaModel = never> = {
-    equals?: string | StringFieldRefInput<$PrismaModel> | null
-    in?: string[] | ListStringFieldRefInput<$PrismaModel> | null
-    notIn?: string[] | ListStringFieldRefInput<$PrismaModel> | null
-    lt?: string | StringFieldRefInput<$PrismaModel>
-    lte?: string | StringFieldRefInput<$PrismaModel>
-    gt?: string | StringFieldRefInput<$PrismaModel>
-    gte?: string | StringFieldRefInput<$PrismaModel>
-    contains?: string | StringFieldRefInput<$PrismaModel>
-    startsWith?: string | StringFieldRefInput<$PrismaModel>
-    endsWith?: string | StringFieldRefInput<$PrismaModel>
-    mode?: QueryMode
-    not?: NestedStringNullableWithAggregatesFilter<$PrismaModel> | string | null
-    _count?: NestedIntNullableFilter<$PrismaModel>
-    _min?: NestedStringNullableFilter<$PrismaModel>
-    _max?: NestedStringNullableFilter<$PrismaModel>
   }
 
   export type DateTimeNullableFilter<$PrismaModel = never> = {
@@ -17708,6 +17708,10 @@ export namespace Prisma {
     connect?: InterviewConfigWhereUniqueInput | InterviewConfigWhereUniqueInput[]
   }
 
+  export type NullableStringFieldUpdateOperationsInput = {
+    set?: string | null
+  }
+
   export type UserUpdateOneRequiredWithoutResumesNestedInput = {
     create?: XOR<UserCreateWithoutResumesInput, UserUncheckedCreateWithoutResumesInput>
     connectOrCreate?: UserCreateOrConnectWithoutResumesInput
@@ -17825,10 +17829,6 @@ export namespace Prisma {
     update?: InterviewUpdateWithWhereUniqueWithoutConfigInput | InterviewUpdateWithWhereUniqueWithoutConfigInput[]
     updateMany?: InterviewUpdateManyWithWhereWithoutConfigInput | InterviewUpdateManyWithWhereWithoutConfigInput[]
     deleteMany?: InterviewScalarWhereInput | InterviewScalarWhereInput[]
-  }
-
-  export type NullableStringFieldUpdateOperationsInput = {
-    set?: string | null
   }
 
   export type InterviewUncheckedUpdateManyWithoutConfigNestedInput = {
@@ -18322,6 +18322,37 @@ export namespace Prisma {
     _max?: NestedDateTimeFilter<$PrismaModel>
   }
 
+  export type NestedStringNullableFilter<$PrismaModel = never> = {
+    equals?: string | StringFieldRefInput<$PrismaModel> | null
+    in?: string[] | ListStringFieldRefInput<$PrismaModel> | null
+    notIn?: string[] | ListStringFieldRefInput<$PrismaModel> | null
+    lt?: string | StringFieldRefInput<$PrismaModel>
+    lte?: string | StringFieldRefInput<$PrismaModel>
+    gt?: string | StringFieldRefInput<$PrismaModel>
+    gte?: string | StringFieldRefInput<$PrismaModel>
+    contains?: string | StringFieldRefInput<$PrismaModel>
+    startsWith?: string | StringFieldRefInput<$PrismaModel>
+    endsWith?: string | StringFieldRefInput<$PrismaModel>
+    not?: NestedStringNullableFilter<$PrismaModel> | string | null
+  }
+
+  export type NestedStringNullableWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: string | StringFieldRefInput<$PrismaModel> | null
+    in?: string[] | ListStringFieldRefInput<$PrismaModel> | null
+    notIn?: string[] | ListStringFieldRefInput<$PrismaModel> | null
+    lt?: string | StringFieldRefInput<$PrismaModel>
+    lte?: string | StringFieldRefInput<$PrismaModel>
+    gt?: string | StringFieldRefInput<$PrismaModel>
+    gte?: string | StringFieldRefInput<$PrismaModel>
+    contains?: string | StringFieldRefInput<$PrismaModel>
+    startsWith?: string | StringFieldRefInput<$PrismaModel>
+    endsWith?: string | StringFieldRefInput<$PrismaModel>
+    not?: NestedStringNullableWithAggregatesFilter<$PrismaModel> | string | null
+    _count?: NestedIntNullableFilter<$PrismaModel>
+    _min?: NestedStringNullableFilter<$PrismaModel>
+    _max?: NestedStringNullableFilter<$PrismaModel>
+  }
+
   export type NestedIntNullableFilter<$PrismaModel = never> = {
     equals?: number | IntFieldRefInput<$PrismaModel> | null
     in?: number[] | ListIntFieldRefInput<$PrismaModel> | null
@@ -18370,20 +18401,6 @@ export namespace Prisma {
     not?: NestedEnumInterviewTypeFilter<$PrismaModel> | $Enums.InterviewType
   }
 
-  export type NestedStringNullableFilter<$PrismaModel = never> = {
-    equals?: string | StringFieldRefInput<$PrismaModel> | null
-    in?: string[] | ListStringFieldRefInput<$PrismaModel> | null
-    notIn?: string[] | ListStringFieldRefInput<$PrismaModel> | null
-    lt?: string | StringFieldRefInput<$PrismaModel>
-    lte?: string | StringFieldRefInput<$PrismaModel>
-    gt?: string | StringFieldRefInput<$PrismaModel>
-    gte?: string | StringFieldRefInput<$PrismaModel>
-    contains?: string | StringFieldRefInput<$PrismaModel>
-    startsWith?: string | StringFieldRefInput<$PrismaModel>
-    endsWith?: string | StringFieldRefInput<$PrismaModel>
-    not?: NestedStringNullableFilter<$PrismaModel> | string | null
-  }
-
   export type NestedIntWithAggregatesFilter<$PrismaModel = never> = {
     equals?: number | IntFieldRefInput<$PrismaModel>
     in?: number[] | ListIntFieldRefInput<$PrismaModel>
@@ -18429,23 +18446,6 @@ export namespace Prisma {
     _count?: NestedIntFilter<$PrismaModel>
     _min?: NestedEnumInterviewTypeFilter<$PrismaModel>
     _max?: NestedEnumInterviewTypeFilter<$PrismaModel>
-  }
-
-  export type NestedStringNullableWithAggregatesFilter<$PrismaModel = never> = {
-    equals?: string | StringFieldRefInput<$PrismaModel> | null
-    in?: string[] | ListStringFieldRefInput<$PrismaModel> | null
-    notIn?: string[] | ListStringFieldRefInput<$PrismaModel> | null
-    lt?: string | StringFieldRefInput<$PrismaModel>
-    lte?: string | StringFieldRefInput<$PrismaModel>
-    gt?: string | StringFieldRefInput<$PrismaModel>
-    gte?: string | StringFieldRefInput<$PrismaModel>
-    contains?: string | StringFieldRefInput<$PrismaModel>
-    startsWith?: string | StringFieldRefInput<$PrismaModel>
-    endsWith?: string | StringFieldRefInput<$PrismaModel>
-    not?: NestedStringNullableWithAggregatesFilter<$PrismaModel> | string | null
-    _count?: NestedIntNullableFilter<$PrismaModel>
-    _min?: NestedStringNullableFilter<$PrismaModel>
-    _max?: NestedStringNullableFilter<$PrismaModel>
   }
 
   export type NestedDateTimeNullableFilter<$PrismaModel = never> = {
@@ -18604,7 +18604,7 @@ export namespace Prisma {
 
   export type ResumeCreateWithoutUserInput = {
     id?: string
-    s3Key: string
+    s3Key?: string | null
     textExtract: string
     parsedJson?: NullableJsonNullValueInput | InputJsonValue
     createdAt?: Date | string
@@ -18613,7 +18613,7 @@ export namespace Prisma {
 
   export type ResumeUncheckedCreateWithoutUserInput = {
     id?: string
-    s3Key: string
+    s3Key?: string | null
     textExtract: string
     parsedJson?: NullableJsonNullValueInput | InputJsonValue
     createdAt?: Date | string
@@ -18760,7 +18760,7 @@ export namespace Prisma {
     NOT?: ResumeScalarWhereInput | ResumeScalarWhereInput[]
     id?: StringFilter<"Resume"> | string
     userId?: StringFilter<"Resume"> | string
-    s3Key?: StringFilter<"Resume"> | string
+    s3Key?: StringNullableFilter<"Resume"> | string | null
     textExtract?: StringFilter<"Resume"> | string
     parsedJson?: JsonNullableFilter<"Resume">
     createdAt?: DateTimeFilter<"Resume"> | Date | string
@@ -19004,7 +19004,7 @@ export namespace Prisma {
 
   export type ResumeCreateWithoutInterviewConfigsInput = {
     id?: string
-    s3Key: string
+    s3Key?: string | null
     textExtract: string
     parsedJson?: NullableJsonNullValueInput | InputJsonValue
     createdAt?: Date | string
@@ -19014,7 +19014,7 @@ export namespace Prisma {
   export type ResumeUncheckedCreateWithoutInterviewConfigsInput = {
     id?: string
     userId: string
-    s3Key: string
+    s3Key?: string | null
     textExtract: string
     parsedJson?: NullableJsonNullValueInput | InputJsonValue
     createdAt?: Date | string
@@ -19121,7 +19121,7 @@ export namespace Prisma {
 
   export type ResumeUpdateWithoutInterviewConfigsInput = {
     id?: StringFieldUpdateOperationsInput | string
-    s3Key?: StringFieldUpdateOperationsInput | string
+    s3Key?: NullableStringFieldUpdateOperationsInput | string | null
     textExtract?: StringFieldUpdateOperationsInput | string
     parsedJson?: NullableJsonNullValueInput | InputJsonValue
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -19131,7 +19131,7 @@ export namespace Prisma {
   export type ResumeUncheckedUpdateWithoutInterviewConfigsInput = {
     id?: StringFieldUpdateOperationsInput | string
     userId?: StringFieldUpdateOperationsInput | string
-    s3Key?: StringFieldUpdateOperationsInput | string
+    s3Key?: NullableStringFieldUpdateOperationsInput | string | null
     textExtract?: StringFieldUpdateOperationsInput | string
     parsedJson?: NullableJsonNullValueInput | InputJsonValue
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -20199,7 +20199,7 @@ export namespace Prisma {
 
   export type ResumeCreateManyUserInput = {
     id?: string
-    s3Key: string
+    s3Key?: string | null
     textExtract: string
     parsedJson?: NullableJsonNullValueInput | InputJsonValue
     createdAt?: Date | string
@@ -20240,7 +20240,7 @@ export namespace Prisma {
 
   export type ResumeUpdateWithoutUserInput = {
     id?: StringFieldUpdateOperationsInput | string
-    s3Key?: StringFieldUpdateOperationsInput | string
+    s3Key?: NullableStringFieldUpdateOperationsInput | string | null
     textExtract?: StringFieldUpdateOperationsInput | string
     parsedJson?: NullableJsonNullValueInput | InputJsonValue
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -20249,7 +20249,7 @@ export namespace Prisma {
 
   export type ResumeUncheckedUpdateWithoutUserInput = {
     id?: StringFieldUpdateOperationsInput | string
-    s3Key?: StringFieldUpdateOperationsInput | string
+    s3Key?: NullableStringFieldUpdateOperationsInput | string | null
     textExtract?: StringFieldUpdateOperationsInput | string
     parsedJson?: NullableJsonNullValueInput | InputJsonValue
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -20258,7 +20258,7 @@ export namespace Prisma {
 
   export type ResumeUncheckedUpdateManyWithoutUserInput = {
     id?: StringFieldUpdateOperationsInput | string
-    s3Key?: StringFieldUpdateOperationsInput | string
+    s3Key?: NullableStringFieldUpdateOperationsInput | string | null
     textExtract?: StringFieldUpdateOperationsInput | string
     parsedJson?: NullableJsonNullValueInput | InputJsonValue
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string

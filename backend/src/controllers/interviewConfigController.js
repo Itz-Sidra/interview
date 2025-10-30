@@ -1,6 +1,6 @@
 import { PrismaClient } from "../generated/index.js";
 import { uploadToS3 } from '../utils/s3.js';
-import { extractTextFromResume } from '../utils/textExtract.js';
+import { extractAndParseResume } from "../utils/resumeParserGemini.js";
 
 const prisma = new PrismaClient();
 
@@ -86,36 +86,30 @@ export const handleSkills = async (req, res) => {
 // ---------------- PART 3: RESUME ----------------
 export const handleResumeUpload = async (req, res) => {
   try {
-    const { configId } = req.body;
-    const file = req.file; 
+    const file = req.file;
+    const userId = req.user.userId;
 
-    if (!file) return res.status(400).json({ message: "No file uploaded" });
+    if (!file) return res.status(400).json({ error: "No file uploaded" });
 
-    console.log("File received:", file);
+    const s3Result = await uploadToS3(file);
 
-    const s3Key = await uploadToS3(file);
-    const textExtract = await extractTextFromResume(file);
+    const { parsedJson } = await extractAndParseResume(file);
 
     const resume = await prisma.resume.create({
       data: {
-        userId: req.user.userId,
-        s3Key,
-        textExtract: textExtract || '',
+        userId,
+        s3Key: s3Result.Key,
+        textExtract: "", 
+        parsedJson,
       },
     });
 
-    await prisma.interviewConfig.update({
-      where: { id: configId },
-      data: { resumeId: resume.id },
-    });
-
-    res.json({ message: "Resume uploaded", resumeId: resume.id });
+    res.json({ success: true, resume });
   } catch (err) {
-    console.error('Error in handleResumeUpload:',err);
+    console.error("Resume upload error:", err);
     res.status(500).json({ error: err.message });
   }
 };
-
 
 // ---------------- PART 4: REVIEW ----------------
 export const handleReview = async (req, res) => {
