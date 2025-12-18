@@ -86,35 +86,68 @@ export const handleSkills = async (req, res) => {
 // ---------------- PART 3: RESUME ----------------
 export const handleResumeUpload = async (req, res) => {
   try {
+    const { configId } = req.body;
     const file = req.file;
     const userId = req.user.userId;
 
-    if (!file) return res.status(400).json({ error: "No file uploaded" });
+    if (!configId) {
+      return res.status(400).json({ error: "configId is required" });
+    }
 
+    if (!file) {
+      return res.status(400).json({ error: "No file uploaded" });
+    }
+
+    // Ensure config exists
+    const config = await prisma.interviewConfig.findUnique({
+      where: { id: configId }
+    });
+
+    if (!config) {
+      return res.status(404).json({ error: "Interview config not found" });
+    }
+
+    // Upload to S3 (this should NOT fail silently)
     const s3Result = await uploadToS3(file);
 
-    // const { parsedJson } = await extractAndParseResume(file);
+    // Parse resume SAFELY (never crash upload)
     let parsedJson = {
+      parseSkipped: true,
       skills: [],
       education: [],
       experience: [],
-      projects: [],
-      parseSkipped: true
+      projects: []
     };
 
+    try {
+      const result = await extractAndParseResume(file);
+      if (result?.parsedJson) {
+        parsedJson = result.parsedJson;
+      }
+    } catch (err) {
+      console.error("Resume parsing failed (non-fatal):", err.message);
+    }
+
+    // Save resume ALWAYS
     const resume = await prisma.resume.create({
       data: {
         userId,
+        configId,             
         s3Key: s3Result.Key,
-        textExtract: "", 
-        parsedJson,
+        textExtract: "",
+        parsedJson
       },
     });
 
-    res.json({ success: true, resume });
+    return res.json({
+      success: true,
+      resumeId: resume.id,
+      parsed: !parsedJson.parseSkipped
+    });
+
   } catch (err) {
     console.error("Resume upload error:", err);
-    res.status(500).json({ error: err.message });
+    return res.status(500).json({ error: "Failed to upload resume" });
   }
 };
 

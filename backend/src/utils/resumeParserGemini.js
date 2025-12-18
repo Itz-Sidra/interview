@@ -8,25 +8,24 @@ export async function extractAndParseResume(file) {
   try {
     const fileBuffer = fs.readFileSync(file.path);
     const base64Data = fileBuffer.toString("base64");
-    const mimeType =
-      file.mimetype || mime.lookup(file.path) || "application/pdf";
+    const mimeType = file.mimetype || mime.lookup(file.path) || "application/pdf";
 
     const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash" });
 
     const prompt = `
-      Parse this resume into clean JSON:
-      {
-        "name": "",
-        "email": "",
-        "phone": "",
-        "skills": [],
-        "education": [],
-        "experience": [],
-        "projects": []
-      }
+Parse this resume into clean JSON:
+{
+  "name": "",
+  "email": "",
+  "phone": "",
+  "skills": [],
+  "education": [],
+  "experience": [],
+  "projects": []
+}
 
-      Return ONLY JSON. No extra text.
-      `;
+Return ONLY JSON. No extra text.
+`;
 
     const result = await model.generateContent({
       contents: [
@@ -37,12 +36,12 @@ export async function extractAndParseResume(file) {
             {
               inlineData: {
                 mimeType: mimeType,
-                data: base64Data,
-              },
-            },
-          ],
-        },
-      ],
+                data: base64Data
+              }
+            }
+          ]
+        }
+      ]
     });
 
     const text = await result.response.text();
@@ -56,26 +55,6 @@ export async function extractAndParseResume(file) {
     return { parsedJson };
   } catch (err) {
     console.error("Error parsing resume with Gemini:", err);
-    
-    // Check if it's a quota error
-    if (err.status === 429) {
-      throw new Error("API quota exceeded. Please try again later or upgrade your Gemini API plan.");
-    }
-    return {
-      parsedJson: {
-        name: "Unknown",
-        email: "",
-        phone: "",
-        location: "",
-        links: {},
-        skills: [],
-        education: [],
-        experience: [],
-        projects: [],
-        certifications: [],
-        achievements: [],
-        parseError: err.message || "Failed to parse resume"
-      }
-    };
+    throw new Error("Failed to extract or parse resume text");
   }
 }

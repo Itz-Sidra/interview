@@ -51,15 +51,17 @@ model User {
 }
 
 model Resume {
-  id               String            @id @default(uuid())
-  user             User              @relation(fields: [userId], references: [id])
-  userId           String
-  s3Key            String?
-  textExtract      String            @db.Text
-  parsedJson       Json?
-  createdAt        DateTime          @default(now())
-  interviewConfigs InterviewConfig[] 
+  id          String   @id @default(uuid())
+  user        User     @relation(fields: [userId], references: [id])
+  userId      String
+  config      InterviewConfig @relation(fields: [configId], references: [id])
+  configId    String   @unique
+  s3Key       String
+  textExtract String?
+  parsedJson  Json?
+  createdAt   DateTime @default(now())
 }
+
 
 model InterviewConfig {
   id              String        @id @default(uuid())
@@ -71,11 +73,8 @@ model InterviewConfig {
   difficulty      Difficulty
   type            InterviewType
   createdAt       DateTime      @default(now())
-
-  resumeId String?
-  Resume   Resume? @relation(fields: [resumeId], references: [id])
-
-  interviews Interview[] 
+  resume          Resume?
+  interviews      Interview[]
 }
 
 model Interview {

@@ -2,6 +2,7 @@ import { PrismaClient } from "../generated/index.js";
 import { GoogleGenerativeAI } from "@google/generative-ai";
 import axios from "axios";
 import FormData from "form-data";
+import { generateFirstQuestion, generateFollowUpQuestion } from "../utils/questionGenerator.js";
 
 const prisma = new PrismaClient();
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
@@ -10,95 +11,61 @@ const ELEVENLABS_API_KEY = process.env.ELEVENLABS_API_KEY;
 // ---------------- START INTERVIEW ----------------
 export const startInterview = async (req, res) => {
   try {
-    const { role, company, configId } = req.body;
+    const { interviewId, role, company } = req.body;
     const userId = req.user.userId;
 
-    // Verify config exists and belongs to user
-    const config = await prisma.interviewConfig.findFirst({
-      where: {
-        id: configId,
-        userId
-      },
+    if (!interviewId) {
+      return res.status(400).json({ error: "interviewId is required" });
+    }
+
+    const interview = await prisma.interview.findUnique({
+      where: { id: interviewId },
       include: {
-        Resume: true
+        config: {
+          include: { Resume: true }
+        }
       }
     });
 
-    if (!config) {
-      return res.status(400).json({ error: "Interview configuration not found." });
+    if (!interview || interview.userId !== userId) {
+      return res.status(404).json({ error: "Interview not found" });
     }
 
-    // Get user's most recent parsed resume if not linked to config
-    let parsedResume = config.Resume?.parsedJson;
-    
-    if (!parsedResume) {
-      const userResume = await prisma.resume.findFirst({
-        where: { userId },
-        orderBy: { createdAt: 'desc' }
+    if (interview.status !== "PENDING" && interview.status !== "IN_PROGRESS") {
+      return res.status(403).json({ error: "Interview cannot be started" });
+    }
+
+    if (!interview.startedAt) {
+      await prisma.interview.update({
+        where: { id: interviewId },
+        data: { status: "IN_PROGRESS", startedAt: new Date() }
       });
-
-      if (!userResume?.parsedJson) {
-        return res.status(400).json({ error: "No parsed resume found. Please upload a resume first." });
-      }
-      parsedResume = userResume.parsedJson;
     }
 
-    const interview = await prisma.interview.findFirst({
-      where: {
-        configId,
-        userId,
-        status: "PENDING"
-      }
+    const resumeContext = interview.config.Resume?.parsedJson || null;
+
+    const questionText = await generateFirstQuestion({
+      role: role || interview.config.role,
+      company,
+      skills: interview.config.skills,
+      resumeContext
     });
 
-    if (!interview) {
-      return res.status(403).json({ error: "Interview not found or already started" });
-    }
-
-    await prisma.interview.update({
-      where: { id: interview.id },
-      data: {
-        status: "IN_PROGRESS",
-        startedAt: new Date(),
-        interviewerModel: "gemini-2.0-flash"
-      }
-    });
-
-    // Generate first question using Gemini
-    const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash-exp" });
-    const prompt = `
-You are a professional AI interview bot. Begin a mock interview for the position of ${role || config.role}${company ? " at " + company : ""}.
-
-Interview Details:
-- Type: ${config.type}
-- Difficulty: ${config.difficulty}
-- Skills: ${config.skills.join(", ")}
-
-Candidate's Resume:
-${JSON.stringify(parsedResume)}
-
-Ask only the first interview question based on the interview type and difficulty level.
-Be clear, concise, and professional.
-`;
-
-    const result = await model.generateContent(prompt);
-    const question = result.response.text().trim();
-
-    // Store first question
     await prisma.question.create({
       data: {
-        interviewId: interview.id,
-        prompt: question
+        interviewId,
+        prompt: questionText
       }
     });
 
     res.json({
-      interviewId: interview.id,
-      question
+      interviewId,
+      question: questionText
     });
+
   } catch (err) {
-    console.error("Start interview error:", err);
-    res.status(500).json({ error: `Failed to start interview: ${err.message}` });
+    console.error("startInterview error:", err);
+    res.status(500).json({ error: "Failed to start interview" });
   }
 };
 
@@ -110,12 +77,11 @@ export const answerQuestion = async (req, res) => {
 
     // Verify interview belongs to user
     const interview = await prisma.interview.findFirst({
-      where: {
-        id: interviewId,
-        userId
-      },
+      where: { id: interviewId, userId },
       include: {
-        config: true,
+        config: {
+          include: { Resume: true }
+        },
         questions: {
           orderBy: { createdAt: 'desc' }
         }
@@ -202,41 +168,27 @@ export const answerQuestion = async (req, res) => {
     const categories = categoryMap[interview.config.type] || ["general"];
     const category = categories[Math.floor(questionCount / 2) % categories.length];
 
-    const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash-exp" });
-    const prompt = `
-You are an AI interviewer conducting a ${interview.config.type} interview at ${interview.config.difficulty} level.
+    const resumeContext = interview.config.Resume?.parsedJson || null;
 
-Category Focus: ${category.replace(/_/g, " ").replace(/\b\w/g, l => l.toUpperCase())}
-
-Last Question: ${question}
-Candidate's Answer: ${answer}
-Answer Quality: Grammar Score ${analysis.grammar.score}/100, Relevance ${analysis.relevance.score}/100
-
-Ask the next question in this category appropriate for ${interview.config.difficulty} difficulty.
-Consider the candidate's performance so far.
-Be clear and relevant.
-Only return the next question text.
-`;
-
-    const result = await model.generateContent(prompt);
-    const nextQuestion = result.response.text().trim();
-
-    // Store next question
-    await prisma.question.create({
-      data: {
-        interviewId: interview.id,
-        prompt: nextQuestion
-      }
+    const nextQuestionText = await generateFollowUpQuestion({
+      previousQuestion: question,
+      answer,
+      role: interview.config.role,
+      skills: interview.config.skills,
+      resumeContext
     });
 
-    // Store interviewer question as transcript
-    await prisma.transcript.create({
-      data: {
-        interviewId,
-        speaker: "interviewer",
-        text: nextQuestion
-      }
-    });
+    if (!nextQuestionText) {
+      await prisma.interview.update({
+        where: { id: interviewId },
+        data: { status: "COMPLETED", endedAt: new Date() }
+      });
+
+      return res.json({
+        done: true,
+        message: "Interview completed. Great job!"
+      });
+    }
 
     res.json({ next_question: nextQuestion });
   } catch (err) {
@@ -248,7 +200,7 @@ Only return the next question text.
 // ---------------- ANALYZE EMOTION AND GRAMMAR ----------------
 async function analyzeVoiceEmotionAndGrammar(text, context = "") {
   try {
-    const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash-exp" });
+    const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
     const prompt = `
 Analyze the following interview response for:
 1. Voice emotion (confident, nervous, excited, uncertain, calm, stressed)
