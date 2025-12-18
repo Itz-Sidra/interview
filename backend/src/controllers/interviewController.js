@@ -22,7 +22,7 @@ export const startInterview = async (req, res) => {
       where: { id: interviewId },
       include: {
         config: {
-          include: { Resume: true }
+          include: { resume: true }
         }
       }
     });
@@ -42,7 +42,7 @@ export const startInterview = async (req, res) => {
       });
     }
 
-    const resumeContext = interview.config.Resume?.parsedJson || null;
+    const resumeContext = interview.config.resume?.parsedJson || null;
 
     const questionText = await generateFirstQuestion({
       role: role || interview.config.role,
@@ -80,7 +80,7 @@ export const answerQuestion = async (req, res) => {
       where: { id: interviewId, userId },
       include: {
         config: {
-          include: { Resume: true }
+          include: { resume: true }
         },
         questions: {
           orderBy: { createdAt: 'desc' }
@@ -168,7 +168,7 @@ export const answerQuestion = async (req, res) => {
     const categories = categoryMap[interview.config.type] || ["general"];
     const category = categories[Math.floor(questionCount / 2) % categories.length];
 
-    const resumeContext = interview.config.Resume?.parsedJson || null;
+    const resumeContext = interview.config.resume?.parsedJson || null;
 
     const nextQuestionText = await generateFollowUpQuestion({
       previousQuestion: question,
