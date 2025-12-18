@@ -7,7 +7,7 @@ class InterviewBot {
                 this.interviewStartTime = null;
                 this.timerInterval = null;
                 this.selectedTimeLimit = 0; 
-                this.uploadedResume = null;
+                // this.uploadedResume = null;
                 this.chatHistory = [];
                 this.webcamStream = null;
                 this.isMicMuted = false;
@@ -56,10 +56,10 @@ class InterviewBot {
                     btn.addEventListener('click', (e) => this.setTimeLimit(e));
                 });
 
-                this.uploadBtn.addEventListener('click', () => this.fileInput.click());
-                this.fileInput.addEventListener('change', (e) => this.handleFileUpload(e));
-                this.uploadArea.addEventListener('dragover', (e) => this.handleDragOver(e));
-                this.uploadArea.addEventListener('drop', (e) => this.handleDrop(e));
+                // this.uploadBtn.addEventListener('click', () => this.fileInput.click());
+                // this.fileInput.addEventListener('change', (e) => this.handleFileUpload(e));
+                // this.uploadArea.addEventListener('dragover', (e) => this.handleDragOver(e));
+                // this.uploadArea.addEventListener('drop', (e) => this.handleDrop(e));
 
                 this.micToggleBtn.addEventListener('click', () => this.toggleRecording());
 
@@ -124,6 +124,7 @@ class InterviewBot {
                 }
             }
 
+            /*
             handleFileUpload(e) {
                 const file = e.target.files[0];
                 if (file) {
@@ -162,6 +163,7 @@ class InterviewBot {
                 
                 this.uploadResumeToServer(file);
             }
+             */
 
             enqueueTTS(text) {
                 this.ttsQueue.push(text);
@@ -195,10 +197,10 @@ class InterviewBot {
                 this.playNextInQueue();
             }
 
-
+            /*
             async uploadResumeToServer(file) {
                 const formData = new FormData();
-                formData.append("file", file);
+                formData.append("resume", file);
 
                 const token = localStorage.getItem("accessToken");
 
@@ -214,7 +216,8 @@ class InterviewBot {
                     const data = await response.json();
 
                     if (!response.ok) {
-                        throw new Error(data.detail || "Resume upload failed.");
+                        const text = await response.text();
+                        throw new Error(text);
                     }
 
                     console.log("Resume uploaded to server:", data);
@@ -225,6 +228,7 @@ class InterviewBot {
                     this.addMessage('bot', "Sorry, there was an error uploading your resume.");
                 }
             }
+            */    
 
 
             async initializeWebcam() {
@@ -373,11 +377,11 @@ class InterviewBot {
                 }
                 
                 response += `\n\nI'm ready to conduct a mock interview with you. `;
-                
+                /*
                 if (this.uploadedResume) {
                     response += `I'll reference your uploaded resume to ask relevant questions. `;
                 }
-                
+                */
                 response += `Click "Start Interview" when you're ready to begin!`;
                 
                 this.addMessage('bot', response);
@@ -511,7 +515,7 @@ class InterviewBot {
             }
 
             async ensureConfigExists() {
-                let configId = localStorage.getItem("interview_config_id");
+                let configId = localStorage.getItem("currentConfigId");
                 if (configId) return configId;
 
                 const token = localStorage.getItem("accessToken");
@@ -534,7 +538,7 @@ class InterviewBot {
                     throw new Error(data.error || "Failed to create interview config");
                 }
 
-                localStorage.setItem("interview_config_id", data.configId);
+                localStorage.setItem("currentConfigId", data.configId);
                 console.log("Config created:", data.configId);
 
                 return data.configId;
@@ -659,7 +663,12 @@ class InterviewBot {
 
             async startInterview() {
             try {
-                await this.createPendingInterview();
+                this.currentInterviewId = localStorage.getItem("currentInterviewId");
+
+                if (!this.currentInterviewId) {
+                throw new Error("Interview not initialized");
+                }
+
 
                 this.isInterviewActive = true;
                 this.interviewStartTime = Date.now();
@@ -686,7 +695,7 @@ class InterviewBot {
 
             async fetchFirstQuestion() {
                 const token = localStorage.getItem("accessToken");
-                const configId = localStorage.getItem("interview_config_id");
+                const interviewId = localStorage.getItem("currentInterviewId");
 
                 const lastMsg = this.chatHistory.find(
                     msg => msg.role === 'user' && this.isInterviewStartCommand(msg.content)
@@ -702,7 +711,7 @@ class InterviewBot {
                     "Content-Type": "application/json",
                     "Authorization": `Bearer ${token}`
                     },
-                    body: JSON.stringify({ configId, role, company })
+                    body: JSON.stringify({ interviewId, role, company })
                 });
 
                 const data = await response.json();
@@ -781,7 +790,7 @@ class InterviewBot {
                 const token = localStorage.getItem("accessToken");
                 
                 try {
-                    const response = await fetch(`http://127.0.0.1:3000/generate_report/${this.currentInterviewId}`, {
+                    const response = await fetch(`http://127.0.0.1:3000/interview/report/${this.currentInterviewId}`, {
                         headers: {
                             "Authorization": `Bearer ${token}`,
                         }
