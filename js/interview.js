@@ -20,6 +20,7 @@ class InterviewBot {
                 this.loadTheme();
                 this.addWelcomeMessage();
             }
+            
 
             initializeElements() {
                 this.timerDisplay = document.getElementById('timerDisplay');
@@ -199,10 +200,10 @@ class InterviewBot {
                 const formData = new FormData();
                 formData.append("file", file);
 
-                const token = localStorage.getItem("access_token");
+                const token = localStorage.getItem("accessToken");
 
                 try {
-                    const response = await fetch("http://127.0.0.1:8001/upload_resume", {
+                    const response = await fetch("http://127.0.0.1:3000/interview-config/resume", {
                         method: "POST",
                         headers: {
                             Authorization: `Bearer ${token}`,
@@ -290,7 +291,7 @@ class InterviewBot {
                 formData.append("audio", blob, "recording.webm");
 
                 try {
-                    const response = await fetch("http://127.0.0.1:8001/transcribe_audio", {
+                    const response = await fetch("http://127.0.0.1:3000/interview/transcribe", {
                         method: "POST",
                         body: formData
                     });
@@ -410,10 +411,12 @@ class InterviewBot {
 
             async playTTS(text) {
                 try {
-                    const response = await fetch("http://127.0.0.1:8001/speak", {
+                    const token = localStorage.getItem("accessToken");
+                    const response = await fetch("http://127.0.0.1:3000/interview/speak", {
                         method: "POST",
                         headers: {
-                            "Content-Type": "application/json"
+                        "Content-Type": "application/json",
+                        "Authorization": `Bearer ${token}`
                         },
                         body: JSON.stringify({ text })
                     });
@@ -438,10 +441,14 @@ class InterviewBot {
             }
 
             playTTSWithPromise(text) {
+                const token = localStorage.getItem("accessToken");
                 return new Promise((resolve, reject) => {
-                    fetch("http://127.0.0.1:8001/speak", {
+                    fetch("http://127.0.0.1:3000/interview/speak", {
                         method: "POST",
-                        headers: { "Content-Type": "application/json" },
+                        headers: {
+                        "Content-Type": "application/json",
+                        "Authorization": `Bearer ${token}`
+                        },
                         body: JSON.stringify({ text })
                     })
                     .then(response => {
@@ -465,17 +472,17 @@ class InterviewBot {
             async handleInterviewResponse(userAnswer) {
                 this.showTypingIndicator();
 
-                const token = localStorage.getItem("access_token");
+                const token = localStorage.getItem("accessToken");
 
                 try {
-                    const response = await fetch("http://127.0.0.1:8001/answer_question", {
+                    const response = await fetch("http://127.0.0.1:3000/interview/answer", {
                         method: "POST",
                         headers: {
                             "Content-Type": "application/json",
                             "Authorization": `Bearer ${token}`,
                         },
                         body: JSON.stringify({
-                            interview_id: this.currentInterviewId,  
+                            interviewId: this.currentInterviewId,  
                             question: this.lastQuestion,
                             answer: userAnswer
                         }),
@@ -502,6 +509,36 @@ class InterviewBot {
                     this.hideTypingIndicator();
                 }
             }
+
+            async ensureConfigExists() {
+                let configId = localStorage.getItem("interview_config_id");
+                if (configId) return configId;
+
+                const token = localStorage.getItem("accessToken");
+
+                const response = await fetch("http://127.0.0.1:3000/interview-config/basics", {
+                    method: "POST",
+                    headers: {
+                    "Content-Type": "application/json",
+                    "Authorization": `Bearer ${token}`
+                    },
+                    body: JSON.stringify({
+                    durationMinutes: this.selectedTimeLimit || 10,
+                    difficulty: "intermediate",
+                    type: "technical"
+                    })
+                });
+
+                const data = await response.json();
+                if (!response.ok) {
+                    throw new Error(data.error || "Failed to create interview config");
+                }
+
+                localStorage.setItem("interview_config_id", data.configId);
+                console.log("Config created:", data.configId);
+
+                return data.configId;
+                }
 
             handleGeneralResponse(message) {
                 this.showTypingIndicator();
@@ -549,7 +586,7 @@ class InterviewBot {
                 this.chatMessages.appendChild(messageDiv);
                 this.chatMessages.scrollTop = this.chatMessages.scrollHeight;
 
-                if (sender === 'bot') {
+                if (sender === 'bot'  && this.isInterviewActive) {
                     const cleanText = content.replace(/<[^>]*>?/gm, '');
                     this.enqueueTTS(cleanText);
                 }
@@ -590,56 +627,93 @@ class InterviewBot {
                 this.startBtn.disabled = false;
             }
 
+            async createPendingInterview() {
+                const token = localStorage.getItem("accessToken");
+                const configId = await this.ensureConfigExists();
+
+                if (!configId) {
+                    throw new Error("configId missing. Basics step not completed.");
+                }
+
+                const response = await fetch("http://127.0.0.1:3000/interview-config/review", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                        "Authorization": `Bearer ${token}`
+                    },
+                    body: JSON.stringify({
+                        configId,
+                        consentRecording: false
+                    })
+                });
+
+                const data = await response.json();
+
+                if (!response.ok) {
+                    throw new Error(data.error || "Failed to create interview");
+                }
+
+                this.currentInterviewId = data.interviewId;
+                localStorage.setItem("currentInterviewId", data.interviewId);
+            }
+
             async startInterview() {
+            try {
+                await this.createPendingInterview();
+
                 this.isInterviewActive = true;
                 this.interviewStartTime = Date.now();
-                
+
                 this.startBtn.disabled = true;
                 this.stopBtn.disabled = false;
                 this.askAgainBtn.disabled = false;
-                
+
                 this.startTimer();
-   
+
                 setTimeout(async () => {
                     const question = await this.fetchFirstQuestion();
                     if (question) {
-                        this.lastQuestion = question;  
+                        this.lastQuestion = question;
                     }
-                }, 1000);
+                }, 500);
+
+            } catch (err) {
+                console.error("Start interview failed:", err);
+                this.addMessage("bot", "Failed to start interview. Please try again.");
             }
+        }
 
 
             async fetchFirstQuestion() {
-                const token = localStorage.getItem("access_token");
+                const token = localStorage.getItem("accessToken");
+                const configId = localStorage.getItem("interview_config_id");
 
-                const lastMsg = this.chatHistory.find(msg => msg.role === 'user' && this.isInterviewStartCommand(msg.content));
+                const lastMsg = this.chatHistory.find(
+                    msg => msg.role === 'user' && this.isInterviewStartCommand(msg.content)
+                );
+
                 const message = lastMsg?.content || "I want to practice for a Software Engineer role";
-
                 const role = this.extractRole(message) || "Software Engineer";
                 const company = this.extractCompany(message) || "";
 
-                try {
-                    const response = await fetch("http://127.0.0.1:8001/start_interview", {
-                        method: "POST",
-                        headers: {
-                            "Content-Type": "application/json",
-                            "Authorization": `Bearer ${token}`,
-                        },
-                        body: JSON.stringify({ role, company }),
-                    });
+                const response = await fetch("http://127.0.0.1:3000/interview/start", {
+                    method: "POST",
+                    headers: {
+                    "Content-Type": "application/json",
+                    "Authorization": `Bearer ${token}`
+                    },
+                    body: JSON.stringify({ configId, role, company })
+                });
 
-                    const data = await response.json();
-                    if (!response.ok) throw new Error(data.detail || "Error starting interview");
+                const data = await response.json();
+                if (!response.ok) throw new Error(data.error);
 
-                    this.currentInterviewId = data.interview_id;  
-                    this.addMessage('bot', data.question);
-                    return data.question;
-                } catch (err) {
-                    console.error("Interview start failed:", err);
-                    this.addMessage('bot', "Oops! Couldn't fetch the first question. Try again.");
-                    return null;
+                this.currentInterviewId = data.interviewId;
+                localStorage.setItem("currentInterviewId", data.interviewId);
+
+                this.addMessage("bot", data.question);
+                return data.question;
                 }
-            }
 
             async askAgain() {
                 if (this.isInterviewActive && this.lastQuestion) {
@@ -647,17 +721,17 @@ class InterviewBot {
 
                     this.showTypingIndicator();
 
-                    const token = localStorage.getItem("access_token");
+                    const token = localStorage.getItem("accessToken");
 
                     try {
-                        const response = await fetch("http://127.0.0.1:8001/answer_question", {
+                        const response = await fetch("http://127.0.0.1:3000/interview/answer", {
                             method: "POST",
                             headers: {
                                 "Content-Type": "application/json",
                                 "Authorization": `Bearer ${token}`,
                             },
                             body: JSON.stringify({
-                                interview_id: this.currentInterviewId,
+                                interviewId: this.currentInterviewId,
                                 question: this.lastQuestion,
                                 answer: "", 
                             }),
@@ -704,10 +778,10 @@ class InterviewBot {
 
                 this.addMessage('bot', "Generating your comprehensive interview performance report...");
                 
-                const token = localStorage.getItem("access_token");
+                const token = localStorage.getItem("accessToken");
                 
                 try {
-                    const response = await fetch(`http://127.0.0.1:8001/generate_report/${this.currentInterviewId}`, {
+                    const response = await fetch(`http://127.0.0.1:3000/generate_report/${this.currentInterviewId}`, {
                         headers: {
                             "Authorization": `Bearer ${token}`,
                         }

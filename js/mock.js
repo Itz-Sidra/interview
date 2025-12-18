@@ -1,4 +1,4 @@
-class InterviewBot {
+class MockInterviewBot  {
     constructor() {
         this.interviewActive = false;
         this.currentInterviewId = null;
@@ -143,7 +143,7 @@ class InterviewBot {
     }
 }
 
-const bot = new InterviewBot();
+const bot = new MockInterviewBot();
 
 document.getElementById("startBtn").addEventListener("click", () => {
     bot.startInterview();
