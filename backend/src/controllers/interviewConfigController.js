@@ -93,7 +93,14 @@ export const handleResumeUpload = async (req, res) => {
 
     const s3Result = await uploadToS3(file);
 
-    const { parsedJson } = await extractAndParseResume(file);
+    // const { parsedJson } = await extractAndParseResume(file);
+    let parsedJson = {
+      skills: [],
+      education: [],
+      experience: [],
+      projects: [],
+      parseSkipped: true
+    };
 
     const resume = await prisma.resume.create({
       data: {
