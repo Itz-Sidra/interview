@@ -98,7 +98,6 @@ export const handleResumeUpload = async (req, res) => {
       return res.status(400).json({ error: "No file uploaded" });
     }
 
-    // Ensure config exists
     const config = await prisma.interviewConfig.findUnique({
       where: { id: configId }
     });
@@ -107,13 +106,13 @@ export const handleResumeUpload = async (req, res) => {
       return res.status(404).json({ error: "Interview config not found" });
     }
 
-    // Upload to S3 (this should NOT fail silently)
+    // Upload (cheap, no API)
     const s3Result = await uploadToS3(file);
 
-    // Parse resume SAFELY (never crash upload)
+    // DEFAULT SAFE FALLBACK (NO API)
     let parsedJson = {
       parseSkipped: true,
-      skills: [],
+      skills: config.skills,
       education: [],
       experience: [],
       projects: []
@@ -125,18 +124,18 @@ export const handleResumeUpload = async (req, res) => {
         parsedJson = result.parsedJson;
       }
     } catch (err) {
-      console.error("Resume parsing failed (non-fatal):", err.message);
+      console.warn("Resume parsing skipped:", err.message);
+      // continue safely
     }
 
-    // Save resume ALWAYS
     const resume = await prisma.resume.create({
       data: {
         userId,
-        configId,             
+        configId,
         s3Key: s3Result.Key,
         textExtract: "",
         parsedJson
-      },
+      }
     });
 
     return res.json({
@@ -150,6 +149,7 @@ export const handleResumeUpload = async (req, res) => {
     return res.status(500).json({ error: "Failed to upload resume" });
   }
 };
+
 
 // ---------------- PART 4: REVIEW ----------------
 export const handleReview = async (req, res) => {

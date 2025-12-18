@@ -725,6 +725,10 @@ class InterviewBot {
                 }
 
             async askAgain() {
+
+                if (!this.lastQuestion) return;
+                this.addMessage("bot", "Please answer the previous question before asking for another.");
+                
                 if (this.isInterviewActive && this.lastQuestion) {
                     this.addMessage('bot', "Let me ask you a follow-up:");
 

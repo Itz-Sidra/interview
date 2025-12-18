@@ -54,7 +54,15 @@ Return ONLY JSON. No extra text.
 
     return { parsedJson };
   } catch (err) {
-    console.error("Error parsing resume with Gemini:", err);
-    throw new Error("Failed to extract or parse resume text");
+     console.warn("Resume parsing skipped:", err.message);
+    return {
+      parsedJson: {
+        parseSkipped: true,
+        skills: [],
+        education: [],
+        experience: [],
+        projects: []
+      }
+    };
   }
 }

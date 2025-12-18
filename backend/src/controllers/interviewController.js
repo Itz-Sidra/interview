@@ -58,6 +58,14 @@ export const startInterview = async (req, res) => {
       }
     });
 
+    await prisma.transcript.create({
+      data: {
+        interviewId,
+        speaker: "interviewer",
+        text: questionText
+      }
+    });
+
     res.json({
       interviewId,
       question: questionText
@@ -72,113 +80,66 @@ export const startInterview = async (req, res) => {
 // ---------------- ANSWER QUESTION ----------------
 export const answerQuestion = async (req, res) => {
   try {
-    const { question, answer, interviewId } = req.body;
+    const { interviewId, question, answer } = req.body;
     const userId = req.user.userId;
 
-    // Verify interview belongs to user
     const interview = await prisma.interview.findFirst({
       where: { id: interviewId, userId },
       include: {
-        config: {
-          include: { resume: true }
-        },
-        questions: {
-          orderBy: { createdAt: 'desc' }
-        }
+        config: { include: { resume: true } },
+        questions: true
       }
     });
 
     if (!interview) {
-      return res.status(404).json({ error: "Interview not found." });
+      return res.status(404).json({ error: "Interview not found" });
     }
 
-    if (interview.status === "COMPLETED") {
-      return res.status(400).json({ error: "Interview is already completed." });
+    const cheapAnalysis = {
+      emotion: "neutral",
+      confidence: Math.min(100, Math.max(40, answer.split(" ").length * 2)),
+      grammarScore: 70,
+      relevanceScore: 70
+    };
+
+    let turn;
+    try {
+      turn = await generateFollowUpQuestion({
+        role: interview.config.role,
+        skills: interview.config.skills,
+        resumeContext: interview.config.resume?.parsedJson,
+        previousQuestion: question,
+        answer
+      });
+    } catch (err) {
+      console.warn("Gemini failed, using fallback");
+      turn = {
+        done: false,
+        analysis: cheapAnalysis,
+        nextQuestion:
+          "Can you walk me through a challenging problem you solved recently?"
+      };
     }
 
-    // Analyze the answer
-    const analysis = await analyzeVoiceEmotionAndGrammar(answer, question);
-
-    // Store candidate's response as transcript
+    // Save transcript
     await prisma.transcript.create({
       data: {
         interviewId,
         speaker: "candidate",
         text: answer,
-        tokensJson: {
-          emotion: analysis.emotion,
-          confidence: analysis.confidence_level,
-          grammarScore: analysis.grammar.score,
-          relevanceScore: analysis.relevance.score
-        }
+        tokensJson: turn.analysis
       }
     });
 
-    // Flag issues if grammar or relevance is poor
-    if (analysis.grammar.score < 60) {
-      await prisma.flaggedIssue.create({
-        data: {
-          interviewId,
-          category: "GRAMMAR",
-          description: `Poor grammar detected. Score: ${analysis.grammar.score}. Mistakes: ${analysis.grammar.mistakes.slice(0, 3).join(", ")}`,
-          severity: analysis.grammar.score < 40 ? 3 : 2
-        }
-      });
-    }
-
-    if (analysis.relevance.score < 60) {
-      await prisma.flaggedIssue.create({
-        data: {
-          interviewId,
-          category: "COMMUNICATION",
-          description: `Low relevance to question. ${analysis.relevance.feedback}`,
-          severity: analysis.relevance.score < 40 ? 3 : 2
-        }
-      });
-    }
-
-    // Check if interview duration exceeded
-    const questionCount = interview.questions.length;
-    const estimatedDuration = questionCount * 3; // 3 minutes per question
-    const configDuration = interview.config.durationMinutes;
-
-    if (estimatedDuration >= configDuration) {
-      // Complete the interview
-      await prisma.interview.update({
-        where: { id: interviewId },
-        data: {
-          status: "COMPLETED",
-          endedAt: new Date()
-        }
-      });
-
-      return res.json({
-        done: true,
-        message: "Interview completed! Click 'Generate Report' to see your analysis."
-      });
-    }
-
-    // Generate next question based on interview type and progress
-    const categoryMap = {
-      "TECHNICAL": ["technical_theory", "coding_problem", "system_design"],
-      "BEHAVIORAL": ["behavioral", "situational", "culture_fit"],
-      "SYSTEM_DESIGN": ["architecture", "scalability", "design_patterns"]
-    };
-
-    const categories = categoryMap[interview.config.type] || ["general"];
-    const category = categories[Math.floor(questionCount / 2) % categories.length];
-
-    const resumeContext = interview.config.resume?.parsedJson || null;
-
-    const nextQuestionText = await generateFollowUpQuestion({
-      previousQuestion: question,
-      answer,
-      role: interview.config.role,
-      skills: interview.config.skills,
-      resumeContext
+    await prisma.transcript.create({
+      data: {
+        interviewId,
+        speaker: "interviewer",
+        text: turn.nextQuestion
+      }
     });
 
-    if (!nextQuestionText) {
+    if (turn.done) {
       await prisma.interview.update({
         where: { id: interviewId },
         data: { status: "COMPLETED", endedAt: new Date() }
@@ -186,57 +147,49 @@ export const answerQuestion = async (req, res) => {
 
       return res.json({
         done: true,
-        message: "Interview completed. Great job!"
+        message: "Interview completed. Generate your report."
       });
     }
 
-    res.json({ next_question: nextQuestion });
+    await prisma.question.create({
+      data: {
+        interviewId,
+        prompt: turn.nextQuestion
+      }
+    });
+
+    res.json({
+      done: false,
+      next_question: turn.nextQuestion
+    });
   } catch (err) {
-    console.error("Answer question error:", err);
-    res.status(500).json({ error: err.message });
+    console.error("Answer error:", err);
+    res.status(500).json({ error: "Failed to process answer" });
   }
 };
 
-// ---------------- ANALYZE EMOTION AND GRAMMAR ----------------
+// Make sure this helper exists and has proper error handling
 async function analyzeVoiceEmotionAndGrammar(text, context = "") {
   try {
     const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
-    const prompt = `
-Analyze the following interview response for:
-1. Voice emotion (confident, nervous, excited, uncertain, calm, stressed)
-2. Grammar mistakes and corrections
-3. Content relevance to the question (score 1-100)
-
-Context/Question: ${context}
+    const prompt = `Analyze this response for emotion and grammar:
+Context: ${context}
 Response: ${text}
 
-Return JSON format:
+Return only JSON:
 {
-    "emotion": "confident/nervous/excited/uncertain/calm/stressed",
-    "confidence_level": 85,
-    "grammar": {
-        "score": 78,
-        "mistakes": ["mistake 1", "mistake 2"],
-        "corrections": ["correction 1", "correction 2"]
-    },
-    "relevance": {
-        "score": 82,
-        "feedback": "Response addresses the question but could be more specific"
-    }
-}
-`;
+  "emotion": "confident/nervous/calm/etc",
+  "confidence_level": 75,
+  "grammar": {"score": 80, "mistakes": [], "corrections": []},
+  "relevance": {"score": 85, "feedback": "brief"}
+}`;
 
     const result = await model.generateContent(prompt);
     const cleaned = result.response.text().replace(/```json|```/g, "").trim();
     return JSON.parse(cleaned);
   } catch (err) {
     console.error("Analysis error:", err);
-    return {
-      emotion: "neutral",
-      confidence_level: 70,
-      grammar: { score: 70, mistakes: [], corrections: [] },
-      relevance: { score: 70, feedback: "Analysis unavailable" }
-    };
+    throw err; // Re-throw to let caller handle it
   }
 }
 

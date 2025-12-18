@@ -49,45 +49,68 @@ Return ONLY the question text.
  * Generate FOLLOW-UP interview question
  */
 export async function generateFollowUpQuestion({
-  previousQuestion,
-  answer,
   role,
   skills = [],
-  resumeContext = null
+  resumeContext,
+  previousQuestion,
+  answer
 }) {
   const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
 
   const prompt = `
-You are continuing a mock interview.
+You are an AI interviewer.
+
+Return ONLY valid JSON.
+
+{
+  "analysis": {
+    "emotion": "confident|nervous|neutral",
+    "confidence": 0-100,
+    "grammarScore": 0-100,
+    "relevanceScore": 0-100
+  },
+  "nextQuestion": "string OR END_INTERVIEW"
+}
 
 Role: ${role}
-Skills: ${skills.join(", ") || "Not specified"}
+Skills: ${skills.join(", ")}
+
+Resume:
+${resumeContext ? JSON.stringify(resumeContext) : "None"}
 
 Previous Question:
 ${previousQuestion}
 
 Candidate Answer:
-${answer || "No answer given"}
-
-Candidate Resume (JSON, may be null):
-${resumeContext ? JSON.stringify(resumeContext) : "No resume provided"}
-
-Instructions:
-- Ask ONE logical follow-up question
-- Increase difficulty gradually
-- If the answer is weak, probe deeper
-- If strong, move to next relevant area
-- If interview should end, return exactly: END_INTERVIEW
-
-Return ONLY the question text or END_INTERVIEW.
+${answer}
 `;
 
-  const result = await model.generateContent(prompt);
-  const text = cleanGeminiResponse(result.response.text());
+  try {
+    const result = await model.generateContent(prompt);
+    const cleaned = cleanGeminiResponse(result.response.text());
+    const parsed = JSON.parse(cleaned);
 
-  if (text.toUpperCase().includes("END_INTERVIEW")) {
-    return null;
+    if (
+      !parsed.nextQuestion ||
+      parsed.nextQuestion.toUpperCase().includes("END_INTERVIEW")
+    ) {
+      return { done: true, analysis: parsed.analysis };
+    }
+
+    return {
+      done: false,
+      analysis: parsed.analysis,
+      nextQuestion: parsed.nextQuestion
+    };
+
+  } catch (err) {
+    console.warn("Follow-up generation failed:", err.message);
+
+    return {
+      done: false,
+      analysis: null,
+      nextQuestion:
+        "Can you describe a challenging project you've worked on recently?"
+    };
   }
-
-  return text;
 }

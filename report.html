@@ -1,34 +1,26 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Sidra Jahangir - Evalvate</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Evalvate · Reports</title>
+
   <style>
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
 
     body {
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
-      background-color: #0a0e1a;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
+        Roboto, Arial, sans-serif;
+      background: #0a0e1a;
       color: #e5e7eb;
       padding: 2rem;
-      line-height: 1.6;
     }
 
     .header {
       display: flex;
       justify-content: space-between;
-      align-items: flex-start;
       margin-bottom: 3rem;
       gap: 2rem;
-    }
-
-    .header-left {
-      flex: 1;
     }
 
     .home-button {
@@ -36,161 +28,86 @@
       align-items: center;
       gap: 0.5rem;
       padding: 0.5rem 1rem;
-      background-color: #1e293b;
+      background: #1e293b;
       color: #60a5fa;
       text-decoration: none;
       border-radius: 0.5rem;
-      font-size: 0.875rem;
-      font-weight: 500;
-      margin-bottom: 1rem;
-      transition: all 0.2s;
       border: 1px solid #334155;
+      margin-bottom: 1rem;
     }
 
-    .home-button:hover {
-      background-color: #334155;
-      border-color: #60a5fa;
-    }
-
-    .home-icon {
-      width: 16px;
-      height: 16px;
-    }
-
-    h1 {
+    .logo-title {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
       font-size: 2.5rem;
       font-weight: 700;
       color: #60a5fa;
-      margin-bottom: 0.5rem;
     }
 
-    .subtitle {
-      font-size: 1rem;
-      color: #9ca3af;
+    .logo-img {
+      width: 30px;
+      height: 30px;
+      border-radius: 6px;
     }
 
-    .header-right {
-      display: flex;
-      align-items: center;
-      gap: 1rem;
-    }
+    .subtitle { color: #9ca3af; }
 
     .search-input {
       padding: 0.75rem 1rem;
-      background-color: #1e293b;
+      background: #1e293b;
       border: 1px solid #334155;
       border-radius: 0.5rem;
       color: #e5e7eb;
-      font-size: 0.875rem;
       width: 250px;
-      outline: none;
-    }
-
-    .search-input::placeholder {
-      color: #6b7280;
-    }
-
-    .search-input:focus {
-      border-color: #60a5fa;
-    }
-
-    .sort-dropdown {
-      padding: 0.75rem 1rem;
-      background-color: transparent;
-      border: 2px solid #60a5fa;
-      border-radius: 0.5rem;
-      color: #60a5fa;
-      font-size: 0.875rem;
-      font-weight: 500;
-      cursor: pointer;
-      min-width: 150px;
-      outline: none;
     }
 
     .stats-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
       gap: 1.5rem;
       margin-bottom: 3rem;
     }
 
     .stat-card {
-      background-color: #1e293b;
+      background: #1e293b;
       border: 1px solid #334155;
       border-radius: 0.75rem;
       padding: 1.5rem;
-      display: flex;
-      align-items: center;
-      gap: 1.5rem;
     }
 
-    .stat-icon {
-      width: 48px;
-      height: 48px;
-      border-radius: 0.5rem;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 1.5rem;
-    }
-
-    .stat-icon.blue {
-      background-color: rgba(59, 130, 246, 0.1);
-      color: #3b82f6;
-    }
-
-    .stat-icon.green {
-      background-color: rgba(34, 197, 94, 0.1);
-      color: #22c55e;
-    }
-
-    .stat-icon.yellow {
-      background-color: rgba(234, 179, 8, 0.1);
-      color: #eab308;
-    }
-
-    .stat-icon.cyan {
-      background-color: rgba(6, 182, 212, 0.1);
-      color: #06b6d4;
-    }
-
-    .stat-content h2 {
+    .stat-card h2 {
       font-size: 2rem;
-      font-weight: 700;
-      margin-bottom: 0.25rem;
+      color: #60a5fa;
     }
 
-    .stat-content p {
-      font-size: 0.875rem;
+    .stat-card p {
       color: #9ca3af;
+      font-size: 0.875rem;
     }
 
     .interviews-section {
-      background-color: #1e293b;
+      background: #1e293b;
       border: 1px solid #334155;
       border-radius: 0.75rem;
       padding: 2rem;
     }
 
     .section-header {
-      display: flex;
-      align-items: center;
-      gap: 0.75rem;
-      margin-bottom: 2rem;
       font-size: 1.5rem;
       font-weight: 600;
+      margin-bottom: 1.5rem;
     }
 
     .interview-card {
       display: flex;
-      align-items: center;
       justify-content: space-between;
-      padding: 1.5rem;
-      background-color: #0f172a;
+      background: #0f172a;
       border: 1px solid #334155;
       border-radius: 0.75rem;
+      padding: 1.5rem;
       margin-bottom: 1rem;
-      transition: border-color 0.2s;
+      cursor: pointer;
     }
 
     .interview-card:hover {
@@ -199,345 +116,176 @@
 
     .interview-left {
       display: flex;
-      align-items: center;
-      gap: 1.5rem;
+      gap: 1rem;
     }
 
     .avatar {
-      width: 60px;
-      height: 60px;
+      width: 56px;
+      height: 56px;
       border-radius: 50%;
-      background: linear-gradient(135deg, #84cc16, #22c55e);
-    }
-
-    .avatar.orange {
-      background: linear-gradient(135deg, #f59e0b, #84cc16);
+      background: linear-gradient(135deg, #22c55e, #84cc16);
     }
 
     .interview-info h3 {
-      font-size: 1.125rem;
-      font-weight: 600;
+      font-size: 1.1rem;
+      margin-bottom: 0.25rem;
+    }
+
+    .interview-info h4 {
+      color: #9ca3af;
+      font-weight: 400;
       margin-bottom: 0.5rem;
     }
 
     .interview-meta {
       display: flex;
-      align-items: center;
-      gap: 1.5rem;
-      font-size: 0.875rem;
-      color: #9ca3af;
-    }
-
-    .meta-item {
-      display: flex;
-      align-items: center;
-      gap: 0.5rem;
-    }
-
-    .meta-icon {
-      width: 16px;
-      height: 16px;
-    }
-
-    .section-icon {
-      width: 24px;
-      height: 24px;
-    }
-
-    .stat-icon svg {
-      width: 24px;
-      height: 24px;
-    }
-
-    .interview-right {
-      display: flex;
-      align-items: center;
       gap: 1rem;
-    }
-
-    .score {
-      text-align: right;
+      font-size: 0.8rem;
+      color: #9ca3af;
     }
 
     .score-value {
       font-size: 2rem;
       font-weight: 700;
-      margin-bottom: 0.25rem;
     }
 
-    .score-value.good {
-      color: #22c55e;
-    }
-
-    .score-value.average {
-      color: #60a5fa;
-    }
-
-    .score-label {
-      font-size: 0.875rem;
-      color: #9ca3af;
-    }
-
-    .score-bars {
-      display: flex;
-      gap: 0.25rem;
-      align-items: flex-end;
-      height: 40px;
-    }
-
-    .bar {
-      width: 8px;
-      background-color: #ef4444;
-      border-radius: 2px;
-    }
-
-    .barg {
-      width: 8px;
-      background-color: #22c55e;
-      border-radius: 2px;
-    }
-
-    @media (max-width: 768px) {
-      .header {
-        flex-direction: column;
-      }
-
-      .header-right {
-        width: 100%;
-        flex-direction: column;
-      }
-
-      .search-input,
-      .sort-dropdown {
-        width: 100%;
-      }
-
-      .interview-card {
-        flex-direction: column;
-        gap: 1rem;
-      }
-
-      .interview-right {
-        width: 100%;
-        justify-content: space-between;
-      }
-    }
-
-    .logo-img {
-      width: 30px;
-      height: 30px;
-      object-fit: cover; 
-      border-radius: 8px; 
-    }
-
-    .logo-title {
-      display: flex;
-      align-items: center; 
-      gap: 0.5rem;           
-      font-size: 2.5rem;
-      font-weight: 700;
-      color: #60a5fa;
-      line-height: 1;      
-    }
-
-
+    .good { color: #22c55e; }
+    .average { color: #60a5fa; }
   </style>
 </head>
+
 <body>
+  <!-- HEADER -->
   <div class="header">
-    <div class="header-left">
-      <a href="index.html" class="home-button">
-        <svg class="home-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path>
-        </svg>
-        Home
-      </a>
-      <h1 class="logo-title">
-        <div class="logo-icon">
-          <img src="assests/logo.jpg" alt="Evalvate Logo" class="logo-img">
-        </div>
-        <span>Evalvate</span>
-      </h1>
-      <p class="subtitle">Analyze and review candidate interviews with AI-powered insights</p>
+    <div>
+      <a href="index.html" class="home-button">← Home</a>
+
+      <div class="logo-title">
+        <img src="assests/logo.jpg" class="logo-img" />
+        Evalvate
+      </div>
+
+      <p class="subtitle">
+        Analyze and review candidate interviews with AI-powered insights
+      </p>
     </div>
-    <div class="header-right">
-      <input type="text" class="search-input" placeholder="Search interview..." id="searchInput">      
-    </div>
+
+    <input
+      id="searchInput"
+      class="search-input"
+      placeholder="Search interview..."
+    />
   </div>
 
+  <!-- STATS -->
   <div class="stats-grid">
     <div class="stat-card">
-      <div class="stat-icon blue">
-        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
-        </svg>
-      </div>
-      <div class="stat-content">
-        <h2>3</h2>
-        <p>Total Interviews</p>
-      </div>
+      <h2 id="totalInterviews">–</h2>
+      <p>Total Interviews</p>
     </div>
+
     <div class="stat-card">
-      <div class="stat-icon green">
-        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"></path>
-        </svg>
-      </div>
-      <div class="stat-content">
-        <h2>85</h2>
-        <p>Avg Score</p>
-      </div>
+      <h2 id="avgScore">–</h2>
+      <p>Avg Score</p>
     </div>
+
     <div class="stat-card">
-      <div class="stat-icon yellow">
-        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
-        </svg>
-      </div>
-      <div class="stat-content">
-        <h2>8</h2>
-        <p>Issues Flagged</p>
-      </div>
+      <h2 id="totalIssues">–</h2>
+      <p>Issues Flagged</p>
     </div>
+
     <div class="stat-card">
-      <div class="stat-icon cyan">
-        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-        </svg>
-      </div>
-      <div class="stat-content">
-        <h2>24m</h2>
-        <p>Total Duration</p>
-      </div>
+      <h2 id="totalDuration">–</h2>
+      <p>Total Duration</p>
     </div>
   </div>
 
+  <!-- LIST -->
   <div class="interviews-section">
-    <div class="section-header">
-        <svg class="section-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path>
-        </svg>
-      Recent Interviews
-    </div>
-
-    
-    <div class="interview-card cursor-pointer" onclick="location.href='dashboard1.html'">
-      <div class="interview-left">
-        <div class="avatar"></div>
-        <div class="interview-info">
-          <span><h3>Sidra Jahangir</h3> <h2>AI Engineer</h2></span>
-          <div class="interview-meta">
-            <span class="meta-item"><svg class="meta-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
-              </svg> Sep 30, 2025, 02:15 PM</span>
-            <span class="meta-item">
-                <svg class="meta-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                </svg>
-                10:00
-            </span>
-          </div>
-        </div>
-      </div>
-      <div class="interview-right">
-        <div class="score">
-          <div class="score-value good">93</div>
-          <div class="score-label">Overall Score</div>
-        </div>
-        <div class="score-bars">
-          <div class="barg" style="height: 95%;"></div>
-          <div class="barg" style="height: 85%;"></div>
-          <div class="barg" style="height: 90%;"></div>
-          <div class="barg" style="height: 80%;"></div>
-        </div>
-      </div>
-    </div>
-
-    <div class="interview-card cursor-pointer" onclick="location.href='dashboard2.html'">
-      <div class="interview-left">
-        <div class="avatar"></div>
-        <div class="interview-info">
-          <span><h3>Sidra Jahangir</h3> <h2>JavaScript Developer</h2></span>
-          <div class="interview-meta">
-            <span class="meta-item">
-                <span class="meta-item"><svg class="meta-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
-              </svg>
-              Sep 25, 2025, 10:34 AM</span>
-            <span class="meta-item">
-                <svg class="meta-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-              </svg>
-              7:00</span>
-          </div>
-        </div>
-      </div>
-      <div class="interview-right">
-        <div class="score">
-          <div class="score-value average">84</div>
-          <div class="score-label">Overall Score</div>
-        </div>
-        <div class="score-bars">
-          <div class="bar" style="height: 70%;"></div>
-          <div class="barg" style="height: 85%;"></div>
-          <div class="bar" style="height: 60%;"></div>
-          <div class="barg" style="height: 90%;"></div>
-        </div>
-      </div>
-    </div>
-
-    <div class="interview-card cursor-pointer" onclick="location.href='dashboard3.html'">
-      <div class="interview-left">
-        <div class="avatar"></div>
-        <div class="interview-info">
-          <span><h3>Sidra Jahangir</h3> <h2>Frontend Developer</h2></span>
-          <div class="interview-meta">
-            <span class="meta-item">
-                <span class="meta-item"><svg class="meta-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
-              </svg>
-              Sep 20, 2025, 11:34 AM</span>
-            <span class="meta-item">
-                <svg class="meta-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-              </svg>
-               7:00</span>
-          </div>
-        </div>
-      </div>
-      <div class="interview-right">
-        <div class="score">
-          <div class="score-value average">78</div>
-          <div class="score-label">Overall Score</div>
-        </div>
-        <div class="score-bars">
-          <div class="bar" style="height: 60%;"></div>
-          <div class="barg" style="height: 85%;"></div>
-          <div class="bar" style="height: 60%;"></div>
-          <div class="bar" style="height: 65%;"></div>
-        </div>
-      </div>
-    </div>
+    <div class="section-header">Recent Interviews</div>
+    <div id="interviewList"></div>
   </div>
 
+  <!-- SCRIPT -->
   <script>
-    // Search functionality (by name or role)
-    const searchInput = document.getElementById('searchInput');
-    searchInput.addEventListener('input', (e) => {
-      const searchTerm = e.target.value.toLowerCase();
-      const interviewCards = document.querySelectorAll('.interview-card');
-      
-      interviewCards.forEach(card => {
-        const name = card.querySelector('h3').textContent.toLowerCase();
-        const role = card.querySelector('h2').textContent.toLowerCase();
-        
-        if (name.includes(searchTerm) || role.includes(searchTerm)) {
-          card.style.display = 'flex';
-        } else {
-          card.style.display = 'none';
-        }
+    const API_BASE = "http://127.0.0.1:3000";
+    const token = localStorage.getItem("accessToken");
+
+    async function loadReports() {
+      const res = await fetch(`${API_BASE}/interview/reports`, {
+        headers: { Authorization: `Bearer ${token}` },
       });
-    });
+
+      if (!res.ok) return alert("Failed to load reports");
+
+      const { reports } = await res.json();
+      updateStats(reports);
+      renderReports(reports);
+    }
+
+    function updateStats(reports) {
+      document.getElementById("totalInterviews").textContent = reports.length;
+
+      const avg =
+        reports.reduce((s, r) => s + (r.ratings?.overall || 0), 0) /
+        (reports.length || 1);
+
+      document.getElementById("avgScore").textContent = Math.round(avg);
+
+      document.getElementById("totalIssues").textContent =
+        reports.reduce((s, r) => s + (r.issuesCount || 0), 0);
+
+      document.getElementById("totalDuration").textContent =
+        reports.reduce((s, r) => s + (r.durationMinutes || 0), 0) + "m";
+    }
+
+    function renderReports(reports) {
+      const container = document.getElementById("interviewList");
+      container.innerHTML = "";
+
+      reports.forEach(r => {
+        container.innerHTML += `
+          <div class="interview-card" onclick="openDashboard('${r.id}')">
+            <div class="interview-left">
+              <div class="avatar"></div>
+              <div class="interview-info">
+                <h3>${r.candidate.name}</h3>
+                <h4>${r.candidate.role}</h4>
+                <div class="interview-meta">
+                  <span>${new Date(r.interview.date).toLocaleString()}</span>
+                  <span>${r.interview.duration}m</span>
+                  <span>${r.interview.type}</span>
+                </div>
+              </div>
+            </div>
+            <div>
+              <div class="score-value ${
+                r.ratings.overall >= 80 ? "good" : "average"
+              }">
+                ${r.ratings.overall}
+              </div>
+            </div>
+          </div>
+        `;
+      });
+    }
+
+    function openDashboard(id) {
+      location.href = `dashboard.html?interviewId=${id}`;
+    }
+
+    document
+      .getElementById("searchInput")
+      .addEventListener("input", e => {
+        const q = e.target.value.toLowerCase();
+        document.querySelectorAll(".interview-card").forEach(c => {
+          c.style.display = c.innerText.toLowerCase().includes(q)
+            ? "flex"
+            : "none";
+        });
+      });
+
+    document.addEventListener("DOMContentLoaded", loadReports);
   </script>
 </body>
 </html>
