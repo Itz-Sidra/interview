@@ -1,4 +1,4 @@
-const API_BASE_URL = 'http://localhost:3000';
+const API_BASE = "https://evalvate-backend-862980960928.asia-south1.run.app";
 
 const getAuthToken = () => {
     return localStorage.getItem('accessToken') || sessionStorage.getItem('accessToken');
@@ -34,7 +34,7 @@ const apiCall = async (endpoint, method = 'GET', data = null, isFormData = false
     }
 
     try {
-        const response = await fetch(`${API_BASE_URL}${endpoint}`, options);
+        const response = await fetch(`${API_BASE}${endpoint}`, options);
         
         if (response.status === 401 || response.status === 403) {
             alert('Session expired. Please login again.');

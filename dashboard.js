@@ -1,4 +1,4 @@
-const API_BASE = "http://127.0.0.1:3000";
+const API_BASE = "https://evalvate-backend-862980960928.asia-south1.run.app";
 const token = localStorage.getItem("accessToken");
 
 function getInterviewId() {

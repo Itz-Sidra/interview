@@ -1,3 +1,5 @@
+const API_BASE = "https://evalvate-backend-862980960928.asia-south1.run.app";
+
 class InterviewBot {
             constructor() {
                 this.ttsQueue = [];
@@ -297,7 +299,7 @@ class InterviewBot {
                 const token = localStorage.getItem("accessToken"); // ADD THIS LINE
                 
                 try {
-                    const response = await fetch("http://127.0.0.1:3000/interview/transcribe", {
+                    const response = await fetch("API_BASE/interview/transcribe", {
                         method: "POST",
                         headers: {
                             "Authorization": `Bearer ${token}` // ADD THIS LINE
@@ -423,7 +425,7 @@ class InterviewBot {
             async playTTS(text) {
                 try {
                     const token = localStorage.getItem("accessToken");
-                    const response = await fetch("http://127.0.0.1:3000/interview/speak", {
+                    const response = await fetch("API_BASE/interview/speak", {
                         method: "POST",
                         headers: {
                         "Content-Type": "application/json",
@@ -454,7 +456,7 @@ class InterviewBot {
             playTTSWithPromise(text) {
                 const token = localStorage.getItem("accessToken");
                 return new Promise((resolve, reject) => {
-                    fetch("http://127.0.0.1:3000/interview/speak", {
+                    fetch("API_BASE/interview/speak", {
                         method: "POST",
                         headers: {
                         "Content-Type": "application/json",
@@ -485,7 +487,7 @@ class InterviewBot {
                 const token = localStorage.getItem("accessToken");
                 
                 try {
-                    const response = await fetch("http://127.0.0.1:3000/interview/answer", {
+                    const response = await fetch("API_BASE/interview/answer", {
                         method: "POST",
                         headers: {
                             "Content-Type": "application/json",
@@ -530,7 +532,7 @@ class InterviewBot {
 
                 const token = localStorage.getItem("accessToken");
 
-                const response = await fetch("http://127.0.0.1:3000/interview-config/basics", {
+                const response = await fetch("API_BASE/interview-config/basics", {
                     method: "POST",
                     headers: {
                     "Content-Type": "application/json",
@@ -655,7 +657,7 @@ class InterviewBot {
                     throw new Error("configId missing. Basics step not completed.");
                 }
 
-                const response = await fetch("http://127.0.0.1:3000/interview-config/review", {
+                const response = await fetch("API_BASE/interview-config/review", {
                     method: "POST",
                     headers: {
                         "Content-Type": "application/json",
@@ -686,7 +688,7 @@ class InterviewBot {
                 }
 
                 // Update status to IN_PROGRESS
-                await fetch("http://127.0.0.1:3000/interview/status", {
+                await fetch("API_BASE/interview/status", {
                     method: "POST",
                     headers: {
                         "Content-Type": "application/json",
@@ -725,7 +727,7 @@ class InterviewBot {
             this.stopTimer();
 
             // Update status to COMPLETED
-            fetch("http://127.0.0.1:3000/interview/status", {
+            fetch("API_BASE/interview/status", {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
@@ -764,7 +766,7 @@ class InterviewBot {
                 const role = this.extractRole(message) || "Software Engineer";
                 const company = this.extractCompany(message) || "";
 
-                const response = await fetch("http://127.0.0.1:3000/interview/start", {
+                const response = await fetch("API_BASE/interview/start", {
                     method: "POST",
                     headers: {
                     "Content-Type": "application/json",
@@ -796,7 +798,7 @@ class InterviewBot {
                     const token = localStorage.getItem("accessToken");
 
                     try {
-                        const response = await fetch("http://127.0.0.1:3000/interview/answer", {
+                        const response = await fetch("API_BASE/interview/answer", {
                             method: "POST",
                             headers: {
                                 "Content-Type": "application/json",
@@ -837,7 +839,7 @@ class InterviewBot {
                 const token = localStorage.getItem("accessToken");
                 
                 try {
-                    const response = await fetch(`http://127.0.0.1:3000/interview/report/${this.currentInterviewId}`, {
+                    const response = await fetch(`${API_BASE}/interview/report/${this.currentInterviewId}`, {
                         headers: {
                             "Authorization": `Bearer ${token}`,
                         }
