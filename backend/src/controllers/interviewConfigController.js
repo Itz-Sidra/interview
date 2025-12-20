@@ -90,6 +90,14 @@ export const handleResumeUpload = async (req, res) => {
     const file = req.file;
     const userId = req.user.userId;
 
+    console.log('=== FILE OBJECT DEBUG ===');
+    console.log('file.path:', file?.path);
+    console.log('file.filename:', file?.filename);
+    console.log('file.originalname:', file?.originalname);
+    console.log('file.destination:', file?.destination);
+    console.log('Full file object:', JSON.stringify(file, null, 2));
+    console.log('========================');
+
     if (!configId) {
       return res.status(400).json({ error: "configId is required" });
     }
@@ -106,7 +114,7 @@ export const handleResumeUpload = async (req, res) => {
       return res.status(404).json({ error: "Interview config not found" });
     }
 
-    //FALLBACK
+    let textExtract = "";
     let parsedJson = {
       parseSkipped: true,
       skills: config.skills,
@@ -117,6 +125,9 @@ export const handleResumeUpload = async (req, res) => {
 
     try {
       const result = await extractAndParseResume(file);
+      if (result?.textExtract) {
+        textExtract = result.textExtract;
+      }
       if (result?.parsedJson) {
         parsedJson = result.parsedJson;
       }
@@ -128,8 +139,8 @@ export const handleResumeUpload = async (req, res) => {
       data: {
         userId,
         configId,
-        s3Key: s3Result.Key,
-        textExtract: "",
+        s3Key: file.filename || `resume-${Date.now()}-${file.originalname}`,
+        textExtract,
         parsedJson
       }
     });

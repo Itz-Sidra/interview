@@ -2,7 +2,7 @@ import { PrismaClient } from "../generated/index.js";
 import { GoogleGenerativeAI } from "@google/generative-ai";
 import axios from "axios";
 import FormData from "form-data";
-import { generateFirstQuestion, generateFollowUpQuestion } from "../utils/questionGenerator.js";
+// import { generateFirstQuestion, generateFollowUpQuestion } from "../utils/questionGenerator.js";
 
 const prisma = new PrismaClient();
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
@@ -79,5 +79,31 @@ export const speakText = async (req, res) => {
   } catch (err) {
     console.error("TTS error:", err);
     res.status(500).json({ error: `TTS error: ${err.message}` });
+  }
+};
+
+// Update interview status
+export const updateInterviewStatus = async (req, res) => {
+  try {
+    const { interviewId, status } = req.body;
+    
+    const validStatuses = ['PENDING', 'IN_PROGRESS', 'COMPLETED', 'CANCELLED'];
+    if (!validStatuses.includes(status)) {
+      return res.status(400).json({ error: 'Invalid status' });
+    }
+
+    const interview = await prisma.interview.update({
+      where: { id: interviewId },
+      data: { 
+        status,
+        ...(status === 'IN_PROGRESS' && { startedAt: new Date() }),
+        ...(status === 'COMPLETED' && { endedAt: new Date() })
+      }
+    });
+
+    res.json({ success: true, interview });
+  } catch (err) {
+    console.error('Status update error:', err);
+    res.status(500).json({ error: 'Failed to update status' });
   }
 };

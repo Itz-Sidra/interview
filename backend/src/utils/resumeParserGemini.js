@@ -1,31 +1,50 @@
 import fs from "fs";
-import mime from "mime-types";
+import path from "path";
+import mammoth from "mammoth";
 import { GoogleGenerativeAI } from "@google/generative-ai";
 
-const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
+const genAI = new GoogleGenerativeAI(process.env.GEMINI_RESUME_API_KEY);
 
 export async function extractAndParseResume(file) {
   try {
+    // Extract text based on file type
+    let textExtract = "";
+    const ext = path.extname(file.originalname).toLowerCase();
+
+    if (ext === ".pdf") {
+      const { default: pdfParse } = await import("pdf-parse/lib/pdf-parse.js");
+      const buffer = fs.readFileSync(file.path);
+      const pdfData = await pdfParse(buffer);
+      textExtract = pdfData.text;
+    } else if (ext === ".docx" || ext === ".doc") {
+      const buffer = fs.readFileSync(file.path);
+      const result = await mammoth.extractRawText({ buffer });
+      textExtract = result.value;
+    } else {
+      throw new Error("Unsupported file format");
+    }
+
+    // Send extracted text to Gemini for structured parsing
     const fileBuffer = fs.readFileSync(file.path);
     const base64Data = fileBuffer.toString("base64");
-    const mimeType = file.mimetype || mime.lookup(file.path) || "application/pdf";
+    const mimeType = file.mimetype;
 
-    const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash" });
+    const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
 
     const prompt = `
-Parse this resume into clean JSON:
-{
-  "name": "",
-  "email": "",
-  "phone": "",
-  "skills": [],
-  "education": [],
-  "experience": [],
-  "projects": []
-}
+      Parse this resume into clean JSON:
+      {
+        "name": "",
+        "email": "",
+        "phone": "",
+        "skills": [],
+        "education": [{"degree": "", "institution": "", "year": ""}],
+        "experience": [{"title": "", "company": "", "duration": "", "description": ""}],
+        "projects": [{"name": "", "description": "", "technologies": []}]
+      }
 
-Return ONLY JSON. No extra text.
-`;
+      Return ONLY JSON. No extra text.
+      `;
 
     const result = await model.generateContent({
       contents: [
@@ -45,17 +64,17 @@ Return ONLY JSON. No extra text.
     });
 
     const text = await result.response.text();
-
     const jsonStart = text.indexOf("{");
     const jsonEnd = text.lastIndexOf("}");
     const jsonString = text.slice(jsonStart, jsonEnd + 1);
-
     const parsedJson = JSON.parse(jsonString);
 
-    return { parsedJson };
+    return { textExtract, parsedJson };
+
   } catch (err) {
-     console.warn("Resume parsing skipped:", err.message);
+    console.warn("Resume parsing failed:", err.message);
     return {
+      textExtract: "",
       parsedJson: {
         parseSkipped: true,
         skills: [],
