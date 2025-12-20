@@ -9,7 +9,9 @@ import interviewConfigRoutes from './src/routes/interviewConfig.js';
 const app = express();
 
 app.use(cors({
-  origin: '*', 
+  origin: [
+    "https://evalvate.dev/"
+  ], 
   credentials: true
 }));
 
@@ -22,5 +24,8 @@ app.get('/profile', authenticateToken, (req, res) => {
 app.use('/interview', interviewRoutes);
 app.use('/interview-config', interviewConfigRoutes);
 
-const PORT = 3000;
-app.listen(PORT, () => console.log(`Server running on http://localhost:${PORT}`));
+const PORT = process.env.PORT || 3000;
+
+app.listen(PORT, "0.0.0.0", () => {
+  console.log(`Server running on port ${PORT}`);
+});
