@@ -10,7 +10,7 @@ const app = express();
 
 app.use(cors({
   origin: [
-    "https://evalvate.dev/"
+    "https://evalvate.dev"
   ], 
   credentials: true
 }));
