@@ -7,38 +7,24 @@ import {
   updateInterviewScores
 } from "../models/InterviewSession.js";
 import axios from 'axios';
-import FormData from 'form-data'; // ADD THIS IMPORT
+import FormData from 'form-data';
 
 const prisma = new PrismaClient();
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
-
-// ADD THIS LINE - Define ElevenLabs API key
 const ELEVENLABS_API_KEY = process.env.ELEVENLABS_API_KEY;
 
-/**
- * UTILITY: Strip markdown code blocks from Gemini response
- * Handles both ```json and ``` formats
- */
 function cleanGeminiJSON(rawText) {
   let cleaned = rawText.trim();
-  
-  // Remove markdown code fences
   cleaned = cleaned
-    .replace(/^```json\s*/i, "")     // Remove opening ```json
-    .replace(/^```\s*/i, "")          // Remove opening ```
-    .replace(/```\s*$/, "");          // Remove closing ```
-  
+    .replace(/^```json\s*/i, "")
+    .replace(/^```\s*/i, "")
+    .replace(/```\s*$/, "");
   return cleaned.trim();
 }
 
-/**
- * POST /interview/start
- * Begin interview - return first question
- */
 export async function startInterview(req, res) {
   const { interviewId, role, company } = req.body;
   try {
-    // Fetch interview
     const interview = await prisma.interview.findUnique({
       where: { id: interviewId },
       include: { config: true }
@@ -46,11 +32,11 @@ export async function startInterview(req, res) {
     if (!interview) {
       return res.status(404).json({ error: "Interview not found" });
     }
-    // Get resume
+
     const resume = await prisma.resume.findUnique({
       where: { configId: interview.configId }
     });
-    // Build session
+
     const session = {
       interviewId,
       userId: interview.userId,
@@ -65,18 +51,19 @@ export async function startInterview(req, res) {
       questionsAnswered: 0,
       totalQuestions: 5
     };
-    // Generate first question
+
     const firstQuestion = await generateFirstQuestion(session);
-    // Save question
-    const savedQuestion = await prisma.question.create({
+
+    await prisma.question.create({
       data: {
         interviewId,
         prompt: firstQuestion
       }
     });
-    // Store session in memory cache (upgrade to Redis for production)
+
     global.interviewSessions = global.interviewSessions || {};
     global.interviewSessions[interviewId] = session;
+
     res.json({
       interviewId,
       question: firstQuestion,
@@ -88,10 +75,6 @@ export async function startInterview(req, res) {
   }
 }
 
-/**
- * Generate first question without candidate answer
- * Uses Gemini once to create a contextual opening question
- */
 async function generateFirstQuestion(session) {
   const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
   
@@ -118,7 +101,7 @@ Format:
         temperature: 0.7,
         maxOutputTokens: 512,
         responseMimeType: "application/json",
-        responseSchema: { // ADD SCHEMA
+        responseSchema: {
           type: "object",
           properties: {
             question: { type: "string" }
@@ -131,44 +114,34 @@ Format:
     const rawText = await response.response.text();
     console.log("DEBUG: Raw Gemini response:", rawText.substring(0, 200));
     
-    // Clean any markdown artifacts
     const cleanedJSON = cleanGeminiJSON(rawText);
     const result = JSON.parse(cleanedJSON);
     return result.question;
   } catch (error) {
     console.error("Gemini first question error:", error.message);
-    // Fallback question
     return `Tell me about your experience with ${session.role} development and what drew you to this role.`;
   }
 }
 
-/**
- * POST /interview/answer
- * Receive candidate answer, evaluate with Gemini, return next question
- */
 export async function handleCandidateAnswer(req, res) {
   const { interviewId, answer } = req.body;
   try {
-    // Retrieve session from cache
     if (!global.interviewSessions || !global.interviewSessions[interviewId]) {
       return res.status(404).json({ error: "Interview session not found" });
     }
     const session = global.interviewSessions[interviewId];
     
-    // Add candidate answer to history
     session.answerHistory.push({
       answerId: `answer-${Date.now()}`,
       answer,
       submittedAt: Date.now()
     });
     
-    // ========== SINGLE GEMINI CALL ==========
     let evaluation;
     try {
       evaluation = await evaluateAndGenerateNextQuestion(session, answer);
     } catch (geminiError) {
       console.error("Gemini evaluation error:", geminiError.message);
-      // Fallback evaluation
       evaluation = {
         evaluation: {
           answerQuality: 60,
@@ -183,15 +156,10 @@ export async function handleCandidateAnswer(req, res) {
         questionRationale: "Fallback follow-up"
       };
     }
-    // ========================================
     
-    // Save evaluation and question to database
     await saveQuestionAndEvaluation(interviewId, evaluation.nextQuestion, evaluation);
-    
-    // Update cumulative scores
     await updateInterviewScores(interviewId, evaluation);
     
-    // Add next question to session
     session.questionHistory.push({
       questionId: `q-${Date.now()}`,
       question: evaluation.nextQuestion,
@@ -200,7 +168,6 @@ export async function handleCandidateAnswer(req, res) {
     });
     session.questionsAnswered++;
     
-    // Check if interview is complete
     const isComplete = session.questionsAnswered >= session.totalQuestions;
     
     res.json({
@@ -218,33 +185,46 @@ export async function handleCandidateAnswer(req, res) {
   }
 }
 
-/**
- * GET /interview/report/:id
- * Generate final report
- */
 export async function generateReport(req, res) {
   const { id: interviewId } = req.params;
+  
   try {
-    const session = await getInterviewSession(interviewId);
-    if (!session) {
+    const interview = await prisma.interview.findUnique({
+      where: { id: interviewId },
+      include: {
+        config: true,
+        user: true,
+        issues: true,
+        questions: true
+      }
+    });
+
+    if (!interview) {
       return res.status(404).json({ error: "Interview not found" });
     }
-    
-    // Aggregate flagged issues
-    const issues = await prisma.flaggedIssue.findMany({
-      where: { interviewId }
-    });
-    
-    // Build report
+
+    const issues = interview.issues || [];
+
     const report = {
       interviewId,
+      candidate: {
+        name: interview.user.name,
+        role: interview.config.role
+      },
+      interview: {
+        date: interview.createdAt,
+        duration: interview.endedAt && interview.startedAt
+          ? Math.floor((new Date(interview.endedAt) - new Date(interview.startedAt)) / 60000)
+          : 0,
+        type: interview.config.type
+      },
       ratings: {
-        overall: session.cumulativeScores.overall,
-        content: session.cumulativeScores.technical,
-        confidence: session.cumulativeScores.confidence
+        overall: Math.round(interview.overallScore || 60),
+        content: Math.round(interview.overallScore || 60),
+        confidence: Math.round(interview.overallScore || 60)
       },
       grammar: {
-        score: session.cumulativeScores.grammar,
+        score: Math.round(interview.overallScore || 60),
         mistakes: issues
           .filter((i) => i.category === "GRAMMAR")
           .map((i) => i.description),
@@ -261,11 +241,13 @@ export async function generateReport(req, res) {
       })),
       recommendation: {
         strengths: ["Clear communication", "Technical knowledge"],
-        areasToImprove: ["Reduce filler words", "More specific examples"],
-        actionableTips: ["Practice speaking clearly", "Prepare examples"]
+        areasToImprove: issues.length > 0 
+          ? issues.map(i => i.description).slice(0, 3)
+          : ["Continue practicing", "Maintain consistency"],
+        actionableTips: ["Practice speaking clearly", "Prepare examples", "Review technical concepts"]
       }
     };
-    
+
     res.json(report);
   } catch (error) {
     console.error("Report generation error:", error);
@@ -273,7 +255,50 @@ export async function generateReport(req, res) {
   }
 }
 
-// ---------------- TRANSCRIBE AUDIO (STT) ----------------
+export async function getAllReports(req, res) {
+  try {
+    const userId = req.user.userId;
+    const interviews = await prisma.interview.findMany({
+      where: { userId },
+      include: {
+        config: true,
+        user: true
+      },
+      orderBy: { createdAt: 'desc' }
+    });
+
+    const reports = interviews.map(interview => {
+      const durationMs = interview.endedAt && interview.startedAt
+        ? new Date(interview.endedAt) - new Date(interview.startedAt)
+        : 0;
+      
+      const durationMinutes = Math.floor(durationMs / 60000);
+
+      return {
+        id: interview.id,
+        candidate: {
+          name: interview.user.name,
+          role: interview.config.role
+        },
+        interview: {
+          date: interview.createdAt,
+          duration: durationMinutes,
+          type: interview.config.type
+        },
+        ratings: {
+          overall: Math.round(interview.overallScore || 0)
+        },
+        issuesCount: 0
+      };
+    });
+
+    res.json({ reports });
+  } catch (error) {
+    console.error("Get reports error:", error);
+    res.status(500).json({ error: error.message });
+  }
+}
+
 export const transcribeAudio = async (req, res) => {
   try {
     if (!ELEVENLABS_API_KEY) {
@@ -290,7 +315,7 @@ export const transcribeAudio = async (req, res) => {
       filename: file.originalname,
       contentType: file.mimetype
     });
-    formData.append('model_id', 'scribe_v2'); // CHANGED from eleven_multilingual_v2
+    formData.append('model_id', 'scribe_v2');
 
     const response = await axios.post(
       'https://api.elevenlabs.io/v1/speech-to-text',
@@ -316,7 +341,6 @@ export const transcribeAudio = async (req, res) => {
   }
 };
 
-// ---------------- TEXT TO SPEECH (TTS) ----------------
 export const speakText = async (req, res) => {
   try {
     if (!ELEVENLABS_API_KEY) {
@@ -329,7 +353,7 @@ export const speakText = async (req, res) => {
     }
 
     const response = await axios.post(
-      `https://api.elevenlabs.io/v1/text-to-speech/21m00Tcm4TlvDq8ikWAM/stream`, // Rachel voice
+      `https://api.elevenlabs.io/v1/text-to-speech/21m00Tcm4TlvDq8ikWAM/stream`,
       {
         text,
         model_id: "eleven_turbo_v2_5",

@@ -12,6 +12,7 @@ router.post('/status', authenticateToken, interviewController.updateInterviewSta
 
 router.post("/start", authenticateToken, interviewController.startInterview);
 router.post("/answer", authenticateToken, interviewController.handleCandidateAnswer);
+router.get("/reports", authenticateToken, interviewController.getAllReports);
 router.get("/report/:id", authenticateToken, interviewController.generateReport);
 
 export default router;
