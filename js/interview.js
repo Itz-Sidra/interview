@@ -293,20 +293,27 @@ class InterviewBot {
             async sendAudioToTranscribe(blob) {
                 const formData = new FormData();
                 formData.append("audio", blob, "recording.webm");
-
+                
+                const token = localStorage.getItem("accessToken"); // ADD THIS LINE
+                
                 try {
                     const response = await fetch("http://127.0.0.1:3000/interview/transcribe", {
                         method: "POST",
+                        headers: {
+                            "Authorization": `Bearer ${token}` // ADD THIS LINE
+                        },
                         body: formData
                     });
-
+                    
                     const data = await response.json();
-                    if (!response.ok) throw new Error(data.detail || "STT failed");
-
+                    
+                    if (!response.ok) {
+                        throw new Error(data.error || data.detail || "STT failed");
+                    }
+                    
                     this.userInput.value = data.transcript;
                     this.userInput.focus();
                     this.autoResizeTextarea();
-
                 } catch (err) {
                     console.error("Transcription error:", err);
                     this.addMessage("bot", "Sorry, I couldn't understand your voice.");
@@ -475,9 +482,8 @@ class InterviewBot {
 
             async handleInterviewResponse(userAnswer) {
                 this.showTypingIndicator();
-
                 const token = localStorage.getItem("accessToken");
-
+                
                 try {
                     const response = await fetch("http://127.0.0.1:3000/interview/answer", {
                         method: "POST",
@@ -491,26 +497,30 @@ class InterviewBot {
                             answer: userAnswer
                         }),
                     });
-
+                    
                     const data = await response.json();
                     this.hideTypingIndicator();
-
+                    
                     if (!response.ok) {
-                        throw new Error(data.detail || "Failed to get next question.");
+                        throw new Error(data.error || data.detail || "Failed to get next question.");
                     }
-
+                    
                     if (data.done) {
                         this.stopInterview();
-                        this.addMessage('bot', data.message);
+                        const message = data.message || "Interview complete! Click 'Generate Report' to see your analysis.";
+                        this.addMessage('bot', message);
                         return;
                     }
-
-                    this.addMessage('bot', data.next_question);
-                    this.lastQuestion = data.next_question;  
+                    
+                    // Check if nextQuestion exists
+                    const nextQuestion = data.nextQuestion || data.evaluation?.nextQuestion || "Could you elaborate on that?";
+                    this.addMessage('bot', nextQuestion);
+                    this.lastQuestion = nextQuestion;
+                    
                 } catch (err) {
                     console.error("Interview follow-up failed:", err);
-                    this.addMessage('bot', "Hmm, I ran into an issue coming up with the next question.");
                     this.hideTypingIndicator();
+                    this.addMessage('bot', "Hmm, I ran into an issue. Could you please try again?");
                 }
             }
 
@@ -579,6 +589,11 @@ class InterviewBot {
             }
 
             addMessage(sender, content) {
+                if (typeof content !== "string") {
+                    console.warn("addMessage received non-string content:", content);
+                    content = "Something went wrong. Please try again.";
+                }
+
                 const messageDiv = document.createElement('div');
                 messageDiv.className = `message ${sender}-message`;
 
@@ -590,11 +605,12 @@ class InterviewBot {
                 this.chatMessages.appendChild(messageDiv);
                 this.chatMessages.scrollTop = this.chatMessages.scrollHeight;
 
-                if (sender === 'bot'  && this.isInterviewActive) {
+                if (sender === 'bot' && this.isInterviewActive) {
                     const cleanText = content.replace(/<[^>]*>?/gm, '');
                     this.enqueueTTS(cleanText);
                 }
             }
+
 
             showTypingIndicator() {
                 const typingDiv = document.createElement('div');
@@ -800,8 +816,8 @@ class InterviewBot {
                             throw new Error(data.detail || "Failed to get next question.");
                         }
 
-                        this.addMessage('bot', data.next_question);
-                        this.lastQuestion = data.next_question;
+                        this.addMessage('bot', data.nextquestion);
+                        this.lastQuestion = data.nextquestion;
                     } catch (err) {
                         console.error("Ask again failed:", err);
                         this.addMessage('bot', "Couldn't generate another question right now.");
