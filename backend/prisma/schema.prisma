@@ -158,7 +158,7 @@ model FlaggedIssue {
   interview   Interview        @relation(fields: [interviewId], references: [id])
   interviewId String
   category    AnalysisCategory
-  timestampMs Int?
+  timestampMs BigInt?
   description String
   severity    Int
   createdAt   DateTime         @default(now())

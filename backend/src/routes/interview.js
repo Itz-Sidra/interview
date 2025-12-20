@@ -10,4 +10,8 @@ router.post('/transcribe', authenticateToken, upload.single('audio'), interviewC
 router.post('/speak', authenticateToken, interviewController.speakText);
 router.post('/status', authenticateToken, interviewController.updateInterviewStatus);
 
+router.post("/start", authenticateToken, interviewController.startInterview);
+router.post("/answer", authenticateToken, interviewController.handleCandidateAnswer);
+router.get("/report/:id", authenticateToken, interviewController.generateReport);
+
 export default router;
