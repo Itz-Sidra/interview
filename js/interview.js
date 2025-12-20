@@ -299,7 +299,7 @@ class InterviewBot {
                 const token = localStorage.getItem("accessToken"); // ADD THIS LINE
                 
                 try {
-                    const response = await fetch("API_BASE/interview/transcribe", {
+                    const response = await fetch(`${API_BASE}/interview/transcribe`, {
                         method: "POST",
                         headers: {
                             "Authorization": `Bearer ${token}` // ADD THIS LINE
@@ -425,7 +425,7 @@ class InterviewBot {
             async playTTS(text) {
                 try {
                     const token = localStorage.getItem("accessToken");
-                    const response = await fetch("API_BASE/interview/speak", {
+                    const response = await fetch(`${API_BASE}/interview/speak`, {
                         method: "POST",
                         headers: {
                         "Content-Type": "application/json",
@@ -456,7 +456,7 @@ class InterviewBot {
             playTTSWithPromise(text) {
                 const token = localStorage.getItem("accessToken");
                 return new Promise((resolve, reject) => {
-                    fetch("API_BASE/interview/speak", {
+                    fetch(`${API_BASE}/interview/speak`, {
                         method: "POST",
                         headers: {
                         "Content-Type": "application/json",
@@ -487,7 +487,7 @@ class InterviewBot {
                 const token = localStorage.getItem("accessToken");
                 
                 try {
-                    const response = await fetch("API_BASE/interview/answer", {
+                    const response = await fetch(`${API_BASE}/interview/answer`, {
                         method: "POST",
                         headers: {
                             "Content-Type": "application/json",
@@ -532,7 +532,7 @@ class InterviewBot {
 
                 const token = localStorage.getItem("accessToken");
 
-                const response = await fetch("API_BASE/interview-config/basics", {
+                const response = await fetch(`${API_BASE}/interview-config/basics`, {
                     method: "POST",
                     headers: {
                     "Content-Type": "application/json",
@@ -657,7 +657,7 @@ class InterviewBot {
                     throw new Error("configId missing. Basics step not completed.");
                 }
 
-                const response = await fetch("API_BASE/interview-config/review", {
+                const response = await fetch(`${API_BASE}/interview-config/review`, {
                     method: "POST",
                     headers: {
                         "Content-Type": "application/json",
@@ -688,7 +688,7 @@ class InterviewBot {
                 }
 
                 // Update status to IN_PROGRESS
-                await fetch("API_BASE/interview/status", {
+                await fetch(`${API_BASE}/interview/status`, {
                     method: "POST",
                     headers: {
                         "Content-Type": "application/json",
@@ -727,7 +727,7 @@ class InterviewBot {
             this.stopTimer();
 
             // Update status to COMPLETED
-            fetch("API_BASE/interview/status", {
+            fetch(`${API_BASE}/interview/status`, {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
@@ -766,7 +766,7 @@ class InterviewBot {
                 const role = this.extractRole(message) || "Software Engineer";
                 const company = this.extractCompany(message) || "";
 
-                const response = await fetch("API_BASE/interview/start", {
+                const response = await fetch(`${API_BASE}/interview/start`, {
                     method: "POST",
                     headers: {
                     "Content-Type": "application/json",
@@ -798,7 +798,7 @@ class InterviewBot {
                     const token = localStorage.getItem("accessToken");
 
                     try {
-                        const response = await fetch("API_BASE/interview/answer", {
+                        const response = await fetch(`${API_BASE}/interview/answer`, {
                             method: "POST",
                             headers: {
                                 "Content-Type": "application/json",
