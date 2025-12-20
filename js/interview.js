@@ -666,9 +666,21 @@ class InterviewBot {
                 this.currentInterviewId = localStorage.getItem("currentInterviewId");
 
                 if (!this.currentInterviewId) {
-                throw new Error("Interview not initialized");
+                    throw new Error("Interview not initialized");
                 }
 
+                // Update status to IN_PROGRESS
+                await fetch("http://127.0.0.1:3000/interview/status", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                        "Authorization": `Bearer ${localStorage.getItem("accessToken")}`
+                    },
+                    body: JSON.stringify({
+                        interviewId: this.currentInterviewId,
+                        status: "IN_PROGRESS"
+                    })
+                });
 
                 this.isInterviewActive = true;
                 this.interviewStartTime = Date.now();
@@ -692,6 +704,37 @@ class InterviewBot {
             }
         }
 
+        stopInterview() {
+            this.isInterviewActive = false;
+            this.stopTimer();
+
+            // Update status to COMPLETED
+            fetch("http://127.0.0.1:3000/interview/status", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    "Authorization": `Bearer ${localStorage.getItem("accessToken")}`
+                },
+                body: JSON.stringify({
+                    interviewId: this.currentInterviewId,
+                    status: "COMPLETED"
+                })
+            });
+
+            this.startBtn.disabled = false;
+            this.stopBtn.disabled = true;
+            this.askAgainBtn.disabled = true;
+            this.reportBtn.style.display = 'inline-flex';
+
+            const duration = Math.floor((Date.now() - this.interviewStartTime) / 1000);
+            const minutes = Math.floor(duration / 60);
+            const seconds = duration % 60;
+
+            this.addMessage(
+                'bot',
+                `Interview completed! Duration: ${minutes}m ${seconds}s. Click "Generate Report" to see your performance analysis.`
+            );
+        }
 
             async fetchFirstQuestion() {
                 const token = localStorage.getItem("accessToken");
@@ -765,22 +808,6 @@ class InterviewBot {
                         this.hideTypingIndicator();
                     }
                 }
-            }
-
-            stopInterview() {
-                this.isInterviewActive = false;
-                this.stopTimer();
-            
-                this.startBtn.disabled = false;
-                this.stopBtn.disabled = true;
-                this.askAgainBtn.disabled = true;
-                this.reportBtn.style.display = 'inline-flex';
-                
-                const duration = Math.floor((Date.now() - this.interviewStartTime) / 1000);
-                const minutes = Math.floor(duration / 60);
-                const seconds = duration % 60;
-                
-                this.addMessage('bot', `Interview completed! Duration: ${minutes}m ${seconds}s. Click "Generate Report" to see your performance analysis.`);
             }
 
             async generateReport() {
