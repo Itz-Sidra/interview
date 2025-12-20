@@ -106,10 +106,7 @@ export const handleResumeUpload = async (req, res) => {
       return res.status(404).json({ error: "Interview config not found" });
     }
 
-    // Upload (cheap, no API)
-    const s3Result = await uploadToS3(file);
-
-    // DEFAULT SAFE FALLBACK (NO API)
+    //FALLBACK
     let parsedJson = {
       parseSkipped: true,
       skills: config.skills,
@@ -125,7 +122,6 @@ export const handleResumeUpload = async (req, res) => {
       }
     } catch (err) {
       console.warn("Resume parsing skipped:", err.message);
-      // continue safely
     }
 
     const resume = await prisma.resume.create({

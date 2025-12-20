@@ -56,7 +56,7 @@ model Resume {
   userId      String
   config      InterviewConfig @relation(fields: [configId], references: [id])
   configId    String   @unique
-  s3Key       String
+  s3Key       String?
   textExtract String?
   parsedJson  Json?
   createdAt   DateTime @default(now())
