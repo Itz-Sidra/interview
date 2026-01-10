@@ -404,7 +404,53 @@
       </div>
     </div>
 
-    <!-- JavaScript -->
-     <script src="js/login.js"></script>
+    <!-- Auth Script -->
+    <script src="js/auth.js"></script>
+    <script>
+      // Redirect if already logged in
+      if (EvalvateAuth.isLoggedIn()) {
+        window.location.href = 'dashboard-home.html';
+      }
+
+      // Password toggle
+      document.querySelectorAll(".password-toggle").forEach((toggle) => {
+        toggle.addEventListener("click", function () {
+          const input = this.parentElement.querySelector("input");
+          const type = input.type === "password" ? "text" : "password";
+          input.type = type;
+        });
+      });
+
+      // Form submission
+      document
+        .getElementById("loginForm")
+        ?.addEventListener("submit", function (e) {
+          e.preventDefault();
+          
+          const email = document.getElementById("email").value;
+          
+          // Set user state (in production, this would come from API response)
+          EvalvateAuth.setUser({
+            name: email.split('@')[0].replace(/[._]/g, ' ').replace(/\b\w/g, c => c.toUpperCase()),
+            email: email
+          });
+          
+          // Redirect to logged-in dashboard instead of interview flow
+          window.location.href = "dashboard-home.html";
+        });
+
+      // Social login handlers (placeholder)
+      document.querySelectorAll(".social-login-btn").forEach((btn) => {
+        btn.addEventListener("click", function () {
+          // In production, this would initiate OAuth flow
+          // For demo, we'll create a mock user
+          EvalvateAuth.setUser({
+            name: "Demo User",
+            email: "demo@evalvate.com"
+          });
+          window.location.href = "dashboard-home.html";
+        });
+      });
+    </script>
   </body>
 </html>

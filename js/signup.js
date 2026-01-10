@@ -225,11 +225,20 @@ document.addEventListener('DOMContentLoaded', () => {
             }
             
             if (response.ok) {
-                showSuccessMessage('Account created successfully! Redirecting to login...');
+                showSuccessMessage('Account created successfully! Setting up your account...');
                 
+                // Set user state with new account (includes 2 free credits)
+                if (typeof EvalvateAuth !== 'undefined') {
+                    EvalvateAuth.setUser({
+                        name: formData.name,
+                        email: formData.email
+                    });
+                }
+                
+                // Redirect to dashboard instead of login
                 setTimeout(() => {
-                    window.location.href = 'login.html';
-                }, 2000);
+                    window.location.href = 'dashboard-home.html';
+                }, 1500);
             } else if (response.status === 400) {
                 const errorMessage = data.message || data.error || data.detail || '';
                 

@@ -54,6 +54,88 @@
         },
       };
     </script>
+    <style>
+      /* AI Feedback Tab Styles */
+      .analysis-nav-item {
+        background: rgba(255, 255, 255, 0.1);
+        backdrop-filter: blur(10px);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        padding: 1rem;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        border-radius: 0.75rem;
+      }
+      .analysis-nav-item:hover {
+        background: rgba(255, 255, 255, 0.15);
+        transform: scale(1.02);
+      }
+      .analysis-nav-item.active {
+        background: rgba(243, 248, 106, 0.2);
+        border: 2px solid rgba(243, 248, 106, 0.4);
+        box-shadow: 0 4px 6px rgba(243, 248, 106, 0.1);
+      }
+      .analysis-panel {
+        opacity: 0;
+        transition: opacity 0.2s ease;
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+      }
+      .analysis-panel.active {
+        opacity: 1;
+        position: relative;
+      }
+      .analysis-panel.hidden {
+        position: absolute;
+        pointer-events: none;
+      }
+      @media (max-width: 768px) {
+        .analysis-panel.hidden {
+          display: none;
+        }
+      }
+      /* Progress Tracking Tab Styles */
+      .progress-nav-item {
+        background: rgba(255, 255, 255, 0.1);
+        backdrop-filter: blur(10px);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        padding: 1rem;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        border-radius: 0.75rem;
+      }
+      .progress-nav-item:hover {
+        background: rgba(255, 255, 255, 0.15);
+        transform: scale(1.02);
+      }
+      .progress-nav-item.active {
+        background: rgba(243, 248, 106, 0.2);
+        border: 2px solid rgba(243, 248, 106, 0.4);
+        box-shadow: 0 4px 6px rgba(243, 248, 106, 0.1);
+      }
+      .progress-panel {
+        opacity: 0;
+        transition: opacity 0.2s ease;
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+      }
+      .progress-panel.active {
+        opacity: 1;
+        position: relative;
+      }
+      .progress-panel.hidden {
+        position: absolute;
+        pointer-events: none;
+      }
+      @media (max-width: 768px) {
+        .progress-panel.hidden {
+          display: none;
+        }
+      }
+    </style>
   </head>
   <body class="antialiased">
     <!-- Animated Background Shapes -->
@@ -106,8 +188,8 @@
             >
           </div>
 
-          <!-- CTA Buttons -->
-          <div class="hidden lg:flex items-center space-x-4">
+          <!-- CTA Buttons (Logged Out State) -->
+          <div class="hidden lg:flex items-center space-x-4" id="loggedOutNav">
             <a href="login.html" class="btn-secondary">Log in</a>
             <a href="signup.html" class="btn-primary">
               <span>Sign up</span>
@@ -122,6 +204,92 @@
                 <path d="M5 12h14M12 5l7 7-7 7" />
               </svg>
             </a>
+          </div>
+
+          <!-- Profile Menu (Logged In State) -->
+          <div
+            class="hidden lg:flex items-center space-x-4"
+            id="loggedInNav"
+            style="display: none"
+          >
+            <a href="dashboard-home.html" class="btn-secondary">Dashboard</a>
+            <div class="profile-dropdown relative">
+              <div
+                class="profile-avatar w-10 h-10 rounded-full bg-gradient-to-br from-deep-navy to-accent flex items-center justify-center text-white font-semibold text-sm cursor-pointer border-2 border-white/20 hover:border-accent transition-all"
+                id="navProfileAvatar"
+              >
+                <span id="navAvatarInitials">U</span>
+              </div>
+              <div
+                class="dropdown-menu absolute top-full right-0 mt-2 w-64 bg-white/95 backdrop-blur-xl rounded-xl shadow-lg border border-white/20 opacity-0 invisible transform -translate-y-2 transition-all z-50"
+                id="navDropdownMenu"
+              >
+                <div class="p-4 border-b border-gray-100">
+                  <p class="font-semibold text-deep-navy" id="navUserName">
+                    User
+                  </p>
+                  <p class="text-sm text-body" id="navUserEmail">
+                    user@email.com
+                  </p>
+                </div>
+                <div class="p-2">
+                  <a
+                    href="dashboard-home.html"
+                    class="flex items-center gap-3 px-3 py-2 text-sm text-deep-navy hover:bg-gray-50 rounded-lg transition-colors"
+                  >
+                    <svg
+                      width="16"
+                      height="16"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="2"
+                    >
+                      <rect x="3" y="3" width="18" height="18" rx="2" />
+                      <line x1="3" y1="9" x2="21" y2="9" />
+                    </svg>
+                    Dashboard
+                  </a>
+                  <a
+                    href="pricing.html"
+                    class="flex items-center gap-3 px-3 py-2 text-sm text-deep-navy hover:bg-gray-50 rounded-lg transition-colors"
+                  >
+                    <svg
+                      width="16"
+                      height="16"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="2"
+                    >
+                      <circle cx="12" cy="12" r="10" />
+                      <path d="M12 6v6l4 2" />
+                    </svg>
+                    <span id="navCreditsDisplay">2</span> Credits
+                  </a>
+                </div>
+                <div class="p-2 border-t border-gray-100">
+                  <button
+                    class="w-full flex items-center gap-3 px-3 py-2 text-sm text-red-500 hover:bg-red-50 rounded-lg transition-colors"
+                    id="navLogoutBtn"
+                  >
+                    <svg
+                      width="16"
+                      height="16"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="2"
+                    >
+                      <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
+                      <polyline points="16 17 21 12 16 7" />
+                      <line x1="21" y1="12" x2="9" y2="12" />
+                    </svg>
+                    Logout
+                  </button>
+                </div>
+              </div>
+            </div>
           </div>
 
           <!-- Mobile Menu Button -->
@@ -175,11 +343,24 @@
               class="text-body hover:text-deep-navy transition-colors font-medium py-2"
               >Contact</a
             >
-            <div class="flex flex-col space-y-3 pt-4 border-t border-white/20">
+            <div
+              class="flex flex-col space-y-3 pt-4 border-t border-white/20"
+              id="mobileLoggedOutNav"
+            >
               <a href="login.html" class="btn-secondary text-center">Login</a>
-              <a href="signup.html" class="btn-primary text-center"
-                >Book Mock</a
+              <a href="signup.html" class="btn-primary text-center">Sign Up</a>
+            </div>
+            <div
+              class="flex flex-col space-y-3 pt-4 border-t border-white/20"
+              id="mobileLoggedInNav"
+              style="display: none"
+            >
+              <a href="dashboard-home.html" class="btn-primary text-center"
+                >Go to Dashboard</a
               >
+              <button class="btn-secondary text-center" id="mobileLogoutBtn">
+                Logout
+              </button>
             </div>
           </div>
         </div>
@@ -1056,8 +1237,91 @@
       </div>
     </footer>
 
+    <!-- Auth Script -->
+    <script src="js/auth.js"></script>
+
     <!-- JavaScript -->
     <script>
+      // Check login state and toggle navigation
+      function updateNavState() {
+        const loggedOutNav = document.getElementById("loggedOutNav");
+        const loggedInNav = document.getElementById("loggedInNav");
+        const mobileLoggedOutNav =
+          document.getElementById("mobileLoggedOutNav");
+        const mobileLoggedInNav = document.getElementById("mobileLoggedInNav");
+
+        if (typeof EvalvateAuth !== "undefined" && EvalvateAuth.isLoggedIn()) {
+          // Show logged-in navigation
+          if (loggedOutNav) loggedOutNav.style.display = "none";
+          if (mobileLoggedOutNav) mobileLoggedOutNav.style.display = "none";
+          if (loggedInNav) {
+            loggedInNav.style.display = "flex";
+
+            // Populate user info
+            const user = EvalvateAuth.getUser();
+            const credits = EvalvateAuth.getCredits();
+
+            if (user) {
+              const initials = EvalvateAuth.getUserInitials();
+              document.getElementById("navAvatarInitials").textContent =
+                initials;
+              document.getElementById("navUserName").textContent =
+                user.name || "User";
+              document.getElementById("navUserEmail").textContent =
+                user.email || "";
+            }
+            document.getElementById("navCreditsDisplay").textContent = credits;
+          }
+          if (mobileLoggedInNav) mobileLoggedInNav.style.display = "flex";
+        } else {
+          // Show logged-out navigation
+          if (loggedOutNav) loggedOutNav.style.display = "flex";
+          if (loggedInNav) loggedInNav.style.display = "none";
+          if (mobileLoggedOutNav) mobileLoggedOutNav.style.display = "flex";
+          if (mobileLoggedInNav) mobileLoggedInNav.style.display = "none";
+        }
+      }
+
+      // Initialize nav state
+      updateNavState();
+
+      // Profile dropdown toggle
+      const navProfileAvatar = document.getElementById("navProfileAvatar");
+      const navDropdownMenu = document.getElementById("navDropdownMenu");
+
+      if (navProfileAvatar && navDropdownMenu) {
+        navProfileAvatar.addEventListener("click", (e) => {
+          e.stopPropagation();
+          navDropdownMenu.classList.toggle("active");
+        });
+
+        document.addEventListener("click", () => {
+          navDropdownMenu.classList.remove("active");
+        });
+
+        navDropdownMenu.addEventListener("click", (e) => {
+          e.stopPropagation();
+        });
+      }
+
+      // Logout handlers
+      const navLogoutBtn = document.getElementById("navLogoutBtn");
+      const mobileLogoutBtn = document.getElementById("mobileLogoutBtn");
+
+      function handleLogout() {
+        if (typeof EvalvateAuth !== "undefined") {
+          EvalvateAuth.logout();
+          window.location.reload();
+        }
+      }
+
+      if (navLogoutBtn) {
+        navLogoutBtn.addEventListener("click", handleLogout);
+      }
+      if (mobileLogoutBtn) {
+        mobileLogoutBtn.addEventListener("click", handleLogout);
+      }
+
       // Mobile Menu Toggle
       const mobileMenuBtn = document.getElementById("mobile-menu-btn");
       const mobileMenu = document.getElementById("mobile-menu");

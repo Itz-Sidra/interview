@@ -478,7 +478,14 @@
     </div>
     
     <!-- JavaScript -->
+    <script src="js/auth.js"></script>
     <script src="js/signup.js"></script>
+    <script>
+      // Redirect if already logged in
+      if (typeof EvalvateAuth !== 'undefined' && EvalvateAuth.isLoggedIn()) {
+        window.location.href = 'dashboard-home.html';
+      }
+    </script>
     <script>
         // Multi-step form logic
         const step1Content = document.getElementById('step1Content');
@@ -545,6 +552,35 @@
                 const input = this.parentElement.querySelector('input');
                 const type = input.type === 'password' ? 'text' : 'password';
                 input.type = type;
+            });
+        });
+
+        // Handle form submit on step 2 (for non-API flow)
+        submitBtn?.addEventListener('click', (e) => {
+            // If signup.js doesn't handle it, this provides a fallback
+            const fullName = document.getElementById('fullName').value;
+            const email = document.getElementById('email').value;
+            
+            if (fullName && email && typeof EvalvateAuth !== 'undefined') {
+                EvalvateAuth.setUser({
+                    name: fullName.trim(),
+                    email: email.trim()
+                });
+            }
+        });
+
+        // Social signup handlers
+        document.querySelectorAll('.social-login-btn').forEach(btn => {
+            btn.addEventListener('click', function() {
+                // In production, this would initiate OAuth flow
+                // For demo, we'll create a mock user
+                if (typeof EvalvateAuth !== 'undefined') {
+                    EvalvateAuth.setUser({
+                        name: 'Demo User',
+                        email: 'demo@evalvate.com'
+                    });
+                    window.location.href = 'dashboard-home.html';
+                }
             });
         });
     </script>
