@@ -13,13 +13,11 @@ const prisma = new PrismaClient();
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
 const ELEVENLABS_API_KEY = process.env.ELEVENLABS_API_KEY;
 
-function cleanGeminiJSON(rawText) {
-  let cleaned = rawText.trim();
-  cleaned = cleaned
-    .replace(/^```json\s*/i, "")
-    .replace(/^```\s*/i, "")
-    .replace(/```\s*$/, "");
-  return cleaned.trim();
+function cleanForEvaluation(text) {
+  return text
+    .replace(/\b(uh+|um+|umm+|actually|you know|like)\b/gi, "")
+    .replace(/\s+/g, " ")
+    .trim();
 }
 
 export async function startInterview(req, res) {
@@ -114,8 +112,12 @@ Format:
     const rawText = await response.response.text();
     console.log("DEBUG: Raw Gemini response:", rawText.substring(0, 200));
     
-    const cleanedJSON = cleanGeminiJSON(rawText);
-    const result = JSON.parse(cleanedJSON);
+    const result = safeParseGeminiJSON(rawText);
+
+    if (!result?.question) {
+      throw new Error("Gemini did not return a question");
+    }
+
     return result.question;
   } catch (error) {
     console.error("Gemini first question error:", error.message);
@@ -125,6 +127,10 @@ Format:
 
 export async function handleCandidateAnswer(req, res) {
   const { interviewId, answer } = req.body;
+
+  const rawAnswer = answer;                // REAL interview
+  const cleanedAnswer = cleanForEvaluation(answer); // LLM-safe
+
   try {
     if (!global.interviewSessions || !global.interviewSessions[interviewId]) {
       return res.status(404).json({ error: "Interview session not found" });
@@ -133,20 +139,21 @@ export async function handleCandidateAnswer(req, res) {
     
     session.answerHistory.push({
       answerId: `answer-${Date.now()}`,
-      answer,
+      rawAnswer,
+      cleanedAnswer,
       submittedAt: Date.now()
     });
-    
+        
     let evaluation;
     try {
-      evaluation = await evaluateAndGenerateNextQuestion(session, answer);
+      evaluation = await evaluateAndGenerateNextQuestion(session, cleanedAnswer);
     } catch (geminiError) {
       console.error("Gemini evaluation error:", geminiError.message);
       evaluation = {
         evaluation: {
           answerQuality: 60,
-          relevance: 60,
-          clarity: 60,
+          relevance: 65,
+          clarity: 70,
           completeness: 60,
           technicalDepth: 60
         },

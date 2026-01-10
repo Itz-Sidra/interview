@@ -1,5 +1,6 @@
 import { GoogleGenerativeAI } from "@google/generative-ai";
 import axios from 'axios';
+import { jsonrepair } from "jsonrepair";
 
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
 
@@ -80,28 +81,14 @@ export async function evaluateAndGenerateNextQuestion(session, candidateAnswer) 
  */
 function safeParseJSON(text) {
   try {
-    // First try direct parse
     return JSON.parse(text);
-  } catch (e) {
-    console.error("Direct JSON parse failed, trying extraction...");
-    
-    // Try to extract JSON object
-    const first = text.indexOf("{");
-    const last = text.lastIndexOf("}");
-    
-    if (first === -1 || last === -1) {
-      console.error("No JSON brackets found in text:", text);
-      throw new Error("No JSON object found in response");
-    }
-    
-    const extractedText = text.slice(first, last + 1); // FIX: renamed from 'extracted' to 'extractedText'
-    console.log("Extracted JSON:", extractedText.substring(0, 200));
-    
+  } catch {
     try {
-      return JSON.parse(extractedText); // FIX: use extractedText here
-    } catch (parseError) {
-      console.error("Failed to parse extracted JSON:", extractedText);
-      throw new Error("Invalid JSON in Gemini response");
+      const repaired = jsonrepair(text);
+      return JSON.parse(repaired);
+    } catch {
+      console.error("Gemini JSON unrecoverable:", text);
+      throw new Error("Invalid JSON from Gemini");
     }
   }
 }
@@ -112,7 +99,7 @@ function safeParseJSON(text) {
 function buildGeminiPrompt(session, candidateAnswer) {
   const previousQA = session.questionHistory
     .map((q, i) => {
-      const answer = session.answerHistory[i]?.answer || "N/A";
+      const answer = session.answerHistory[i]?.rawAnswer || "N/A";
       return `Q${i + 1}: ${q.question}\nA${i + 1}: ${answer}`;
     })
     .join("\n\n");
@@ -140,9 +127,10 @@ CURRENT ANSWER TO EVALUATE:
 
 EVALUATION INSTRUCTIONS:
 1. Score the answer (0-100) on: relevance, clarity, completeness, technical depth
-2. Identify any issues: filler words, low confidence, grammar, missing concepts
-3. Generate ONE follow-up question that builds on this answer
-4. Explain why you chose this question
+2. Identify issues related to clarity, structure, correctness, or missing concepts.
+3. Do NOT penalize natural filler words unless they severely reduce understanding.
+4. Generate ONE follow-up question that builds on this answer
+5. Explain why you chose this question
 
 Return ONLY valid JSON. Keep descriptions under 200 characters each.
 
@@ -170,24 +158,33 @@ Return ONLY valid JSON. Keep descriptions under 200 characters each.
   `;
 }
 
+function normalizeSeverity(severity) {
+  if (typeof severity !== "number") return 1;
+  if (severity <= 1) return 1;
+  if (severity === 2) return 2;
+  return 3; // clamp everything else (3,4,5,10…)
+}
+
 function validateGeminiResponse(evaluation) {
-  if (!evaluation.evaluation) throw new Error("Missing 'evaluation' field");
-  if (!evaluation.nextQuestion) throw new Error("Missing 'nextQuestion' field");
+  if (!evaluation.evaluation) throw new Error("Missing 'evaluation'");
+  if (!evaluation.nextQuestion) throw new Error("Missing 'nextQuestion'");
   if (!Array.isArray(evaluation.detectedIssues)) {
-    throw new Error("'detectedIssues' must be an array");
+    evaluation.detectedIssues = [];
   }
 
-  Object.values(evaluation.evaluation).forEach((score) => {
-    if (typeof score !== "number" || score < 0 || score > 100) {
-      throw new Error(`Invalid score: ${score}`);
-    }
+  function normalizeScore(score) {
+    if (typeof score !== "number") return 60;
+    return Math.min(100, Math.max(0, score));
+  }
+
+  Object.keys(evaluation.evaluation).forEach((key) => {
+    evaluation.evaluation[key] = normalizeScore(evaluation.evaluation[key]);
   });
 
-  evaluation.detectedIssues.forEach((issue) => {
-    if (![1, 2, 3].includes(issue.severity)) {
-      throw new Error(`Invalid severity: ${issue.severity}`);
-    }
-  });
+  evaluation.detectedIssues = evaluation.detectedIssues.map(issue => ({
+    ...issue,
+    severity: normalizeSeverity(issue.severity)
+  }));
 }
 
 export default { evaluateAndGenerateNextQuestion };
