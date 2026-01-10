@@ -138,10 +138,10 @@ document.addEventListener('DOMContentLoaded', () => {
         submitBtn.innerHTML = '<span class="loading-spinner"></span> Logging In...';
         
         try {
-            console.log('Sending request to:', `${API_BASE_URL}/auth/login`);
+            console.log('Sending request to:', `${API_BASE}/auth/login`);
             console.log('Payload:', { ...formData, password: '***' });
             
-            const response = await fetch(`${API_BASE_URL}/auth/login`, {
+            const response = await fetch(`${API_BASE}/auth/login`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',

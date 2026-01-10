@@ -202,10 +202,10 @@ document.addEventListener('DOMContentLoaded', () => {
         submitBtn.textContent = 'Creating Account...';
         
         try {
-            console.log('Sending request to:', `${API_BASE_URL}/auth/signup`);
+            console.log('Sending request to:', `${API_BASE}/auth/signup`);
             console.log('Payload:', { ...formData, password: '***' });
             
-            const response = await fetch(`${API_BASE_URL}/auth/signup`, {
+            const response = await fetch(`${API_BASE}/auth/signup`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
