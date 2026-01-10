@@ -23,8 +23,11 @@ const EvalvateAuth = {
    * @returns {boolean}
    */
   isLoggedIn() {
-    return localStorage.getItem(this.KEYS.IS_LOGGED_IN) === 'true';
-  },
+  return (
+    !!localStorage.getItem('accessToken') ||
+    !!sessionStorage.getItem('accessToken')
+  );
+},
 
   /**
    * Get current user data

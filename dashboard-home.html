@@ -611,6 +611,37 @@
     <!-- Auth Script -->
     <script src="js/auth.js"></script>
     <script>
+
+      async function syncCreditsFromBackend() {
+  const token =
+    localStorage.getItem('accessToken') ||
+    sessionStorage.getItem('accessToken');
+
+  if (!token) return;
+
+  try {
+    const res = await fetch('http://localhost:3000/auth/me', {
+      headers: {
+        Authorization: `Bearer ${token}`
+      }
+    });
+
+    if (!res.ok) return;
+
+    const user = await res.json();
+
+    // 🔥 THIS IS THE FIX
+    EvalvateAuth.setCredits(user.credits);
+    EvalvateAuth.updateUser({
+      name: user.name,
+      email: user.email
+    });
+
+  } catch (err) {
+    console.error('Failed to sync credits:', err);
+  }
+}
+
       // Check if user is logged in, redirect to login if not
       if (!EvalvateAuth.isLoggedIn()) {
         window.location.href = 'login.html';
@@ -837,7 +868,10 @@
       });
 
       // Initialize dashboard
-      initDashboard();
+      (async () => {
+  await syncCreditsFromBackend();
+  initDashboard();
+})();
 
       // Navbar scroll effect
       const navbar = document.getElementById("navbar");

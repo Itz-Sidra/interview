@@ -49,12 +49,43 @@ export async function saveQuestionAndEvaluation(interviewId, question, evaluatio
   const prisma = new PrismaClient();
   
   try {
-    // Save question
+    const scores = evaluation.evaluation;
+
+    const scoreAverage =
+      (scores.answerQuality +
+      scores.relevance +
+      scores.clarity +
+      scores.completeness +
+      scores.technicalDepth) / 5;
+
     const savedQuestion = await prisma.question.create({
       data: {
         interviewId,
-        prompt: question
+        prompt: question,
+        evaluation: scores,
+        scoreAverage   
       }
+    });
+
+    const allScoredQuestions = await prisma.question.findMany({
+      where: {
+        interviewId,
+        scoreAverage: { not: null }
+      },
+      select: { scoreAverage: true }
+    });
+
+    const overallScore =
+      allScoredQuestions.length > 0
+        ? allScoredQuestions.reduce(
+            (sum, q) => sum + q.scoreAverage,
+            0
+          ) / allScoredQuestions.length
+        : null;
+
+    await prisma.interview.update({
+      where: { id: interviewId },
+      data: { overallScore }
     });
 
     // Save detected issues with proper category mapping

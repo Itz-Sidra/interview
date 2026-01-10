@@ -13,13 +13,11 @@ const prisma = new PrismaClient();
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
 const ELEVENLABS_API_KEY = process.env.ELEVENLABS_API_KEY;
 
-function cleanGeminiJSON(rawText) {
-  let cleaned = rawText.trim();
-  cleaned = cleaned
-    .replace(/^```json\s*/i, "")
-    .replace(/^```\s*/i, "")
-    .replace(/```\s*$/, "");
-  return cleaned.trim();
+function cleanForEvaluation(text) {
+  return text
+    .replace(/\b(uh+|um+|umm+|actually|you know|like)\b/gi, "")
+    .replace(/\s+/g, " ")
+    .trim();
 }
 
 export async function startInterview(req, res) {
@@ -72,34 +70,35 @@ export async function startInterview(req, res) {
 
     const firstQuestion = await generateFirstQuestion(session);
 
-    // Deduct credit and create question in transaction
-    const result = await prisma.$transaction(async (tx) => {
-      // Deduct credit
-      const updatedUser = await tx.user.update({
-        where: { id: userId },
-        data: { credits: { decrement: 1 } },
-        select: { credits: true },
-      });
-
-      // Create question
-      await tx.question.create({
-        data: {
-          interviewId,
-          prompt: firstQuestion
-        }
-      });
-
-      return updatedUser;
+    await prisma.question.create({
+      data: {
+        interviewId,
+        prompt: firstQuestion,
+        evaluation: {
+          answerQuality: 0,
+          relevance: 0,
+          clarity: 0,
+          completeness: 0,
+          technicalDepth: 0
+        },
+        scoreAverage: 0
+      }
     });
 
     global.interviewSessions = global.interviewSessions || {};
     global.interviewSessions[interviewId] = session;
 
+    const updatedUser = await prisma.user.update({
+      where: { id: userId },
+      data: { credits: { decrement: 1 } },
+      select: { credits: true }
+    });
+
     res.json({
       interviewId,
       question: firstQuestion,
       questionNumber: 1,
-      credits: result.credits
+      credits: updatedUser.credits
     });
   } catch (error) {
     console.error("Start interview error:", error);
@@ -109,76 +108,77 @@ export async function startInterview(req, res) {
 
 async function generateFirstQuestion(session) {
   const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
-  
+
   const prompt = `You are starting a ${session.difficulty} difficulty ${session.type} interview for a ${session.role} position.
-${session.resumeText ? `Resume Summary:\n${session.resumeText.substring(0, 500)}` : "No resume provided"}
 
-Generate ONE opening interview question that:
-1. Sets the tone for the interview
-2. Allows the candidate to introduce themselves and their relevant experience
-3. Is appropriate for the ${session.difficulty} difficulty level
-4. Is specific to the ${session.role} role
-
-CRITICAL: Return ONLY valid JSON with no preamble, no markdown, no explanation. Just the JSON object.
-
-Format:
+Generate ONE opening interview question.
+Return ONLY valid JSON:
 {
-  "question": "Your opening question here"
+  "question": "Your opening question"
 }`;
 
-  try {
+  async function attempt() {
     const response = await model.generateContent({
       contents: [{ role: "user", parts: [{ text: prompt }] }],
       generationConfig: {
-        temperature: 0.7,
-        maxOutputTokens: 512,
-        responseMimeType: "application/json",
-        responseSchema: {
-          type: "object",
-          properties: {
-            question: { type: "string" }
-          },
-          required: ["question"]
-        }
+        temperature: 0.6,
+        maxOutputTokens: 256,
+        responseMimeType: "application/json"
       }
     });
-    
+
     const rawText = await response.response.text();
-    console.log("DEBUG: Raw Gemini response:", rawText.substring(0, 200));
-    
-    const cleanedJSON = cleanGeminiJSON(rawText);
-    const result = JSON.parse(cleanedJSON);
-    return result.question;
-  } catch (error) {
-    console.error("Gemini first question error:", error.message);
-    return `Tell me about your experience with ${session.role} development and what drew you to this role.`;
+    console.log("DEBUG: Raw Gemini response:", rawText);
+
+    return JSON.parse(rawText);
+  }
+
+  try {
+    const result = await attempt();
+    if (result?.question) return result.question;
+    throw new Error("Missing question");
+  } catch (err) {
+    console.warn("Retrying first question generation...");
+    try {
+      const result = await attempt();
+      if (result?.question) return result.question;
+      throw new Error("Retry failed");
+    } catch (err2) {
+      console.error("Gemini failed twice, using fallback");
+      return `Tell me about your experience with ${session.role} development and what drew you to this role.`;
+    }
   }
 }
 
 export async function handleCandidateAnswer(req, res) {
   const { interviewId, answer } = req.body;
+
+  const rawAnswer = answer;                // REAL interview
+  const cleanedAnswer = cleanForEvaluation(answer); // LLM-safe
+
   try {
     if (!global.interviewSessions || !global.interviewSessions[interviewId]) {
       return res.status(404).json({ error: "Interview session not found" });
     }
     const session = global.interviewSessions[interviewId];
-    
+
     session.answerHistory.push({
       answerId: `answer-${Date.now()}`,
-      answer,
+      rawAnswer,
+      cleanedAnswer,
       submittedAt: Date.now()
     });
-    
+
     let evaluation;
     try {
-      evaluation = await evaluateAndGenerateNextQuestion(session, answer);
+      evaluation = await evaluateAndGenerateNextQuestion(session, cleanedAnswer);
     } catch (geminiError) {
       console.error("Gemini evaluation error:", geminiError.message);
       evaluation = {
         evaluation: {
           answerQuality: 60,
-          relevance: 60,
-          clarity: 60,
+          relevance: 65,
+          clarity: 70,
           completeness: 60,
           technicalDepth: 60
         },
@@ -188,10 +188,9 @@ export async function handleCandidateAnswer(req, res) {
         questionRationale: "Fallback follow-up"
       };
     }
-    
+
     await saveQuestionAndEvaluation(interviewId, evaluation.nextQuestion, evaluation);
-    await updateInterviewScores(interviewId, evaluation);
-    
+
     session.questionHistory.push({
       questionId: `q-${Date.now()}`,
       question: evaluation.nextQuestion,
@@ -199,9 +198,9 @@ export async function handleCandidateAnswer(req, res) {
       category: evaluation.followUpCategory
     });
     session.questionsAnswered++;
-    
+
     const isComplete = session.questionsAnswered >= session.totalQuestions;
-    
+
     res.json({
       evaluation,
       nextQuestion: evaluation.nextQuestion,
@@ -211,15 +210,36 @@ export async function handleCandidateAnswer(req, res) {
         ? "Interview complete! Click 'Generate Report' for analysis."
         : null
     });
-  } catch (error) {
-    console.error("Answer handling error:", error);
-    res.status(500).json({ error: error.message });
+    } catch (geminiError) {
+    const isRateLimit = geminiError.message === "GEMINI_RATE_LIMIT";
+
+    console.error(
+      isRateLimit
+        ? "Gemini quota exhausted — falling back"
+        : "Gemini evaluation error:",
+      geminiError.message
+    );
+
+    evaluation = {
+      evaluation: {
+        answerQuality: 70,
+        relevance: 90,
+        clarity: 65,
+        completeness: 60,
+        technicalDepth: 70
+      },
+      detectedIssues: [],
+      nextQuestion: generateFallbackQuestion(session),
+      followUpCategory: "GENERAL",
+      questionRationale: isRateLimit
+        ? "AI quota exhausted — fallback interview flow"
+        : "Fallback due to evaluation error"
+    };
   }
 }
-
 export async function generateReport(req, res) {
   const { id: interviewId } = req.params;
-  
+
   try {
     const interview = await prisma.interview.findUnique({
       where: { id: interviewId },
@@ -237,6 +257,30 @@ export async function generateReport(req, res) {
 
     const issues = interview.issues || [];
 
+    function average(arr) {
+    return arr.length ? Math.round(arr.reduce((a, b) => a + b, 0) / arr.length) : 60;
+  }
+
+  const questionScores = interview.questions
+    .filter(q => typeof q.scoreAverage === "number" && q.scoreAverage > 0);
+
+  const technicalScores = questionScores.map(q => q.evaluation?.technicalDepth || 60);
+  const clarityScores = questionScores.map(q => q.evaluation?.clarity || 60);
+  const relevanceScores = questionScores.map(q => q.evaluation?.relevance || 60);
+
+    const scoredQuestions = interview.questions.filter(
+      q => typeof q.scoreAverage === "number" && q.scoreAverage > 0
+    );
+
+    const overallScore =
+      scoredQuestions.length > 0
+        ? Math.round(
+            scoredQuestions.reduce((sum, q) => sum + q.scoreAverage, 0) /
+            scoredQuestions.length
+          )
+        : 60;
+
+
     const report = {
       interviewId,
       candidate: {
@@ -251,16 +295,16 @@ export async function generateReport(req, res) {
         type: interview.config.type
       },
       ratings: {
-        overall: Math.round(interview.overallScore || 60),
-        content: Math.round(interview.overallScore || 60),
-        confidence: Math.round(interview.overallScore || 60)
+        overall: overallScore,
+        content: average(relevanceScores),
+        confidence: average(clarityScores)
       },
       grammar: {
-        score: Math.round(interview.overallScore || 60),
-        mistakes: issues
-          .filter((i) => i.category === "GRAMMAR")
-          .map((i) => i.description),
-        corrections: []
+        score: average(
+          interview.issues
+            .filter(i => i.category === "GRAMMAR")
+            .map(() => 70)
+        )
       },
       emotions: [
         { emotion: "Confident", percentage: 60 },
@@ -303,7 +347,7 @@ export async function getAllReports(req, res) {
       const durationMs = interview.endedAt && interview.startedAt
         ? new Date(interview.endedAt) - new Date(interview.startedAt)
         : 0;
-      
+
       const durationMinutes = Math.floor(durationMs / 60000);
 
       return {
@@ -422,7 +466,7 @@ export async function updateInterviewStatus(req, res) {
   try {
     const { interviewId, status } = req.body;
     const validStatuses = ['PENDING', 'IN_PROGRESS', 'COMPLETED', 'CANCELLED'];
-    
+
     if (!validStatuses.includes(status)) {
       return res.status(400).json({ error: 'Invalid status' });
     }
