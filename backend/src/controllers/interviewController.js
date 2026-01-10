@@ -55,15 +55,7 @@ export async function startInterview(req, res) {
     await prisma.question.create({
       data: {
         interviewId,
-        prompt: firstQuestion,
-        evaluation: {
-          answerQuality: 0,
-          relevance: 0,
-          clarity: 0,
-          completeness: 0,
-          technicalDepth: 0
-        },
-        scoreAverage: 0
+        prompt: firstQuestion
       }
     });
 
@@ -83,46 +75,53 @@ export async function startInterview(req, res) {
 
 async function generateFirstQuestion(session) {
   const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
-
+  
   const prompt = `You are starting a ${session.difficulty} difficulty ${session.type} interview for a ${session.role} position.
+${session.resumeText ? `Resume Summary:\n${session.resumeText.substring(0, 500)}` : "No resume provided"}
 
-Generate ONE opening interview question.
+Generate ONE opening interview question that:
+1. Sets the tone for the interview
+2. Allows the candidate to introduce themselves and their relevant experience
+3. Is appropriate for the ${session.difficulty} difficulty level
+4. Is specific to the ${session.role} role
 
-Return ONLY valid JSON:
+CRITICAL: Return ONLY valid JSON with no preamble, no markdown, no explanation. Just the JSON object.
+
+Format:
 {
-  "question": "Your opening question"
+  "question": "Your opening question here"
 }`;
 
-  async function attempt() {
+  try {
     const response = await model.generateContent({
       contents: [{ role: "user", parts: [{ text: prompt }] }],
       generationConfig: {
-        temperature: 0.6,
-        maxOutputTokens: 256,
-        responseMimeType: "application/json"
+        temperature: 0.7,
+        maxOutputTokens: 512,
+        responseMimeType: "application/json",
+        responseSchema: {
+          type: "object",
+          properties: {
+            question: { type: "string" }
+          },
+          required: ["question"]
+        }
       }
     });
-
+    
     const rawText = await response.response.text();
-    console.log("DEBUG: Raw Gemini response:", rawText);
+    console.log("DEBUG: Raw Gemini response:", rawText.substring(0, 200));
+    
+    const result = safeParseGeminiJSON(rawText);
 
-    return JSON.parse(rawText);
-  }
-
-  try {
-    const result = await attempt();
-    if (result?.question) return result.question;
-    throw new Error("Missing question");
-  } catch {
-    try {
-      console.warn("Retrying first question generation...");
-      const result = await attempt();
-      if (result?.question) return result.question;
-      throw new Error("Retry failed");
-    } catch {
-      console.error("Gemini failed twice, using fallback");
-      return `Tell me about your experience with ${session.role} development and what drew you to this role.`;
+    if (!result?.question) {
+      throw new Error("Gemini did not return a question");
     }
+
+    return result.question;
+  } catch (error) {
+    console.error("Gemini first question error:", error.message);
+    return `Tell me about your experience with ${session.role} development and what drew you to this role.`;
   }
 }
 
@@ -166,6 +165,7 @@ export async function handleCandidateAnswer(req, res) {
     }
     
     await saveQuestionAndEvaluation(interviewId, evaluation.nextQuestion, evaluation);
+    await updateInterviewScores(interviewId, evaluation);
     
     session.questionHistory.push({
       questionId: `q-${Date.now()}`,
@@ -186,31 +186,9 @@ export async function handleCandidateAnswer(req, res) {
         ? "Interview complete! Click 'Generate Report' for analysis."
         : null
     });
-  } catch (geminiError) {
-    const isRateLimit = geminiError.message === "GEMINI_RATE_LIMIT";
-
-    console.error(
-      isRateLimit
-        ? "Gemini quota exhausted — falling back"
-        : "Gemini evaluation error:",
-      geminiError.message
-    );
-
-    evaluation = {
-      evaluation: {
-        answerQuality: 70,
-        relevance: 90,
-        clarity: 65,
-        completeness: 60,
-        technicalDepth: 70
-      },
-      detectedIssues: [],
-      nextQuestion: generateFallbackQuestion(session),
-      followUpCategory: "GENERAL",
-      questionRationale: isRateLimit
-        ? "AI quota exhausted — fallback interview flow"
-        : "Fallback due to evaluation error"
-    };
+  } catch (error) {
+    console.error("Answer handling error:", error);
+    res.status(500).json({ error: error.message });
   }
 }
 
@@ -234,30 +212,6 @@ export async function generateReport(req, res) {
 
     const issues = interview.issues || [];
 
-    function average(arr) {
-    return arr.length ? Math.round(arr.reduce((a, b) => a + b, 0) / arr.length) : 60;
-  }
-
-  const questionScores = interview.questions
-    .filter(q => typeof q.scoreAverage === "number" && q.scoreAverage > 0);
-
-  const technicalScores = questionScores.map(q => q.evaluation?.technicalDepth || 60);
-  const clarityScores = questionScores.map(q => q.evaluation?.clarity || 60);
-  const relevanceScores = questionScores.map(q => q.evaluation?.relevance || 60);
-
-    const scoredQuestions = interview.questions.filter(
-      q => typeof q.scoreAverage === "number" && q.scoreAverage > 0
-    );
-
-    const overallScore =
-      scoredQuestions.length > 0
-        ? Math.round(
-            scoredQuestions.reduce((sum, q) => sum + q.scoreAverage, 0) /
-            scoredQuestions.length
-          )
-        : 60;
-
-
     const report = {
       interviewId,
       candidate: {
@@ -272,16 +226,16 @@ export async function generateReport(req, res) {
         type: interview.config.type
       },
       ratings: {
-        overall: overallScore,
-        content: average(relevanceScores),
-        confidence: average(clarityScores)
+        overall: Math.round(interview.overallScore || 60),
+        content: Math.round(interview.overallScore || 60),
+        confidence: Math.round(interview.overallScore || 60)
       },
       grammar: {
-        score: average(
-          interview.issues
-            .filter(i => i.category === "GRAMMAR")
-            .map(() => 70)
-        )
+        score: Math.round(interview.overallScore || 60),
+        mistakes: issues
+          .filter((i) => i.category === "GRAMMAR")
+          .map((i) => i.description),
+        corrections: []
       },
       emotions: [
         { emotion: "Confident", percentage: 60 },
