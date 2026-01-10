@@ -1,79 +1,437 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Login - Evalvate</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="css/login.css">
-</head>
-<body>
-    <div class="custom-cursor" id="customCursor"></div>
+    <meta
+      name="description"
+      content="Login to your Evalvate account and continue practicing interviews."
+    />
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Space+Grotesk:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="css/glassmorphism.css" />
+
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+      tailwind.config = {
+        theme: {
+          extend: {
+            colors: {
+              "deep-navy": "#0F2233",
+              "pale-frost": "#EEF3FF",
+              periwinkle: "#E6EEFF",
+              "lavender-tint": "#C7D5FF",
+              accent: "#F3F86A",
+              body: "#5A6B7A",
+            },
+          },
+        },
+      };
+    </script>
+
+    <style>
+      .auth-container {
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 2rem;
+      }
+
+      .input-group {
+        position: relative;
+      }
+
+      .input-field {
+        width: 100%;
+        padding: 0.875rem 1rem;
+        background: rgba(255, 255, 255, 0.05);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        border-radius: 12px;
+        color: var(--deep-navy);
+        font-size: 1rem;
+        transition: all 0.3s;
+        backdrop-filter: blur(10px);
+      }
+
+      .input-field:focus {
+        outline: none;
+        border-color: var(--accent);
+        background: rgba(255, 255, 255, 0.08);
+        box-shadow: 0 0 0 3px rgba(243, 248, 106, 0.1);
+      }
+
+      .input-field::placeholder {
+        color: var(--body);
+      }
+
+      .password-toggle {
+        position: absolute;
+        right: 12px;
+        top: 50%;
+        transform: translateY(-50%);
+        background: none;
+        border: none;
+        color: var(--body);
+        cursor: pointer;
+        padding: 4px;
+        transition: color 0.3s;
+      }
+
+      .password-toggle:hover {
+        color: var(--deep-navy);
+      }
+
+      .social-login-btn {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.75rem;
+        width: 100%;
+        padding: 0.875rem;
+        background: rgba(255, 255, 255, 0.08);
+        border: 1px solid rgba(255, 255, 255, 0.15);
+        border-radius: 12px;
+        color: var(--deep-navy);
+        font-weight: 500;
+        transition: all 0.3s;
+        cursor: pointer;
+      }
+
+      .social-login-btn:hover {
+        background: rgba(255, 255, 255, 0.12);
+        transform: translateY(-2px);
+        box-shadow: 0 4px 20px rgba(15, 34, 51, 0.1);
+      }
+
+      .divider {
+        position: relative;
+        text-align: center;
+        margin: 2rem 0;
+      }
+
+      .divider::before {
+        content: "";
+        position: absolute;
+        top: 50%;
+        left: 0;
+        right: 0;
+        height: 1px;
+        background: rgba(255, 255, 255, 0.1);
+      }
+
+      .divider span {
+        position: relative;
+        padding: 0 1rem;
+        background: linear-gradient(
+          135deg,
+          var(--pale-frost) 0%,
+          var(--periwinkle) 50%,
+          var(--lavender-tint) 100%
+        );
+        color: var(--body);
+        font-size: 0.875rem;
+      }
+
+      .error-message {
+        color: #ef4444;
+        font-size: 0.875rem;
+        margin-top: 0.5rem;
+        display: none;
+      }
+
+      .error-message.show {
+        display: block;
+      }
+
+      .input-field.error {
+        border-color: #ef4444;
+      }
+
+      @keyframes slideIn {
+        from {
+          opacity: 0;
+          transform: translateY(20px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+
+      .animate-slide-in {
+        animation: slideIn 0.5s ease-out forwards;
+      }
+
+      .back-arrow {
+        position: absolute;
+        top: 1.5rem;
+        left: 1.5rem;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        color: var(--deep-navy);
+        text-decoration: none;
+        font-weight: 500;
+        transition: all 0.3s;
+      }
+
+      .back-arrow:hover {
+        color: var(--accent);
+        transform: translateX(-4px);
+      }
+    </style>
+  </head>
+  <body class="antialiased">
+    <!-- Animated Background -->
+    <div class="floating-shape shape-1"></div>
+    <div class="floating-shape shape-2"></div>
+    <div class="floating-shape shape-3"></div>
+
+    <!-- Back Arrow -->
+    <a href="index.html" class="back-arrow">
+      <svg
+        width="20"
+        height="20"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2"
+      >
+        <path d="M19 12H5M12 19l-7-7 7-7" />
+      </svg>
+      Back to Home
+    </a>
 
     <div class="auth-container">
-        <div class="auth-card" id="authCard">
-            <div class="form-panel">
-                <div class="auth-header">
-                     <a href="#" class="logo">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 8V4H8"/><rect x="4" y="12" width="16" height="8" rx="2"/><path d="M2 12h20"/><path d="M17.5 12a.5.5 0 0 1 .5.5v3a.5.5 0 0 1-.5.5h-11a.5.5 0 0 1-.5-.5v-3a.5.5 0 0 1 .5-.5z"/></svg>
-                        <h1 class="auth-title">Evalvate</h1>
-                    </a>
-                    <p class="auth-subtitle">Welcome back! Login in to continue your practice.</p>
-                </div>
-
-                <form id="loginForm" novalidate>
-                    <div class="form-group">
-                        <label for="email" class="form-label">Email Address</label>
-                        <input type="email" id="email" name="email" class="form-input" placeholder="Enter your email" required>
-                        <div class="error-message" id="emailError"></div>
-                    </div>
-
-                    <div class="form-group">
-                        <label for="password" class="form-label">Password</label>
-                        <div class="password-input-wrapper">
-                            <input type="password" id="password" name="password" class="form-input" placeholder="Enter your password" required>
-                            <button type="button" class="password-toggle" aria-label="Toggle password visibility" aria-pressed="false">
-                                <svg class="eye-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                    <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
-                                    <circle cx="12" cy="12" r="3" />
-                                </svg>
-                            </button>
-                        </div>
-                        <div class="error-message" id="passwordError"></div>
-                    </div>
-
-                    <div class="form-options">
-                        <label class="checkbox-wrapper">
-                            <input type="checkbox" id="rememberMe" name="rememberMe">
-                            <span class="checkmark"></span>
-                            Remember me
-                        </label>
-                        <a href="#" class="forgot-password" id="forgotPassword">Forgot Password?</a>
-                    </div>
-
-                    <button type="submit" class="btn btn-primary" id="submitBtn">
-                        Log In
-                    </button>
-                </form>
-
-                <div class="auth-footer">
-                    <p>New user? <a href="signup.html">Create an account</a></p>
-                </div>
+      <div class="w-full max-w-md">
+        <!-- Logo -->
+        <div class="text-center mb-8 animate-slide-in">
+          <a href="index.html" class="inline-flex items-center space-x-2">
+            <div
+              class="w-12 h-12 bg-gradient-to-br from-deep-navy to-accent rounded-xl flex items-center justify-center"
+            >
+              <span class="text-white font-bold text-2xl">E</span>
             </div>
+            <span class="text-3xl font-bold font-space text-deep-navy"
+              >Evalvate</span
+            >
+          </a>
         </div>
+
+        <!-- Login Card -->
+        <div
+          class="glass-card p-8 animate-slide-in"
+          style="animation-delay: 0.1s"
+        >
+          <h1 class="text-2xl font-bold text-deep-navy mb-2">Welcome Back</h1>
+          <p class="text-body mb-6">
+            Login to continue your interview practice
+          </p>
+
+          <!-- Social Login -->
+          <div class="space-y-3 mb-6">
+            <button class="social-login-btn">
+              <svg class="w-5 h-5" viewBox="0 0 24 24">
+                <path
+                  fill="#4285F4"
+                  d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"
+                />
+                <path
+                  fill="#34A853"
+                  d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"
+                />
+                <path
+                  fill="#FBBC05"
+                  d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"
+                />
+                <path
+                  fill="#EA4335"
+                  d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"
+                />
+              </svg>
+              Continue with Google
+            </button>
+
+            <button class="social-login-btn">
+              <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+                <path
+                  d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"
+                />
+              </svg>
+              Continue with GitHub
+            </button>
+          </div>
+
+          <!-- Divider -->
+          <div class="divider">
+            <span>OR</span>
+          </div>
+
+          <!-- Login Form -->
+          <form id="loginForm">
+            <div class="space-y-4">
+              <!-- Email -->
+              <div class="input-group">
+                <label
+                  for="email"
+                  class="block text-sm font-medium text-deep-navy mb-2"
+                  >Email</label
+                >
+                <input
+                  type="email"
+                  id="email"
+                  name="email"
+                  class="input-field"
+                  placeholder="Enter your email"
+                  required
+                />
+                <span id="emailError" class="error-message"></span>
+              </div>
+
+              <!-- Password -->
+              <div class="input-group">
+                <label
+                  for="password"
+                  class="block text-sm font-medium text-deep-navy mb-2"
+                  >Password</label
+                >
+                <div class="relative">
+                  <input
+                    type="password"
+                    id="password"
+                    name="password"
+                    class="input-field pr-12"
+                    placeholder="Enter your password"
+                    required
+                  />
+                  <button
+                    type="button"
+                    class="password-toggle"
+                    aria-label="Toggle password visibility"
+                  >
+                    <svg
+                      class="w-5 h-5"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        stroke-width="2"
+                        d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
+                      />
+                      <path
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        stroke-width="2"
+                        d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"
+                      />
+                    </svg>
+                  </button>
+                </div>
+                <span id="passwordError" class="error-message"></span>
+              </div>
+
+              <!-- Remember Me & Forgot Password -->
+              <div class="flex items-center justify-between">
+                <label class="flex items-center gap-2 cursor-pointer">
+                  <input
+                    type="checkbox"
+                    id="rememberMe"
+                    class="w-4 h-4 rounded border-white/20 text-accent focus:ring-accent"
+                  />
+                  <span class="text-sm text-body">Remember me</span>
+                </label>
+                <a
+                  href="#"
+                  class="text-sm text-deep-navy hover:text-accent transition-colors"
+                  >Forgot password?</a
+                >
+              </div>
+            </div>
+
+            <!-- Login Button -->
+            <button type="submit" class="btn-primary w-full mt-6 py-3">
+              Log In
+              <svg
+                class="w-5 h-5 ml-2"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M13 7l5 5m0 0l-5 5m5-5H6"
+                />
+              </svg>
+            </button>
+          </form>
+
+          <!-- Sign Up Link -->
+          <p class="text-center mt-6 text-body">
+            New to Evalvate?
+            <a
+              href="signup.html"
+              class="text-deep-navy font-semibold hover:text-accent transition-colors"
+            >
+              Create an account
+            </a>
+          </p>
+        </div>
+
+        <!-- Footer Links -->
+        <div
+          class="text-center mt-8 animate-slide-in"
+          style="animation-delay: 0.2s"
+        >
+          <div class="flex justify-center gap-6 text-sm text-body">
+            <a href="terms.html" class="hover:text-deep-navy transition-colors"
+              >Terms</a
+            >
+            <a
+              href="privacy.html"
+              class="hover:text-deep-navy transition-colors"
+              >Privacy</a
+            >
+            <a href="#" class="hover:text-deep-navy transition-colors">Help</a>
+          </div>
+        </div>
+      </div>
     </div>
-    
-    <svg class="liquid-blob" viewBox="0 0 400 400" preserveAspectRatio="none">
-        <defs>
-            <linearGradient id="blobGradient" x1="0%" y1="0%" x2="100%" y2="100%">
-                <stop offset="0%" style="stop-color:var(--color-bg-soft);stop-opacity:0.3" />
-                <stop offset="100%" style="stop-color:var(--color-accent-dark);stop-opacity:0.1" />
-            </linearGradient>
-        </defs>
-        <path class="blob-path" d="M343,252Q308,304,251,324.5Q194,345,142,319Q90,293,76.5,246.5Q63,200,77,152Q91,104,142.5,84.5Q194,65,247,74Q300,83,342,133.5Q384,184,343,252Z" fill="url(#blobGradient)" />
-    </svg>
 
+    <!-- JavaScript -->
+    <script>
+      // Password toggle
+      document.querySelectorAll(".password-toggle").forEach((toggle) => {
+        toggle.addEventListener("click", function () {
+          const input = this.parentElement.querySelector("input");
+          const type = input.type === "password" ? "text" : "password";
+          input.type = type;
+        });
+      });
 
-    <script src="js/login.js"></script>
-</body>
+      // Form submission
+      document
+        .getElementById("loginForm")
+        ?.addEventListener("submit", function (e) {
+          e.preventDefault();
+          // Add login logic here
+          window.location.href = "dashboard.html";
+        });
+    </script>
+  </body>
 </html>

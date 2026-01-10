@@ -1,282 +1,442 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Performance Dashboard - Sidra Jahangir</title>
-    <link rel="stylesheet" href="dashboard.css">
-</head>
-<body>
-    <div class="dashboard-container">
-        <header class="dashboard-header">
-            <div class="header-left">
-                <a href="index.html" class="home-link">
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
-                        <polyline points="9 22 9 12 15 12 15 22"></polyline>
-                    </svg>
-                    Home
-                </a>
-                <a href="report.html" class="back-link">← Back to List</a>
-                <div class="user-info">
-                    <h1>Sidra Jahangir</h1>
-                    <p class="timestamp">Sep 20, 2025, 11:34 AM</p>
-                </div>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Dashboard - Evalvate</title>
+    <meta
+      name="description"
+      content="Evalvate dashboard: review interview sessions and AI performance summaries."
+    />
+
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Space+Grotesk:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+
+    <link rel="stylesheet" href="css/glassmorphism.css" />
+    <link rel="stylesheet" href="css/dashboard-glass.css" />
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+      tailwind.config = {
+        theme: {
+          extend: {
+            colors: {
+              "deep-navy": "#0F2233",
+              "pale-frost": "#EEF3FF",
+              periwinkle: "#E6EEFF",
+              "lavender-tint": "#C7D5FF",
+              accent: "#F3F86A",
+              body: "#5A6B7A",
+            },
+          },
+        },
+      };
+    </script>
+  </head>
+
+  <body class="antialiased">
+    <div class="floating-shape shape-1"></div>
+    <div class="floating-shape shape-2"></div>
+    <div class="floating-shape shape-3"></div>
+
+    <nav id="navbar" class="fixed top-0 left-0 right-0 z-50">
+      <div class="container mx-auto px-6 py-4">
+        <div class="flex items-center justify-between">
+          <div class="flex items-center space-x-2">
+            <div
+              class="w-10 h-10 bg-gradient-to-br from-deep-navy to-accent rounded-xl flex items-center justify-center"
+            >
+              <span class="text-white font-bold text-xl">E</span>
             </div>
-            <div class="header-right">
-                <button class="btn-icon">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
-                        <polyline points="7 10 12 15 17 10"></polyline>
-                        <line x1="12" y1="15" x2="12" y2="3"></line>
-                    </svg>
-                    Export PDF
-                </button>
-                <button class="btn-icon">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"></path>
-                        <polyline points="16 6 12 2 8 6"></polyline>
-                        <line x1="12" y1="2" x2="12" y2="15"></line>
-                    </svg>
-                    Share Report
-                </button>
-                <button class="btn-icon">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <circle cx="12" cy="12" r="3"></circle>
-                        <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
-                    </svg>
-                </button>
-            </div>
-        </header>
+            <span class="text-2xl font-bold font-space text-deep-navy"
+              >Evalvate</span
+            >
+          </div>
 
-        <div class="main-content">
-            <div class="left-column">
-                <div class="performance-card">
-                    <div class="score-circle">
-                        <div class="score-number">78</div>
-                        <div class="score-label">Score</div>
-                    </div>
-                    <div class="performance-info">
-                        <h2>Overall Performance</h2>
-                        <p>Comprehensive analysis across all evaluation criteria</p>
-                        <div class="rating">
-                            <span class="star"></span>
-                            <span>Good</span>
-                        </div>
-                    </div>
-                    <div class="score-display">
-                        <div class="score-large">78</div>
-                        <div class="score-max">/ 100</div>
-                    </div>
-                </div>
+          <div class="hidden lg:flex items-center space-x-8">
+            <a
+              href="index.html"
+              class="text-body hover:text-deep-navy transition-colors font-medium"
+              >Home</a
+            >
+            <a href="dashboard.html" class="text-deep-navy font-semibold"
+              >Dashboard</a
+            >
+            <a
+              href="pricing.html"
+              class="text-body hover:text-deep-navy transition-colors font-medium"
+              >Pricing</a
+            >
+            <a
+              href="blogs.html"
+              class="text-body hover:text-deep-navy transition-colors font-medium"
+              >Blogs</a
+            >
+            <a
+              href="#contact.html"
+              class="text-body hover:text-deep-navy transition-colors font-medium"
+              >Contact</a
+            >
+          </div>
 
-                <div class="metrics-grid">
-                    <div class="metric-card">
-                        <div class="metric-header">
-                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
-                            </svg>
-                            <span>Communication</span>
-                        </div>
-                        <div class="metric-bar">
-                            <div class="bar-fill" style="width: 80%"></div>
-                        </div>
-                        <div class="metric-score">80</div>
-                    </div>
-
-                    <div class="metric-card">
-                        <div class="metric-header">
-                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path>
-                                <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path>
-                            </svg>
-                            <span>Grammar</span>
-                        </div>
-                        <div class="metric-bar">
-                            <div class="bar-fill" style="width: 85%"></div>
-                        </div>
-                        <div class="metric-score">85</div>
-                    </div>
-
-                    <div class="metric-card">
-                        <div class="metric-header">
-                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path>
-                            </svg>
-                            <span>Filler Words</span>
-                        </div>
-                        <div class="metric-bar warning">
-                            <div class="bar-fill" style="width: 60%"></div>
-                        </div>
-                        <div class="metric-score">60</div>
-                    </div>
-
-                    <div class="metric-card">
-                        <div class="metric-header">
-                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
-                                <polyline points="22 4 12 14.01 9 11.01"></polyline>
-                            </svg>
-                            <span>Confidence</span>
-                        </div>
-                        <div class="metric-bar">
-                            <div class="bar-fill" style="width: 70%"></div>
-                        </div>
-                        <div class="metric-score">70</div>
-                    </div>
-
-                    <div class="metric-card">
-                        <div class="metric-header">
-                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <polyline points="16 18 22 12 16 6"></polyline>
-                                <polyline points="8 6 2 12 8 18"></polyline>
-                            </svg>
-                            <span>Technical</span>
-                        </div>
-                        <div class="metric-bar">
-                            <div class="bar-fill" style="width: 75%"></div>
-                        </div>
-                        <div class="metric-score">75</div>
-                    </div>
-
-                    <div class="metric-card">
-                        <div class="metric-header">
-                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"></path>
-                                <path d="M19 10v2a7 7 0 0 1-14 0v-2"></path>
-                                <line x1="12" y1="19" x2="12" y2="23"></line>
-                                <line x1="8" y1="23" x2="16" y2="23"></line>
-                            </svg>
-                            <span>Vocal</span>
-                        </div>
-                        <div class="metric-bar">
-                            <div class="bar-fill" style="width: 72%"></div>
-                        </div>
-                        <div class="metric-score">72</div>
-                    </div>
-                </div>
-
-                <div class="video-container">
-                    <video id="videoPlayer" controls poster="assests/thumbnail.jpg">
-                        <source src="sample-video.mp4" type="video/mp4">
-                        Your browser does not support the video tag.
-                    </video>
-                    <div class="video-overlay" id="videoOverlay">
-                        <button class="play-button" id="playButton">
-                            <svg width="32" height="32" viewBox="0 0 24 24" fill="white">
-                                <polygon points="5 3 19 12 5 21 5 3"></polygon>
-                            </svg>
-                        </button>
-                    </div>
-                </div>
-            </div>
-
-            <div class="right-column">
-                <div class="flagged-section">
-                    <h3>
-                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"></path>
-                            <line x1="4" y1="22" x2="4" y2="15"></line>
-                        </svg>
-                        Flagged Issues (3)
-                    </h3>
-                    
-                    <div class="issue-card warning">
-                        <div class="issue-header">
-                            <span class="issue-icon">⚠️</span>
-                            <span class="issue-title">Filler Words</span>
-                            <span class="issue-time">0:34</span>
-                        </div>
-                        <div class="issue-content">
-                            <p class="issue-quote">"um, so"</p>
-                            <p class="issue-description">Pause 100ms before answering</p>
-                        </div>
-                    </div>
-
-                    <div class="issue-card success">
-                        <div class="issue-header">
-                            <span class="issue-icon">✓</span>
-                            <span class="issue-title">Eye Contact</span>
-                            <span class="issue-time">1:22</span>
-                        </div>
-                        <div class="issue-content">
-                            <p class="issue-quote">"looked away"</p>
-                            <p class="issue-description">Practice triangle eye-contact for 10 minutes</p>
-                        </div>
-                    </div>
-
-                    <div class="issue-card error">
-                        <div class="issue-header">
-                            <span class="issue-icon">✕</span>
-                            <span class="issue-title">Technical</span>
-                            <span class="issue-time">2:36</span>
-                        </div>
-                        <div class="issue-content">
-                            <p class="issue-quote">"missed key concept"</p>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="assessment-section">
-                    <h3>
-                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <circle cx="12" cy="12" r="10"></circle>
-                            <line x1="12" y1="16" x2="12" y2="12"></line>
-                            <line x1="12" y1="8" x2="12.01" y2="8"></line>
-                        </svg>
-                        Technical Assessment
-                    </h3>
-
-                    <div class="assessment-item">
-                        <div class="assessment-header">
-                            <span>Explain database normalization</span>
-                            <span class="assessment-score">70</span>
-                        </div>
-                        <div class="assessment-bar">
-                            <div class="bar-fill" style="width: 70%"></div>
-                        </div>
-                        <p class="assessment-note">Missed 2NF and 3NF examples</p>
-                        <button class="view-button">View @ 2:00</button>
-                    </div>
-
-                    <div class="assessment-item">
-                        <div class="assessment-header">
-                            <span>What is a closure in JavaScript?</span>
-                            <span class="assessment-score high">85</span>
-                        </div>
-                        <div class="assessment-bar">
-                            <div class="bar-fill" style="width: 85%"></div>
-                        </div>
-                        <p class="assessment-note">Good explanation with practical example</p>
-                        <button class="view-button">View @ 4:08</button>
-                    </div>
-
-                    <div class="assessment-item">
-                        <div class="assessment-header">
-                            <span>Describe REST principles</span>
-                            <span class="assessment-score">65</span>
-                        </div>
-                        <div class="assessment-bar">
-                            <div class="bar-fill" style="width: 65%"></div>
-                        </div>
-                        <p class="assessment-note">Understood basics but missed HATEOAS</p>
-                        <button class="view-button">View @ 5:20</button>
-                    </div>
-                </div>
-
-                <div class="actions-section">
-                    <h3>Actions</h3>
-                    <div class="actions-grid">
-                        <button class="action-button">Generate Report</button>
-                        <button class="action-button">Schedule Follow-up</button>
-                        <button class="action-button">Send Feedback</button>
-                        <button class="action-button">Export Data</button>
-                    </div>
-                </div>
-            </div>
+          <div class="hidden lg:flex items-center space-x-4">
+            <a href="login.html" class="btn-secondary">Log in</a>
+            <a href="signup.html" class="btn-primary">
+              <span>Sign up</span>
+              <svg
+                width="16"
+                height="16"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+              >
+                <path d="M5 12h14M12 5l7 7-7 7" />
+              </svg>
+            </a>
+          </div>
         </div>
-    </div>
+      </div>
+    </nav>
 
-    <script src="dashboard.js"></script>
-</body>
+    <main class="dash-wrap">
+      <div class="dash-container">
+        <div
+          class="flex flex-col lg:flex-row lg:items-end lg:justify-between gap-14"
+        >
+          <div>
+            <h1 class="dash-title text-4xl md:text-5xl">Dashboard</h1>
+            <p class="dash-subtitle mt-3 max-w-2xl">
+              Analyze and review candidate interviews with AI-powered insights.
+            </p>
+          </div>
+
+          <div class="glass-card dash-search w-full lg:w-[420px]">
+            <svg
+              class="w-5 h-5"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              style="color: rgba(15, 34, 51, 0.65)"
+            >
+              <circle cx="11" cy="11" r="8"></circle>
+              <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+            </svg>
+            <input
+              type="text"
+              placeholder="Search interviews by name or role..."
+              id="searchInput"
+              aria-label="Search interviews"
+            />
+          </div>
+        </div>
+
+        <div class="stats-grid">
+          <div class="glass-card stat-card">
+            <div class="stat-icon">
+              <svg
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+                stroke-width="2"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
+                ></path>
+              </svg>
+            </div>
+            <div class="stat-content">
+              <h2>3</h2>
+              <p>Total Interviews</p>
+            </div>
+          </div>
+
+          <div class="glass-card stat-card">
+            <div class="stat-icon">
+              <svg
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+                stroke-width="2"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"
+                ></path>
+              </svg>
+            </div>
+            <div class="stat-content">
+              <h2>85</h2>
+              <p>Avg Score</p>
+            </div>
+          </div>
+
+          <div class="glass-card stat-card">
+            <div class="stat-icon">
+              <svg
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+                stroke-width="2"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  d="M12 9v2m0 4h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
+                ></path>
+              </svg>
+            </div>
+            <div class="stat-content">
+              <h2>8</h2>
+              <p>Issues Flagged</p>
+            </div>
+          </div>
+
+          <div class="glass-card stat-card">
+            <div class="stat-icon">
+              <svg
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+                stroke-width="2"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
+                ></path>
+              </svg>
+            </div>
+            <div class="stat-content">
+              <h2>24m</h2>
+              <p>Total Duration</p>
+            </div>
+          </div>
+        </div>
+
+        <section class="glass-card interviews-section">
+          <div class="section-header">
+            <svg
+              class="section-icon"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+              stroke-width="2"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"
+              ></path>
+            </svg>
+            Recent Interviews
+          </div>
+
+          <div class="interview-card" onclick="location.href='dashboard1.html'">
+            <div class="interview-left">
+              <div class="avatar"></div>
+              <div class="interview-info">
+                <span
+                  ><h3>Sidra Jahangir</h3>
+                  <h2>AI Engineer</h2></span
+                >
+                <div class="interview-meta">
+                  <span class="meta-item"
+                    ><svg
+                      class="meta-icon"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                      stroke-width="2"
+                    >
+                      <path
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
+                      ></path>
+                    </svg>
+                    Sep 30, 2025, 02:15 PM</span
+                  >
+                  <span class="meta-item"
+                    ><svg
+                      class="meta-icon"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                      stroke-width="2"
+                    >
+                      <path
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
+                      ></path>
+                    </svg>
+                    10:00</span
+                  >
+                </div>
+              </div>
+            </div>
+            <div class="interview-right">
+              <div class="score">
+                <div class="score-value good">93</div>
+                <div class="score-label">Overall Score</div>
+              </div>
+              <div class="score-bars">
+                <div class="barg" style="height: 95%"></div>
+                <div class="barg" style="height: 85%"></div>
+                <div class="barg" style="height: 90%"></div>
+                <div class="barg" style="height: 80%"></div>
+              </div>
+            </div>
+          </div>
+
+          <div class="interview-card" onclick="location.href='dashboard2.html'">
+            <div class="interview-left">
+              <div class="avatar orange"></div>
+              <div class="interview-info">
+                <span
+                  ><h3>Sidra Jahangir</h3>
+                  <h2>JavaScript Developer</h2></span
+                >
+                <div class="interview-meta">
+                  <span class="meta-item"
+                    ><svg
+                      class="meta-icon"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                      stroke-width="2"
+                    >
+                      <path
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
+                      ></path>
+                    </svg>
+                    Sep 25, 2025, 10:34 AM</span
+                  >
+                  <span class="meta-item"
+                    ><svg
+                      class="meta-icon"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                      stroke-width="2"
+                    >
+                      <path
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
+                      ></path>
+                    </svg>
+                    7:00</span
+                  >
+                </div>
+              </div>
+            </div>
+            <div class="interview-right">
+              <div class="score">
+                <div class="score-value average">84</div>
+                <div class="score-label">Overall Score</div>
+              </div>
+              <div class="score-bars">
+                <div class="bar" style="height: 70%"></div>
+                <div class="barg" style="height: 85%"></div>
+                <div class="bar" style="height: 60%"></div>
+                <div class="barg" style="height: 90%"></div>
+              </div>
+            </div>
+          </div>
+
+          <div class="interview-card" onclick="location.href='dashboard3.html'">
+            <div class="interview-left">
+              <div class="avatar"></div>
+              <div class="interview-info">
+                <span
+                  ><h3>Sidra Jahangir</h3>
+                  <h2>Frontend Developer</h2></span
+                >
+                <div class="interview-meta">
+                  <span class="meta-item"
+                    ><svg
+                      class="meta-icon"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                      stroke-width="2"
+                    >
+                      <path
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
+                      ></path>
+                    </svg>
+                    Sep 20, 2025, 11:34 AM</span
+                  >
+                  <span class="meta-item"
+                    ><svg
+                      class="meta-icon"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                      stroke-width="2"
+                    >
+                      <path
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
+                      ></path>
+                    </svg>
+                    7:00</span
+                  >
+                </div>
+              </div>
+            </div>
+            <div class="interview-right">
+              <div class="score">
+                <div class="score-value average">78</div>
+                <div class="score-label">Overall Score</div>
+              </div>
+              <div class="score-bars">
+                <div class="bar" style="height: 60%"></div>
+                <div class="barg" style="height: 85%"></div>
+                <div class="bar" style="height: 60%"></div>
+                <div class="bar" style="height: 65%"></div>
+              </div>
+            </div>
+          </div>
+        </section>
+      </div>
+    </main>
+
+    <script>
+      // Search functionality (by name or role)
+      const searchInput = document.getElementById("searchInput");
+      searchInput.addEventListener("input", (e) => {
+        const searchTerm = e.target.value.toLowerCase();
+        const interviewCards = document.querySelectorAll(".interview-card");
+
+        interviewCards.forEach((card) => {
+          const name =
+            card.querySelector("h3")?.textContent?.toLowerCase() || "";
+          const role =
+            card.querySelector("h2")?.textContent?.toLowerCase() || "";
+
+          if (name.includes(searchTerm) || role.includes(searchTerm)) {
+            card.style.display = "flex";
+          } else {
+            card.style.display = "none";
+          }
+        });
+      });
+    </script>
+  </body>
 </html>

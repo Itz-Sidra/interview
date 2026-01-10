@@ -1,6 +1,3 @@
-import interviewRoutes from './src/routes/interview.js';
-   app.use('/api/interview', interviewRoutes);
-
 document.addEventListener('DOMContentLoaded', () => {
 
     window.addEventListener('scroll', () => {

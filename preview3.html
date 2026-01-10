@@ -3,10 +3,24 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Evalvate - Resume Upload</title>
+    <title>Evalvate - Analysis Configuration</title>
+    <meta name="description" content="Configure analysis types for your interview - Facial, Technical, Vocal, and Linguistic analysis.">
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Custom CSS -->
     <link rel="stylesheet" href="preview.css">
 </head>
 <body>
+    <!-- Animated Background Shapes -->
+    <div class="floating-shape shape-1"></div>
+    <div class="floating-shape shape-2"></div>
+    <div class="floating-shape shape-3"></div>
+
+    <!-- Header -->
     <header class="header">
         <div class="logo-container">
             <div class="logo-icon">
@@ -17,16 +31,19 @@
                 <p class="logo-subtitle">Configure Your Interview</p>
             </div>
         </div>
-        <button class="theme-toggle" id="themeToggle" aria-label="Toggle theme">
-            <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
-                <path d="M10 2.5a.75.75 0 01.75.75v1.5a.75.75 0 01-1.5 0v-1.5A.75.75 0 0110 2.5zM10 15.25a.75.75 0 01.75.75v1.5a.75.75 0 01-1.5 0V16a.75.75 0 01.75-.75zM3.75 10a.75.75 0 01-.75.75h-1.5a.75.75 0 010-1.5H3a.75.75 0 01.75.75zM17.5 10a.75.75 0 01-.75.75h-1.5a.75.75 0 010-1.5h1.5a.75.75 0 01.75.75zM5.99 4.929a.75.75 0 011.06 0l1.061 1.06a.75.75 0 11-1.06 1.061L5.99 5.99a.75.75 0 010-1.06zM13.94 12.879a.75.75 0 011.06 0l1.061 1.06a.75.75 0 11-1.06 1.061l-1.061-1.06a.75.75 0 010-1.061zM4.929 14.06a.75.75 0 011.061-1.06l1.06 1.06a.75.75 0 11-1.06 1.061l-1.061-1.06zM12.879 6.111a.75.75 0 011.061-1.06l1.06 1.06a.75.75 0 11-1.06 1.061l-1.061-1.06zM10 7a3 3 0 100 6 3 3 0 000-6z"/>
+        <a href="index.html" class="back-btn">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M19 12H5M12 19l-7-7 7-7"/>
             </svg>
-        </button>
+            Back to Home
+        </a>
     </header>
 
     <main class="main-container">
         <div class="content-wrapper">
-            <div class="left-panel">
+            <!-- Left Panel -->
+            <div class="left-panel slide-up">
+                <!-- Stepper -->
                 <div class="stepper">
                     <div class="step completed">
                         <div class="step-circle">
@@ -36,7 +53,7 @@
                         </div>
                         <div class="step-info">
                             <div class="step-title">Basics</div>
-                            <div class="step-subtitle">Duration & difficulty</div>
+                            <div class="step-subtitle">Duration & type</div>
                         </div>
                     </div>
                     <div class="step-line completed"></div>
@@ -47,8 +64,8 @@
                             </svg>
                         </div>
                         <div class="step-info">
-                            <div class="step-title">Skills</div>
-                            <div class="step-subtitle">Role & expertise</div>
+                            <div class="step-title">Details</div>
+                            <div class="step-subtitle">Skills or exam info</div>
                         </div>
                     </div>
                     <div class="step-line completed"></div>
@@ -57,8 +74,8 @@
                             <span class="step-number">3</span>
                         </div>
                         <div class="step-info">
-                            <div class="step-title">Resume</div>
-                            <div class="step-subtitle">Upload document</div>
+                            <div class="step-title">Analysis</div>
+                            <div class="step-subtitle">Configure analysis</div>
                         </div>
                     </div>
                     <div class="step-line"></div>
@@ -73,84 +90,225 @@
                     </div>
                 </div>
 
+                <!-- Page Content -->
                 <div class="page-content">
-                    <h2 class="page-title">Resume Upload</h2>
-                    <p class="page-description">Upload your resume to personalize interview questions</p>
+                    <h2 class="page-title">Analysis Configuration</h2>
+                    <p class="page-description">Choose how we analyze your interview performance with 4 types of AI-powered analysis</p>
 
                     <div class="form-section">
-                        <div class="upload-area" id="uploadArea">
-                            <input type="file" id="fileInput" class="file-input" accept=".pdf,.doc,.docx" />
-                            <svg class="upload-icon" viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="2">
-                                <path d="M32 42V22M22 32L32 22L42 32M52 42V52H12V42"/>
-                                <rect x="12" y="12" width="40" height="40" rx="4"/>
-                            </svg>
-                            <div class="upload-title">Click to upload or drag and drop</div>
-                            <div class="upload-subtitle">Upload your resume to help us tailor the interview</div>
-                            <div class="upload-formats">PDF, DOC, or DOCX (Max 10MB)</div>
+                        <!-- Analysis Presets -->
+                        <div class="form-group">
+                            <label>Quick Presets</label>
+                            <p class="help-text" style="margin-bottom: 0.75rem;">Select a preset or customize individually below</p>
+                            <div class="preset-grid">
+                                <label class="preset-card active" data-preset="full">
+                                    <input type="radio" name="preset" value="full" checked>
+                                    <span class="preset-badge">Recommended</span>
+                                    <div class="preset-header">
+                                        <div class="preset-icon">
+                                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                                <circle cx="12" cy="12" r="10"/>
+                                                <path d="M8 14s1.5 2 4 2 4-2 4-2"/>
+                                                <line x1="9" y1="9" x2="9.01" y2="9"/>
+                                                <line x1="15" y1="9" x2="15.01" y2="9"/>
+                                            </svg>
+                                        </div>
+                                        <span class="preset-title">Full Analysis</span>
+                                    </div>
+                                    <p class="preset-desc">Complete evaluation with all 4 analysis types enabled</p>
+                                </label>
+
+                                <label class="preset-card" data-preset="technical">
+                                    <input type="radio" name="preset" value="technical">
+                                    <div class="preset-header">
+                                        <div class="preset-icon">
+                                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                                <polyline points="16 18 22 12 16 6"/>
+                                                <polyline points="8 6 2 12 8 18"/>
+                                            </svg>
+                                        </div>
+                                        <span class="preset-title">Technical Focus</span>
+                                    </div>
+                                    <p class="preset-desc">Technical + Linguistic analysis for coding interviews</p>
+                                </label>
+
+                                <label class="preset-card" data-preset="communication">
+                                    <input type="radio" name="preset" value="communication">
+                                    <div class="preset-header">
+                                        <div class="preset-icon">
+                                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                                <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+                                            </svg>
+                                        </div>
+                                        <span class="preset-title">Communication</span>
+                                    </div>
+                                    <p class="preset-desc">Facial + Vocal + Linguistic for soft skill focus</p>
+                                </label>
+
+                                <label class="preset-card" data-preset="custom">
+                                    <input type="radio" name="preset" value="custom">
+                                    <div class="preset-header">
+                                        <div class="preset-icon">
+                                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                                <circle cx="12" cy="12" r="3"/>
+                                                <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/>
+                                            </svg>
+                                        </div>
+                                        <span class="preset-title">Custom</span>
+                                    </div>
+                                    <p class="preset-desc">Choose your own combination</p>
+                                </label>
+                            </div>
                         </div>
 
-                        <div id="uploadedFile" class="uploaded-file" style="display: none;">
-                            <div class="file-icon">
-                                <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
-                                    <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8l-6-6z"/>
-                                    <path d="M14 2v6h6M16 13H8M16 17H8M10 9H8"/>
-                                </svg>
+                        <!-- Individual Analysis Toggles -->
+                        <div class="form-group" id="customToggles">
+                            <label>Individual Analysis Types</label>
+                            <div class="analysis-toggles">
+                                <!-- Facial Analysis -->
+                                <div class="analysis-toggle-card enabled" data-analysis="facial">
+                                    <div class="analysis-icon">
+                                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                            <circle cx="12" cy="8" r="4"/>
+                                            <path d="M6 21v-2a4 4 0 0 1 4-4h4a4 4 0 0 1 4 4v2"/>
+                                        </svg>
+                                    </div>
+                                    <div class="analysis-content">
+                                        <div class="analysis-title">Facial Analysis</div>
+                                        <div class="analysis-desc">Analyze facial expressions, eye contact, confidence, and body language cues</div>
+                                    </div>
+                                    <label class="toggle-switch">
+                                        <input type="checkbox" id="analysisFacial" checked>
+                                        <span class="toggle-slider"></span>
+                                    </label>
+                                </div>
+
+                                <!-- Technical Analysis -->
+                                <div class="analysis-toggle-card enabled" data-analysis="technical">
+                                    <div class="analysis-icon">
+                                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                            <polyline points="16 18 22 12 16 6"/>
+                                            <polyline points="8 6 2 12 8 18"/>
+                                        </svg>
+                                    </div>
+                                    <div class="analysis-content">
+                                        <div class="analysis-title">Technical Analysis</div>
+                                        <div class="analysis-desc">Evaluate technical knowledge, problem-solving approach, and answer accuracy</div>
+                                    </div>
+                                    <label class="toggle-switch">
+                                        <input type="checkbox" id="analysisTechnical" checked>
+                                        <span class="toggle-slider"></span>
+                                    </label>
+                                </div>
+
+                                <!-- Vocal Analysis -->
+                                <div class="analysis-toggle-card enabled" data-analysis="vocal">
+                                    <div class="analysis-icon">
+                                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                            <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/>
+                                            <path d="M19 10v2a7 7 0 0 1-14 0v-2"/>
+                                            <line x1="12" y1="19" x2="12" y2="23"/>
+                                            <line x1="8" y1="23" x2="16" y2="23"/>
+                                        </svg>
+                                    </div>
+                                    <div class="analysis-content">
+                                        <div class="analysis-title">Vocal Analysis</div>
+                                        <div class="analysis-desc">Assess speech clarity, pace, tone, volume, and articulation quality</div>
+                                    </div>
+                                    <label class="toggle-switch">
+                                        <input type="checkbox" id="analysisVocal" checked>
+                                        <span class="toggle-slider"></span>
+                                    </label>
+                                </div>
+
+                                <!-- Linguistic Analysis -->
+                                <div class="analysis-toggle-card enabled" data-analysis="linguistic">
+                                    <div class="analysis-icon">
+                                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                            <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+                                        </svg>
+                                    </div>
+                                    <div class="analysis-content">
+                                        <div class="analysis-title">Linguistic Analysis</div>
+                                        <div class="analysis-desc">Evaluate vocabulary, grammar, communication structure, and clarity</div>
+                                    </div>
+                                    <label class="toggle-switch">
+                                        <input type="checkbox" id="analysisLinguistic" checked>
+                                        <span class="toggle-slider"></span>
+                                    </label>
+                                </div>
                             </div>
-                            <div class="file-info">
-                                <div class="file-name" id="fileName">Resume.pdf</div>
-                                <div class="file-size" id="fileSize">2.4 MB</div>
-                            </div>
-                            <button class="file-remove" id="removeFile" aria-label="Remove file">
-                                <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
-                                    <path d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z"/>
-                                </svg>
-                            </button>
                         </div>
 
-                        <div class="info-box">
-                            <svg class="info-icon" viewBox="0 0 20 20" fill="currentColor">
-                                <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z"/>
-                            </svg>
-                            <div class="info-text">
-                                Your resume helps us create personalized interview questions based on your experience and skills. This is optional but highly recommended.
+                        <!-- Analysis Intensity -->
+                        <div class="form-group">
+                            <div class="label-row">
+                                <label for="analysisIntensity">Analysis Depth</label>
+                                <span class="duration-value" id="intensityValue">Detailed</span>
                             </div>
+                            <input type="range" id="analysisIntensity" class="slider" min="1" max="3" value="2" step="1">
+                            <div style="display: flex; justify-content: space-between; font-size: 0.75rem; color: var(--body); margin-top: 0.25rem;">
+                                <span>Standard</span>
+                                <span>Detailed</span>
+                                <span>Comprehensive</span>
+                            </div>
+                            <p class="help-text" style="margin-top: 0.5rem;">Higher depth provides more detailed feedback but takes longer to process</p>
                         </div>
                     </div>
 
+                    <!-- Info Box -->
+                    <div class="info-box">
+                        <svg class="info-icon" viewBox="0 0 20 20" fill="currentColor">
+                            <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z"/>
+                        </svg>
+                        <div class="info-text">
+                            Each analysis type provides unique insights into your performance. We recommend enabling all types for comprehensive feedback, but you can customize based on your focus areas.
+                        </div>
+                    </div>
+
+                    <!-- Navigation Buttons -->
                     <div class="button-group">
                         <button class="btn btn-secondary" onclick="window.location.href='preview2.html'">
-                            <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
-                                <path d="M12.5 15l-5-5 5-5" stroke="currentColor" stroke-width="2" fill="none"/>
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M19 12H5M12 19l-7-7 7-7"/>
                             </svg>
                             Back
                         </button>
-                        <button class="btn btn-primary" onclick="handleResumeUploadContinue(event)">
+                        <button class="btn btn-primary" onclick="handleAnalysisContinue(event)">
                             Continue
-                            <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
-                                <path d="M7.5 15l5-5-5-5" stroke="currentColor" stroke-width="2" fill="none"/>
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M5 12h14M12 5l7 7-7 7"/>
                             </svg>
                         </button>
                     </div>
                 </div>
             </div>
 
-            <div class="right-panel">
+            <!-- Right Panel -->
+            <div class="right-panel fade-in">
+                <!-- Summary Card -->
                 <div class="summary-card">
                     <h3 class="summary-title">
-                        <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
-                            <path d="M10 2L3 7v6c0 3.5 2.5 6.5 7 8 4.5-1.5 7-4.5 7-8V7l-7-5z"/>
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M12 2L3 7v6c0 3.5 2.5 6.5 7 8 4.5-1.5 7-4.5 7-8V7l-7-5z"/>
                         </svg>
                         Interview Summary
                     </h3>
                     
                     <div class="summary-item">
                         <div class="summary-label">
-                            <svg width="18" height="18" viewBox="0 0 20 20" fill="currentColor">
-                                <path d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-13a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V5z"/>
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <circle cx="12" cy="12" r="10"/>
+                                <polyline points="12 6 12 12 16 14"/>
                             </svg>
                             Duration
                         </div>
-                        <div class="summary-value" id="summaryDuration">45 minutes</div>
+                        <div class="summary-value" id="summaryDuration">30 minutes</div>
+                    </div>
+
+                    <div class="summary-item">
+                        <div class="summary-label">Purpose</div>
+                        <div class="summary-badge" id="summaryPurpose">Job Interview</div>
                     </div>
 
                     <div class="summary-item">
@@ -162,17 +320,52 @@
                         <div class="summary-label">Type</div>
                         <div class="summary-badge" id="summaryType">Technical</div>
                     </div>
+                </div>
 
-                    <div class="summary-item">
-                        <div class="summary-label">
-                            <svg width="18" height="18" viewBox="0 0 20 20" fill="currentColor">
-                                <path d="M2 6a2 2 0 012-2h6a2 2 0 012 2v8a2 2 0 01-2 2H4a2 2 0 01-2-2V6zm12.553 1.106A1 1 0 0014 8v4a1 1 0 00.553.894l2 1A1 1 0 0018 13V7a1 1 0 00-1.447-.894l-2 1z"/>
+                <!-- Analysis Summary Card -->
+                <div class="summary-card">
+                    <h3 class="summary-title">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/>
+                        </svg>
+                        Enabled Analysis
+                    </h3>
+                    <div class="analysis-summary" id="analysisSummaryPanel">
+                        <div class="analysis-badge" data-type="facial">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <circle cx="12" cy="8" r="4"/>
+                                <path d="M6 21v-2a4 4 0 0 1 4-4h4a4 4 0 0 1 4 4v2"/>
                             </svg>
-                            Recording enabled
+                            Facial
                         </div>
+                        <div class="analysis-badge" data-type="technical">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <polyline points="16 18 22 12 16 6"/>
+                                <polyline points="8 6 2 12 8 18"/>
+                            </svg>
+                            Technical
+                        </div>
+                        <div class="analysis-badge" data-type="vocal">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/>
+                                <path d="M19 10v2a7 7 0 0 1-14 0v-2"/>
+                            </svg>
+                            Vocal
+                        </div>
+                        <div class="analysis-badge" data-type="linguistic">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+                            </svg>
+                            Linguistic
+                        </div>
+                    </div>
+                    <div class="summary-item" style="margin-top: 1rem;">
+                        <div class="summary-label">Analysis Depth</div>
+                        <div class="summary-badge" id="summaryIntensity">Detailed</div>
                     </div>
                 </div>
 
+                <!-- Cost Card -->
                 <div class="cost-card">
                     <div class="cost-header">
                         <span>Interview Cost</span>
@@ -180,11 +373,218 @@
                     </div>
                     <p class="cost-description">One interview will be consumed from your plan</p>
                 </div>
-                
             </div>
         </div>
     </main>
 
     <script src="preview.js"></script>
+    <script>
+        // Preset configurations
+        const presetConfigs = {
+            full: { facial: true, technical: true, vocal: true, linguistic: true },
+            technical: { facial: false, technical: true, vocal: false, linguistic: true },
+            communication: { facial: true, technical: false, vocal: true, linguistic: true },
+            custom: null // null means don't change toggles
+        };
+
+        // Handle preset selection
+        document.querySelectorAll('.preset-card').forEach(card => {
+            card.addEventListener('click', function() {
+                document.querySelectorAll('.preset-card').forEach(c => c.classList.remove('active'));
+                this.classList.add('active');
+                this.querySelector('input').checked = true;
+                
+                const preset = this.dataset.preset;
+                if (preset !== 'custom' && presetConfigs[preset]) {
+                    applyPreset(presetConfigs[preset]);
+                }
+                
+                saveAnalysisConfig();
+            });
+        });
+
+        // Apply preset configuration
+        function applyPreset(config) {
+            document.getElementById('analysisFacial').checked = config.facial;
+            document.getElementById('analysisTechnical').checked = config.technical;
+            document.getElementById('analysisVocal').checked = config.vocal;
+            document.getElementById('analysisLinguistic').checked = config.linguistic;
+            
+            updateToggleCards();
+            updateAnalysisSummary();
+        }
+
+        // Update toggle card visual states
+        function updateToggleCards() {
+            document.querySelectorAll('.analysis-toggle-card').forEach(card => {
+                const type = card.dataset.analysis;
+                const checkbox = document.getElementById('analysis' + type.charAt(0).toUpperCase() + type.slice(1));
+                if (checkbox.checked) {
+                    card.classList.add('enabled');
+                } else {
+                    card.classList.remove('enabled');
+                }
+            });
+        }
+
+        // Update analysis summary panel
+        function updateAnalysisSummary() {
+            const types = ['facial', 'technical', 'vocal', 'linguistic'];
+            types.forEach(type => {
+                const checkbox = document.getElementById('analysis' + type.charAt(0).toUpperCase() + type.slice(1));
+                const badge = document.querySelector(`#analysisSummaryPanel .analysis-badge[data-type="${type}"]`);
+                if (badge) {
+                    badge.style.display = checkbox.checked ? 'flex' : 'none';
+                }
+            });
+        }
+
+        // Handle individual toggle changes
+        document.querySelectorAll('.analysis-toggle-card input[type="checkbox"]').forEach(checkbox => {
+            checkbox.addEventListener('change', function() {
+                // Switch to custom preset when manually changing
+                document.querySelectorAll('.preset-card').forEach(c => c.classList.remove('active'));
+                document.querySelector('.preset-card[data-preset="custom"]').classList.add('active');
+                document.querySelector('input[value="custom"]').checked = true;
+                
+                updateToggleCards();
+                updateAnalysisSummary();
+                saveAnalysisConfig();
+            });
+        });
+
+        // Intensity slider
+        const intensitySlider = document.getElementById('analysisIntensity');
+        const intensityValue = document.getElementById('intensityValue');
+        const summaryIntensity = document.getElementById('summaryIntensity');
+        const intensityLabels = ['Standard', 'Detailed', 'Comprehensive'];
+
+        if (intensitySlider) {
+            intensitySlider.addEventListener('input', function() {
+                const label = intensityLabels[parseInt(this.value) - 1];
+                if (intensityValue) intensityValue.textContent = label;
+                if (summaryIntensity) summaryIntensity.textContent = label;
+                saveAnalysisConfig();
+            });
+        }
+
+        // Save analysis configuration
+        function saveAnalysisConfig() {
+            const config = {
+                preset: document.querySelector('.preset-card.active')?.dataset.preset || 'full',
+                facial: document.getElementById('analysisFacial')?.checked ?? true,
+                technical: document.getElementById('analysisTechnical')?.checked ?? true,
+                vocal: document.getElementById('analysisVocal')?.checked ?? true,
+                linguistic: document.getElementById('analysisLinguistic')?.checked ?? true,
+                intensity: intensityLabels[parseInt(intensitySlider?.value || 2) - 1].toLowerCase()
+            };
+            localStorage.setItem('interviewAnalysis', JSON.stringify(config));
+        }
+
+        // Load analysis configuration
+        function loadAnalysisConfig() {
+            const saved = localStorage.getItem('interviewAnalysis');
+            if (saved) {
+                const config = JSON.parse(saved);
+                
+                // Apply preset
+                if (config.preset) {
+                    document.querySelectorAll('.preset-card').forEach(c => c.classList.remove('active'));
+                    const presetCard = document.querySelector(`.preset-card[data-preset="${config.preset}"]`);
+                    if (presetCard) {
+                        presetCard.classList.add('active');
+                        presetCard.querySelector('input').checked = true;
+                    }
+                }
+                
+                // Apply toggles
+                if (document.getElementById('analysisFacial')) {
+                    document.getElementById('analysisFacial').checked = config.facial ?? true;
+                }
+                if (document.getElementById('analysisTechnical')) {
+                    document.getElementById('analysisTechnical').checked = config.technical ?? true;
+                }
+                if (document.getElementById('analysisVocal')) {
+                    document.getElementById('analysisVocal').checked = config.vocal ?? true;
+                }
+                if (document.getElementById('analysisLinguistic')) {
+                    document.getElementById('analysisLinguistic').checked = config.linguistic ?? true;
+                }
+                
+                // Apply intensity
+                if (config.intensity && intensitySlider) {
+                    const index = intensityLabels.findIndex(l => l.toLowerCase() === config.intensity);
+                    if (index !== -1) {
+                        intensitySlider.value = index + 1;
+                        if (intensityValue) intensityValue.textContent = intensityLabels[index];
+                        if (summaryIntensity) summaryIntensity.textContent = intensityLabels[index];
+                    }
+                }
+                
+                updateToggleCards();
+                updateAnalysisSummary();
+            }
+        }
+
+        // Handle continue
+        async function handleAnalysisContinue(event) {
+            if (!checkAuth()) return;
+
+            const configId = localStorage.getItem('currentConfigId');
+            if (!configId) {
+                showErrorMessage('No configuration found. Redirecting to start...');
+                setTimeout(() => window.location.href = 'preview1.html', 2000);
+                return;
+            }
+
+            // Check at least one analysis is enabled
+            const facial = document.getElementById('analysisFacial')?.checked;
+            const technical = document.getElementById('analysisTechnical')?.checked;
+            const vocal = document.getElementById('analysisVocal')?.checked;
+            const linguistic = document.getElementById('analysisLinguistic')?.checked;
+
+            if (!facial && !technical && !vocal && !linguistic) {
+                showErrorMessage('Please enable at least one analysis type');
+                return;
+            }
+
+            const continueBtn = event.target;
+            const originalText = continueBtn.innerHTML;
+            continueBtn.disabled = true;
+            continueBtn.innerHTML = '<span class="loading-spinner"></span> Saving...';
+
+            try {
+                saveAnalysisConfig();
+                
+                const result = await apiCall('/interview-config/analysis', 'POST', {
+                    configId: configId,
+                    analysisFacial: facial,
+                    analysisTechnical: technical,
+                    analysisVocal: vocal,
+                    analysisLinguistic: linguistic,
+                    analysisIntensity: intensityLabels[parseInt(intensitySlider?.value || 2) - 1].toLowerCase()
+                });
+
+                console.log('Analysis config saved:', result);
+                showSuccessMessage('Analysis configuration saved!');
+                
+                setTimeout(() => {
+                    window.location.href = 'preview4.html';
+                }, 500);
+            } catch (error) {
+                console.error('Error saving analysis config:', error);
+                showErrorMessage(error.message || 'Failed to save configuration. Please try again.');
+                continueBtn.disabled = false;
+                continueBtn.innerHTML = originalText;
+            }
+        }
+
+        // Initialize on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            loadAnalysisConfig();
+            updateToggleCards();
+            updateAnalysisSummary();
+        });
+    </script>
 </body>
 </html>

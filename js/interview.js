@@ -1,5 +1,3 @@
-//const API_BASE = "https://evalvate-backend-862980960928.asia-south1.run.app";
-const API_BASE = "http://localhost:3000";
 class InterviewBot {
             constructor() {
                 this.ttsQueue = [];
@@ -9,7 +7,7 @@ class InterviewBot {
                 this.interviewStartTime = null;
                 this.timerInterval = null;
                 this.selectedTimeLimit = 0; 
-                // this.uploadedResume = null;
+                this.uploadedResume = null;
                 this.chatHistory = [];
                 this.webcamStream = null;
                 this.isMicMuted = false;
@@ -22,7 +20,6 @@ class InterviewBot {
                 this.loadTheme();
                 this.addWelcomeMessage();
             }
-            
 
             initializeElements() {
                 this.timerDisplay = document.getElementById('timerDisplay');
@@ -58,10 +55,10 @@ class InterviewBot {
                     btn.addEventListener('click', (e) => this.setTimeLimit(e));
                 });
 
-                // this.uploadBtn.addEventListener('click', () => this.fileInput.click());
-                // this.fileInput.addEventListener('change', (e) => this.handleFileUpload(e));
-                // this.uploadArea.addEventListener('dragover', (e) => this.handleDragOver(e));
-                // this.uploadArea.addEventListener('drop', (e) => this.handleDrop(e));
+                this.uploadBtn.addEventListener('click', () => this.fileInput.click());
+                this.fileInput.addEventListener('change', (e) => this.handleFileUpload(e));
+                this.uploadArea.addEventListener('dragover', (e) => this.handleDragOver(e));
+                this.uploadArea.addEventListener('drop', (e) => this.handleDrop(e));
 
                 this.micToggleBtn.addEventListener('click', () => this.toggleRecording());
 
@@ -126,7 +123,6 @@ class InterviewBot {
                 }
             }
 
-            /*
             handleFileUpload(e) {
                 const file = e.target.files[0];
                 if (file) {
@@ -165,7 +161,6 @@ class InterviewBot {
                 
                 this.uploadResumeToServer(file);
             }
-             */
 
             enqueueTTS(text) {
                 this.ttsQueue.push(text);
@@ -199,15 +194,15 @@ class InterviewBot {
                 this.playNextInQueue();
             }
 
-            /*
+
             async uploadResumeToServer(file) {
                 const formData = new FormData();
-                formData.append("resume", file);
+                formData.append("file", file);
 
-                const token = localStorage.getItem("accessToken");
+                const token = localStorage.getItem("access_token");
 
                 try {
-                    const response = await fetch("http://127.0.0.1:3000/interview-config/resume", {
+                    const response = await fetch("http://127.0.0.1:8001/upload_resume", {
                         method: "POST",
                         headers: {
                             Authorization: `Bearer ${token}`,
@@ -218,8 +213,7 @@ class InterviewBot {
                     const data = await response.json();
 
                     if (!response.ok) {
-                        const text = await response.text();
-                        throw new Error(text);
+                        throw new Error(data.detail || "Resume upload failed.");
                     }
 
                     console.log("Resume uploaded to server:", data);
@@ -230,7 +224,6 @@ class InterviewBot {
                     this.addMessage('bot', "Sorry, there was an error uploading your resume.");
                 }
             }
-            */    
 
 
             async initializeWebcam() {
@@ -295,27 +288,20 @@ class InterviewBot {
             async sendAudioToTranscribe(blob) {
                 const formData = new FormData();
                 formData.append("audio", blob, "recording.webm");
-                
-                const token = localStorage.getItem("accessToken"); // ADD THIS LINE
-                
+
                 try {
-                    const response = await fetch(`${API_BASE}/interview/transcribe`, {
+                    const response = await fetch("http://127.0.0.1:8001/transcribe_audio", {
                         method: "POST",
-                        headers: {
-                            "Authorization": `Bearer ${token}` // ADD THIS LINE
-                        },
                         body: formData
                     });
-                    
+
                     const data = await response.json();
-                    
-                    if (!response.ok) {
-                        throw new Error(data.error || data.detail || "STT failed");
-                    }
-                    
+                    if (!response.ok) throw new Error(data.detail || "STT failed");
+
                     this.userInput.value = data.transcript;
                     this.userInput.focus();
                     this.autoResizeTextarea();
+
                 } catch (err) {
                     console.error("Transcription error:", err);
                     this.addMessage("bot", "Sorry, I couldn't understand your voice.");
@@ -326,7 +312,12 @@ class InterviewBot {
             addWelcomeMessage() {
                 const welcomeMessage = `
                     <strong>Welcome to AI Interview Bot!</strong><br><br>
-                    I'm here to help you practice for your upcoming interview. 
+                    I'm here to help you practice for your upcoming interview. Here's how we can get started:<br><br>
+                    1. <strong>Upload your resume</strong> (optional) – This helps me ask more relevant questions<br>
+                    2. <strong>Set your preferred time limit</strong> using the timer options above<br>
+                    3. <strong>Tell me about the position</strong> you're interviewing for<br><br>
+                    <em>For example:</em><br>
+                    <code>"I want to practice for my interview at Google for the role Software Engineer"</code><br><br>
                     Ready when you are!
                 `;
 
@@ -381,11 +372,11 @@ class InterviewBot {
                 }
                 
                 response += `\n\nI'm ready to conduct a mock interview with you. `;
-                /*
+                
                 if (this.uploadedResume) {
                     response += `I'll reference your uploaded resume to ask relevant questions. `;
                 }
-                */
+                
                 response += `Click "Start Interview" when you're ready to begin!`;
                 
                 this.addMessage('bot', response);
@@ -419,12 +410,10 @@ class InterviewBot {
 
             async playTTS(text) {
                 try {
-                    const token = localStorage.getItem("accessToken");
-                    const response = await fetch(`${API_BASE}/interview/speak`, {
+                    const response = await fetch("http://127.0.0.1:8001/speak", {
                         method: "POST",
                         headers: {
-                        "Content-Type": "application/json",
-                        "Authorization": `Bearer ${token}`
+                            "Content-Type": "application/json"
                         },
                         body: JSON.stringify({ text })
                     });
@@ -449,14 +438,10 @@ class InterviewBot {
             }
 
             playTTSWithPromise(text) {
-                const token = localStorage.getItem("accessToken");
                 return new Promise((resolve, reject) => {
-                    fetch(`${API_BASE}/interview/speak`, {
+                    fetch("http://127.0.0.1:8001/speak", {
                         method: "POST",
-                        headers: {
-                        "Content-Type": "application/json",
-                        "Authorization": `Bearer ${token}`
-                        },
+                        headers: { "Content-Type": "application/json" },
                         body: JSON.stringify({ text })
                     })
                     .then(response => {
@@ -479,77 +464,44 @@ class InterviewBot {
 
             async handleInterviewResponse(userAnswer) {
                 this.showTypingIndicator();
-                const token = localStorage.getItem("accessToken");
-                
+
+                const token = localStorage.getItem("access_token");
+
                 try {
-                    const response = await fetch(`${API_BASE}/interview/answer`, {
+                    const response = await fetch("http://127.0.0.1:8001/answer_question", {
                         method: "POST",
                         headers: {
                             "Content-Type": "application/json",
                             "Authorization": `Bearer ${token}`,
                         },
                         body: JSON.stringify({
-                            interviewId: this.currentInterviewId,  
+                            interview_id: this.currentInterviewId,  
                             question: this.lastQuestion,
                             answer: userAnswer
                         }),
                     });
-                    
+
                     const data = await response.json();
                     this.hideTypingIndicator();
-                    
+
                     if (!response.ok) {
-                        throw new Error(data.error || data.detail || "Failed to get next question.");
+                        throw new Error(data.detail || "Failed to get next question.");
                     }
-                    
+
                     if (data.done) {
                         this.stopInterview();
-                        const message = data.message || "Interview complete! Click 'Generate Report' to see your analysis.";
-                        this.addMessage('bot', message);
+                        this.addMessage('bot', data.message);
                         return;
                     }
-                    
-                    // Check if nextQuestion exists
-                    const nextQuestion = data.nextQuestion || data.evaluation?.nextQuestion || "Could you elaborate on that?";
-                    this.addMessage('bot', nextQuestion);
-                    this.lastQuestion = nextQuestion;
-                    
+
+                    this.addMessage('bot', data.next_question);
+                    this.lastQuestion = data.next_question;  
                 } catch (err) {
                     console.error("Interview follow-up failed:", err);
+                    this.addMessage('bot', "Hmm, I ran into an issue coming up with the next question.");
                     this.hideTypingIndicator();
-                    this.addMessage('bot', "Hmm, I ran into an issue. Could you please try again?");
                 }
             }
-
-            async ensureConfigExists() {
-                let configId = localStorage.getItem("currentConfigId");
-                if (configId) return configId;
-
-                const token = localStorage.getItem("accessToken");
-
-                const response = await fetch(`${API_BASE}/interview-config/basics`, {
-                    method: "POST",
-                    headers: {
-                    "Content-Type": "application/json",
-                    "Authorization": `Bearer ${token}`
-                    },
-                    body: JSON.stringify({
-                    durationMinutes: this.selectedTimeLimit || 10,
-                    difficulty: "intermediate",
-                    type: "technical"
-                    })
-                });
-
-                const data = await response.json();
-                if (!response.ok) {
-                    throw new Error(data.error || "Failed to create interview config");
-                }
-
-                localStorage.setItem("currentConfigId", data.configId);
-                console.log("Config created:", data.configId);
-
-                return data.configId;
-                }
 
             handleGeneralResponse(message) {
                 this.showTypingIndicator();
@@ -586,11 +538,6 @@ class InterviewBot {
             }
 
             addMessage(sender, content) {
-                if (typeof content !== "string") {
-                    console.warn("addMessage received non-string content:", content);
-                    content = "Something went wrong. Please try again.";
-                }
-
                 const messageDiv = document.createElement('div');
                 messageDiv.className = `message ${sender}-message`;
 
@@ -602,12 +549,11 @@ class InterviewBot {
                 this.chatMessages.appendChild(messageDiv);
                 this.chatMessages.scrollTop = this.chatMessages.scrollHeight;
 
-                if (sender === 'bot' && this.isInterviewActive) {
+                if (sender === 'bot') {
                     const cleanText = content.replace(/<[^>]*>?/gm, '');
                     this.enqueueTTS(cleanText);
                 }
             }
-
 
             showTypingIndicator() {
                 const typingDiv = document.createElement('div');
@@ -644,163 +590,74 @@ class InterviewBot {
                 this.startBtn.disabled = false;
             }
 
-            async createPendingInterview() {
-                const token = localStorage.getItem("accessToken");
-                const configId = await this.ensureConfigExists();
-
-                if (!configId) {
-                    throw new Error("configId missing. Basics step not completed.");
-                }
-
-                const response = await fetch(`${API_BASE}/interview-config/review`, {
-                    method: "POST",
-                    headers: {
-                        "Content-Type": "application/json",
-                        "Authorization": `Bearer ${token}`
-                    },
-                    body: JSON.stringify({
-                        configId,
-                        consentRecording: false
-                    })
-                });
-
-                const data = await response.json();
-
-                if (!response.ok) {
-                    throw new Error(data.error || "Failed to create interview");
-                }
-
-                this.currentInterviewId = data.interviewId;
-                localStorage.setItem("currentInterviewId", data.interviewId);
-            }
-
             async startInterview() {
-            try {
-                this.currentInterviewId = localStorage.getItem("currentInterviewId");
-
-                if (!this.currentInterviewId) {
-                    throw new Error("Interview not initialized");
-                }
-
-                // Update status to IN_PROGRESS
-                await fetch(`${API_BASE}/interview/status`, {
-                    method: "POST",
-                    headers: {
-                        "Content-Type": "application/json",
-                        "Authorization": `Bearer ${localStorage.getItem("accessToken")}`
-                    },
-                    body: JSON.stringify({
-                        interviewId: this.currentInterviewId,
-                        status: "IN_PROGRESS"
-                    })
-                });
-
                 this.isInterviewActive = true;
                 this.interviewStartTime = Date.now();
-
+                
                 this.startBtn.disabled = true;
                 this.stopBtn.disabled = false;
                 this.askAgainBtn.disabled = false;
-
+                
                 this.startTimer();
-
+   
                 setTimeout(async () => {
                     const question = await this.fetchFirstQuestion();
                     if (question) {
-                        this.lastQuestion = question;
+                        this.lastQuestion = question;  
                     }
-                }, 500);
-
-            } catch (err) {
-                console.error("Start interview failed:", err);
-                this.addMessage("bot", "Failed to start interview. Please try again.");
+                }, 1000);
             }
-        }
 
-        stopInterview() {
-            this.isInterviewActive = false;
-            this.stopTimer();
-
-            // Update status to COMPLETED
-            fetch(`${API_BASE}/interview/status`, {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                    "Authorization": `Bearer ${localStorage.getItem("accessToken")}`
-                },
-                body: JSON.stringify({
-                    interviewId: this.currentInterviewId,
-                    status: "COMPLETED"
-                })
-            });
-
-            this.startBtn.disabled = false;
-            this.stopBtn.disabled = true;
-            this.askAgainBtn.disabled = true;
-            this.reportBtn.style.display = 'inline-flex';
-
-            const duration = Math.floor((Date.now() - this.interviewStartTime) / 1000);
-            const minutes = Math.floor(duration / 60);
-            const seconds = duration % 60;
-
-            this.addMessage(
-                'bot',
-                `Interview completed! Duration: ${minutes}m ${seconds}s. Click "Generate Report" to see your performance analysis.`
-            );
-        }
 
             async fetchFirstQuestion() {
-                const token = localStorage.getItem("accessToken");
-                const interviewId = localStorage.getItem("currentInterviewId");
+                const token = localStorage.getItem("access_token");
 
-                const lastMsg = this.chatHistory.find(
-                    msg => msg.role === 'user' && this.isInterviewStartCommand(msg.content)
-                );
-
+                const lastMsg = this.chatHistory.find(msg => msg.role === 'user' && this.isInterviewStartCommand(msg.content));
                 const message = lastMsg?.content || "I want to practice for a Software Engineer role";
+
                 const role = this.extractRole(message) || "Software Engineer";
                 const company = this.extractCompany(message) || "";
 
-                const response = await fetch(`${API_BASE}/interview/start`, {
-                    method: "POST",
-                    headers: {
-                    "Content-Type": "application/json",
-                    "Authorization": `Bearer ${token}`
-                    },
-                    body: JSON.stringify({ interviewId, role, company })
-                });
+                try {
+                    const response = await fetch("http://127.0.0.1:8001/start_interview", {
+                        method: "POST",
+                        headers: {
+                            "Content-Type": "application/json",
+                            "Authorization": `Bearer ${token}`,
+                        },
+                        body: JSON.stringify({ role, company }),
+                    });
 
-                const data = await response.json();
-                if (!response.ok) throw new Error(data.error);
+                    const data = await response.json();
+                    if (!response.ok) throw new Error(data.detail || "Error starting interview");
 
-                this.currentInterviewId = data.interviewId;
-                localStorage.setItem("currentInterviewId", data.interviewId);
-
-                this.addMessage("bot", data.question);
-                return data.question;
+                    this.currentInterviewId = data.interview_id;  
+                    this.addMessage('bot', data.question);
+                    return data.question;
+                } catch (err) {
+                    console.error("Interview start failed:", err);
+                    this.addMessage('bot', "Oops! Couldn't fetch the first question. Try again.");
+                    return null;
                 }
+            }
 
             async askAgain() {
-
-                if (!this.lastQuestion) return;
-                this.addMessage("bot", "Please answer the previous question before asking for another.");
-                
                 if (this.isInterviewActive && this.lastQuestion) {
                     this.addMessage('bot', "Let me ask you a follow-up:");
 
                     this.showTypingIndicator();
 
-                    const token = localStorage.getItem("accessToken");
+                    const token = localStorage.getItem("access_token");
 
                     try {
-                        const response = await fetch(`${API_BASE}/interview/answer`, {
+                        const response = await fetch("http://127.0.0.1:8001/answer_question", {
                             method: "POST",
                             headers: {
                                 "Content-Type": "application/json",
                                 "Authorization": `Bearer ${token}`,
                             },
                             body: JSON.stringify({
-                                interviewId: this.currentInterviewId,
+                                interview_id: this.currentInterviewId,
                                 question: this.lastQuestion,
                                 answer: "", 
                             }),
@@ -813,14 +670,30 @@ class InterviewBot {
                             throw new Error(data.detail || "Failed to get next question.");
                         }
 
-                        this.addMessage('bot', data.nextquestion);
-                        this.lastQuestion = data.nextquestion;
+                        this.addMessage('bot', data.next_question);
+                        this.lastQuestion = data.next_question;
                     } catch (err) {
                         console.error("Ask again failed:", err);
                         this.addMessage('bot', "Couldn't generate another question right now.");
                         this.hideTypingIndicator();
                     }
                 }
+            }
+
+            stopInterview() {
+                this.isInterviewActive = false;
+                this.stopTimer();
+            
+                this.startBtn.disabled = false;
+                this.stopBtn.disabled = true;
+                this.askAgainBtn.disabled = true;
+                this.reportBtn.style.display = 'inline-flex';
+                
+                const duration = Math.floor((Date.now() - this.interviewStartTime) / 1000);
+                const minutes = Math.floor(duration / 60);
+                const seconds = duration % 60;
+                
+                this.addMessage('bot', `Interview completed! Duration: ${minutes}m ${seconds}s. Click "Generate Report" to see your performance analysis.`);
             }
 
             async generateReport() {
@@ -831,10 +704,10 @@ class InterviewBot {
 
                 this.addMessage('bot', "Generating your comprehensive interview performance report...");
                 
-                const token = localStorage.getItem("accessToken");
+                const token = localStorage.getItem("access_token");
                 
                 try {
-                    const response = await fetch(`${API_BASE}/interview/report/${this.currentInterviewId}`, {
+                    const response = await fetch(`http://127.0.0.1:8001/generate_report/${this.currentInterviewId}`, {
                         headers: {
                             "Authorization": `Bearer ${token}`,
                         }

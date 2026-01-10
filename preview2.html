@@ -3,10 +3,24 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Evalvate - Skills & Role</title>
+    <title>Evalvate - Skills & Details</title>
+    <meta name="description" content="Define your role, skills, or exam details for a personalized interview experience.">
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Custom CSS -->
     <link rel="stylesheet" href="preview.css">
 </head>
 <body>
+    <!-- Animated Background Shapes -->
+    <div class="floating-shape shape-1"></div>
+    <div class="floating-shape shape-2"></div>
+    <div class="floating-shape shape-3"></div>
+
+    <!-- Header -->
     <header class="header">
         <div class="logo-container">
             <div class="logo-icon">
@@ -17,16 +31,19 @@
                 <p class="logo-subtitle">Configure Your Interview</p>
             </div>
         </div>
-        <button class="theme-toggle" id="themeToggle" aria-label="Toggle theme">
-            <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
-                <path d="M10 2.5a.75.75 0 01.75.75v1.5a.75.75 0 01-1.5 0v-1.5A.75.75 0 0110 2.5zM10 15.25a.75.75 0 01.75.75v1.5a.75.75 0 01-1.5 0V16a.75.75 0 01.75-.75zM3.75 10a.75.75 0 01-.75.75h-1.5a.75.75 0 010-1.5H3a.75.75 0 01.75.75zM17.5 10a.75.75 0 01-.75.75h-1.5a.75.75 0 010-1.5h1.5a.75.75 0 01.75.75zM5.99 4.929a.75.75 0 011.06 0l1.061 1.06a.75.75 0 11-1.06 1.061L5.99 5.99a.75.75 0 010-1.06zM13.94 12.879a.75.75 0 011.06 0l1.061 1.06a.75.75 0 11-1.06 1.061l-1.061-1.06a.75.75 0 010-1.061zM4.929 14.06a.75.75 0 011.061-1.06l1.06 1.06a.75.75 0 11-1.06 1.061l-1.061-1.06zM12.879 6.111a.75.75 0 011.061-1.06l1.06 1.06a.75.75 0 11-1.06 1.061l-1.061-1.06zM10 7a3 3 0 100 6 3 3 0 000-6z"/>
+        <a href="index.html" class="back-btn">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M19 12H5M12 19l-7-7 7-7"/>
             </svg>
-        </button>
+            Back to Home
+        </a>
     </header>
 
     <main class="main-container">
         <div class="content-wrapper">
-            <div class="left-panel">
+            <!-- Left Panel -->
+            <div class="left-panel slide-up">
+                <!-- Stepper -->
                 <div class="stepper">
                     <div class="step completed">
                         <div class="step-circle">
@@ -36,7 +53,7 @@
                         </div>
                         <div class="step-info">
                             <div class="step-title">Basics</div>
-                            <div class="step-subtitle">Duration & difficulty</div>
+                            <div class="step-subtitle">Duration & type</div>
                         </div>
                     </div>
                     <div class="step-line completed"></div>
@@ -45,8 +62,8 @@
                             <span class="step-number">2</span>
                         </div>
                         <div class="step-info">
-                            <div class="step-title">Skills</div>
-                            <div class="step-subtitle">Role & expertise</div>
+                            <div class="step-title">Details</div>
+                            <div class="step-subtitle">Skills or exam info</div>
                         </div>
                     </div>
                     <div class="step-line"></div>
@@ -55,8 +72,8 @@
                             <span class="step-number">3</span>
                         </div>
                         <div class="step-info">
-                            <div class="step-title">Technical</div>
-                            <div class="step-subtitle">Coding & setup</div>
+                            <div class="step-title">Analysis</div>
+                            <div class="step-subtitle">Configure analysis</div>
                         </div>
                     </div>
                     <div class="step-line"></div>
@@ -71,65 +88,188 @@
                     </div>
                 </div>
 
+                <!-- Page Content -->
                 <div class="page-content">
-                    <h2 class="page-title">Skills & Role</h2>
-                    <p class="page-description">Define the role and skills to focus on during the interview</p>
+                    <h2 class="page-title" id="pageTitle">Skills & Role</h2>
+                    <p class="page-description" id="pageDescription">Define the role and skills to focus on during the interview</p>
 
-                    <div class="form-section">
+                    <!-- Job Interview Section -->
+                    <div class="form-section conditional-section active" id="jobSection">
                         <div class="form-group">
                             <label for="targetRole">Target Role</label>
-                            <input type="text" id="targetRole" class="text-input" placeholder="e.g., Senior Frontend Developer">
-                            <p class="help-text">The specific position you're interviewing for</p>
+                            <input type="text" id="targetRole" class="text-input" placeholder="e.g., Senior Frontend Developer, Product Manager">
+                            <p class="help-text">The specific position you're preparing for</p>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="companyType">Company Type (Optional)</label>
+                            <select id="companyType" class="select-input">
+                                <option value="">Select company type</option>
+                                <option value="startup">Startup</option>
+                                <option value="midsize">Mid-size Company</option>
+                                <option value="enterprise">Enterprise / MNC</option>
+                                <option value="faang">FAANG / Big Tech</option>
+                                <option value="consulting">Consulting Firm</option>
+                            </select>
                         </div>
 
                         <div class="form-group">
                             <label for="keySkills">Key Skills</label>
                             <div class="skill-input-group">
-                                <input type="text" id="keySkills" class="text-input" placeholder="Add a skill (e.g., React, TypeScript)">
-                                <button class="btn-add" id="addSkillBtn">
+                                <input type="text" id="keySkills" class="text-input" placeholder="Add a skill (e.g., React, TypeScript, Python)">
+                                <button class="btn-add" id="addSkillBtn" type="button">
                                     <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
                                         <path d="M10 5a1 1 0 011 1v3h3a1 1 0 110 2h-3v3a1 1 0 11-2 0v-3H6a1 1 0 110-2h3V6a1 1 0 011-1z"/>
                                     </svg>
                                 </button>
                             </div>
                             <div class="skills-list" id="skillsList"></div>
+                            <p class="help-text">Press Enter or click + to add skills</p>
+                        </div>
+
+                        <!-- Resume Upload -->
+                        <div class="form-group">
+                            <label>Resume (Optional)</label>
+                            <div class="upload-area" id="uploadArea">
+                                <input type="file" id="fileInput" class="file-input" accept=".pdf,.doc,.docx">
+                                <svg class="upload-icon" viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M32 42V22M22 32L32 22L42 32M52 42V52H12V42"/>
+                                    <rect x="12" y="12" width="40" height="40" rx="4"/>
+                                </svg>
+                                <div class="upload-title">Click to upload or drag and drop</div>
+                                <div class="upload-subtitle">Upload your resume to personalize questions</div>
+                                <div class="upload-formats">PDF, DOC, or DOCX (Max 10MB)</div>
+                            </div>
+
+                            <div id="uploadedFile" class="uploaded-file" style="display: none;">
+                                <div class="file-icon">
+                                    <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+                                        <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8l-6-6z"/>
+                                        <path d="M14 2v6h6M16 13H8M16 17H8M10 9H8"/>
+                                    </svg>
+                                </div>
+                                <div class="file-info">
+                                    <div class="file-name" id="fileName">Resume.pdf</div>
+                                    <div class="file-size" id="fileSize">2.4 MB</div>
+                                </div>
+                                <button class="file-remove" id="removeFile" type="button">
+                                    <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
+                                        <path d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z"/>
+                                    </svg>
+                                </button>
+                            </div>
                         </div>
                     </div>
 
+                    <!-- Exam/Viva Section -->
+                    <div class="form-section conditional-section" id="examSection">
+                        <div class="form-group">
+                            <label for="examSubject">Subject Name</label>
+                            <input type="text" id="examSubject" class="text-input" placeholder="e.g., Object-Oriented Programming, Data Structures">
+                            <p class="help-text">The subject or course you're being examined on</p>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="examType">Exam Type</label>
+                            <select id="examType" class="select-input">
+                                <option value="viva" selected>Viva / Oral Examination</option>
+                                <option value="practical">Practical Test</option>
+                                <option value="theory">Theory Examination</option>
+                                <option value="mixed">Mixed Format</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="examDescription">Describe Your Exam Requirements</label>
+                            <textarea id="examDescription" class="textarea-input" 
+                                placeholder="Be specific about what you want to practice. For example:
+
+• 'OOP viva covering classes, inheritance, polymorphism, encapsulation. Focus on practical implementation and design patterns.'
+
+• 'Data Structures exam focusing on trees, graphs, and their algorithms. Include complexity analysis questions.'
+
+• 'Database Management viva with SQL queries, normalization, and transaction management.'"
+                                rows="6"></textarea>
+                            <div class="char-counter" id="descCharCounter">0 / 50 minimum characters</div>
+                            <p class="help-text">The more specific you are, the better we can tailor your interview</p>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="topicFocus">Key Topics to Focus On</label>
+                            <div class="skill-input-group">
+                                <input type="text" id="topicFocus" class="text-input" placeholder="Add a topic (e.g., Inheritance, Polymorphism)">
+                                <button class="btn-add" id="addTopicBtn" type="button">
+                                    <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
+                                        <path d="M10 5a1 1 0 011 1v3h3a1 1 0 110 2h-3v3a1 1 0 11-2 0v-3H6a1 1 0 110-2h3V6a1 1 0 011-1z"/>
+                                    </svg>
+                                </button>
+                            </div>
+                            <div class="skills-list" id="topicsList"></div>
+                        </div>
+
+                        <div class="form-group">
+                            <div class="label-row">
+                                <label for="questionsCount">Expected Questions</label>
+                                <span class="duration-value" id="questionsValue">10 questions</span>
+                            </div>
+                            <input type="range" id="questionsCount" class="slider" min="5" max="30" value="10" step="1">
+                            <p class="help-text">Approximate number of questions for your session</p>
+                        </div>
+                    </div>
+
+                    <!-- Info Box -->
+                    <div class="info-box">
+                        <svg class="info-icon" viewBox="0 0 20 20" fill="currentColor">
+                            <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z"/>
+                        </svg>
+                        <div class="info-text" id="infoText">
+                            Your role and skills help us create personalized interview questions. Add relevant skills to get more targeted practice.
+                        </div>
+                    </div>
+
+                    <!-- Navigation Buttons -->
                     <div class="button-group">
                         <button class="btn btn-secondary" onclick="window.location.href='preview1.html'">
-                            <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
-                                <path d="M12.5 15l-5-5 5-5" stroke="currentColor" stroke-width="2" fill="none"/>
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M19 12H5M12 19l-7-7 7-7"/>
                             </svg>
                             Back
                         </button>
-                        <button class="btn btn-primary" onclick="handleSkillsContinue(event)">
+                        <button class="btn btn-primary" onclick="handleDetailsContinue(event)">
                             Continue
-                            <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
-                                <path d="M7.5 15l5-5-5-5" stroke="currentColor" stroke-width="2" fill="none"/>
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M5 12h14M12 5l7 7-7 7"/>
                             </svg>
                         </button>
                     </div>
                 </div>
             </div>
 
-            <div class="right-panel">
+            <!-- Right Panel -->
+            <div class="right-panel fade-in">
+                <!-- Summary Card -->
                 <div class="summary-card">
                     <h3 class="summary-title">
-                        <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
-                            <path d="M10 2L3 7v6c0 3.5 2.5 6.5 7 8 4.5-1.5 7-4.5 7-8V7l-7-5z"/>
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M12 2L3 7v6c0 3.5 2.5 6.5 7 8 4.5-1.5 7-4.5 7-8V7l-7-5z"/>
                         </svg>
                         Interview Summary
                     </h3>
                     
                     <div class="summary-item">
                         <div class="summary-label">
-                            <svg width="18" height="18" viewBox="0 0 20 20" fill="currentColor">
-                                <path d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-13a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V5z"/>
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <circle cx="12" cy="12" r="10"/>
+                                <polyline points="12 6 12 12 16 14"/>
                             </svg>
                             Duration
                         </div>
-                        <div class="summary-value" id="summaryDuration">45 minutes</div>
+                        <div class="summary-value" id="summaryDuration">30 minutes</div>
+                    </div>
+
+                    <div class="summary-item">
+                        <div class="summary-label">Purpose</div>
+                        <div class="summary-badge" id="summaryPurpose">Job Interview</div>
                     </div>
 
                     <div class="summary-item">
@@ -142,16 +282,29 @@
                         <div class="summary-badge" id="summaryType">Technical</div>
                     </div>
 
+                    <div class="summary-item" id="summaryRoleItem">
+                        <div class="summary-label">Target Role</div>
+                        <div class="summary-value" id="summaryRole">Not set</div>
+                    </div>
+
+                    <div class="summary-item" id="summarySubjectItem" style="display: none;">
+                        <div class="summary-label">Subject</div>
+                        <div class="summary-value" id="summarySubject">Not set</div>
+                    </div>
+
                     <div class="summary-item">
                         <div class="summary-label">
-                            <svg width="18" height="18" viewBox="0 0 20 20" fill="currentColor">
-                                <path d="M2 6a2 2 0 012-2h6a2 2 0 012 2v8a2 2 0 01-2 2H4a2 2 0 01-2-2V6zm12.553 1.106A1 1 0 0014 8v4a1 1 0 00.553.894l2 1A1 1 0 0018 13V7a1 1 0 00-1.447-.894l-2 1z"/>
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <polygon points="23 7 16 12 23 17 23 7"/>
+                                <rect x="1" y="5" width="15" height="14" rx="2" ry="2"/>
                             </svg>
-                            Recording enabled
+                            Recording
                         </div>
+                        <div class="summary-badge">Enabled</div>
                     </div>
                 </div>
 
+                <!-- Cost Card -->
                 <div class="cost-card">
                     <div class="cost-header">
                         <span>Interview Cost</span>
@@ -159,11 +312,273 @@
                     </div>
                     <p class="cost-description">One interview will be consumed from your plan</p>
                 </div>
-                
             </div>
         </div>
     </main>
 
     <script src="preview.js"></script>
+    <script>
+        // Load purpose from localStorage and show appropriate section
+        function initializePage() {
+            const config = JSON.parse(localStorage.getItem('interviewConfig') || '{}');
+            const purpose = config.purpose || 'job';
+            
+            const jobSection = document.getElementById('jobSection');
+            const examSection = document.getElementById('examSection');
+            const pageTitle = document.getElementById('pageTitle');
+            const pageDescription = document.getElementById('pageDescription');
+            const infoText = document.getElementById('infoText');
+            const summaryRoleItem = document.getElementById('summaryRoleItem');
+            const summarySubjectItem = document.getElementById('summarySubjectItem');
+            
+            if (purpose === 'exam') {
+                jobSection.classList.remove('active');
+                examSection.classList.add('active');
+                pageTitle.textContent = 'Exam Details';
+                pageDescription.textContent = 'Configure your exam or viva preparation session';
+                infoText.textContent = 'Describe your exam requirements in detail for personalized questions. Include specific topics, concepts, and areas you want to focus on.';
+                summaryRoleItem.style.display = 'none';
+                summarySubjectItem.style.display = 'flex';
+            } else {
+                jobSection.classList.add('active');
+                examSection.classList.remove('active');
+                pageTitle.textContent = 'Skills & Role';
+                pageDescription.textContent = 'Define the role and skills to focus on during the interview';
+                infoText.textContent = 'Your role and skills help us create personalized interview questions. Add relevant skills to get more targeted practice.';
+                summaryRoleItem.style.display = 'flex';
+                summarySubjectItem.style.display = 'none';
+            }
+        }
+
+        // Character counter for exam description
+        const examDescription = document.getElementById('examDescription');
+        const descCharCounter = document.getElementById('descCharCounter');
+        
+        if (examDescription && descCharCounter) {
+            examDescription.addEventListener('input', function() {
+                const count = this.value.length;
+                descCharCounter.textContent = `${count} / 50 minimum characters`;
+                
+                if (count < 50) {
+                    descCharCounter.classList.add('warning');
+                    descCharCounter.classList.remove('error');
+                } else {
+                    descCharCounter.classList.remove('warning', 'error');
+                }
+            });
+        }
+
+        // Questions count slider
+        const questionsSlider = document.getElementById('questionsCount');
+        const questionsValue = document.getElementById('questionsValue');
+        
+        if (questionsSlider && questionsValue) {
+            questionsSlider.addEventListener('input', function() {
+                questionsValue.textContent = `${this.value} questions`;
+            });
+        }
+
+        // Topic management for exam mode
+        const addTopicBtn = document.getElementById('addTopicBtn');
+        const topicInput = document.getElementById('topicFocus');
+        const topicsList = document.getElementById('topicsList');
+        
+        if (addTopicBtn && topicInput && topicsList) {
+            addTopicBtn.addEventListener('click', addTopic);
+            topicInput.addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    e.preventDefault();
+                    addTopic();
+                }
+            });
+        }
+
+        function addTopic() {
+            const value = topicInput.value.trim();
+            if (value) {
+                const existing = Array.from(topicsList.querySelectorAll('.skill-tag'))
+                    .map(tag => tag.textContent.trim().toLowerCase());
+                
+                if (existing.includes(value.toLowerCase())) {
+                    showErrorMessage('This topic has already been added');
+                    return;
+                }
+
+                const tag = document.createElement('div');
+                tag.className = 'skill-tag';
+                tag.innerHTML = `
+                    ${value}
+                    <button class="skill-remove" onclick="this.parentElement.remove(); saveExamDataToLocalStorage();">
+                        <svg width="14" height="14" viewBox="0 0 14 14" fill="currentColor">
+                            <path d="M11 3L3 11M3 3l8 8" stroke="currentColor" stroke-width="2" fill="none"/>
+                        </svg>
+                    </button>
+                `;
+                topicsList.appendChild(tag);
+                topicInput.value = '';
+                saveExamDataToLocalStorage();
+            }
+        }
+
+        // Update role summary in real-time
+        const targetRoleInput = document.getElementById('targetRole');
+        const summaryRole = document.getElementById('summaryRole');
+        
+        if (targetRoleInput && summaryRole) {
+            targetRoleInput.addEventListener('input', function() {
+                summaryRole.textContent = this.value || 'Not set';
+            });
+        }
+
+        // Update subject summary in real-time
+        const examSubjectInput = document.getElementById('examSubject');
+        const summarySubject = document.getElementById('summarySubject');
+        
+        if (examSubjectInput && summarySubject) {
+            examSubjectInput.addEventListener('input', function() {
+                summarySubject.textContent = this.value || 'Not set';
+            });
+        }
+
+        // Save exam data to localStorage
+        function saveExamDataToLocalStorage() {
+            const examData = {
+                subject: document.getElementById('examSubject')?.value || '',
+                examType: document.getElementById('examType')?.value || 'viva',
+                description: document.getElementById('examDescription')?.value || '',
+                topics: Array.from(document.querySelectorAll('#topicsList .skill-tag'))
+                    .map(tag => tag.firstChild.textContent.trim()),
+                questionsCount: document.getElementById('questionsCount')?.value || 10
+            };
+            localStorage.setItem('interviewExamData', JSON.stringify(examData));
+        }
+
+        // Load exam data from localStorage
+        function loadExamDataFromLocalStorage() {
+            const savedData = localStorage.getItem('interviewExamData');
+            if (savedData) {
+                const data = JSON.parse(savedData);
+                
+                if (document.getElementById('examSubject')) {
+                    document.getElementById('examSubject').value = data.subject || '';
+                    if (summarySubject) summarySubject.textContent = data.subject || 'Not set';
+                }
+                if (document.getElementById('examType')) {
+                    document.getElementById('examType').value = data.examType || 'viva';
+                }
+                if (document.getElementById('examDescription')) {
+                    document.getElementById('examDescription').value = data.description || '';
+                    const count = (data.description || '').length;
+                    if (descCharCounter) {
+                        descCharCounter.textContent = `${count} / 50 minimum characters`;
+                    }
+                }
+                if (document.getElementById('questionsCount')) {
+                    document.getElementById('questionsCount').value = data.questionsCount || 10;
+                    if (questionsValue) {
+                        questionsValue.textContent = `${data.questionsCount || 10} questions`;
+                    }
+                }
+                
+                // Load topics
+                if (data.topics && topicsList) {
+                    topicsList.innerHTML = '';
+                    data.topics.forEach(topic => {
+                        const tag = document.createElement('div');
+                        tag.className = 'skill-tag';
+                        tag.innerHTML = `
+                            ${topic}
+                            <button class="skill-remove" onclick="this.parentElement.remove(); saveExamDataToLocalStorage();">
+                                <svg width="14" height="14" viewBox="0 0 14 14" fill="currentColor">
+                                    <path d="M11 3L3 11M3 3l8 8" stroke="currentColor" stroke-width="2" fill="none"/>
+                                </svg>
+                            </button>
+                        `;
+                        topicsList.appendChild(tag);
+                    });
+                }
+            }
+        }
+
+        // Handle continue button based on purpose
+        async function handleDetailsContinue(event) {
+            const config = JSON.parse(localStorage.getItem('interviewConfig') || '{}');
+            const purpose = config.purpose || 'job';
+            
+            if (purpose === 'job') {
+                await handleSkillsContinue(event);
+            } else {
+                await handleExamContinue(event);
+            }
+        }
+
+        // Handle exam continue
+        async function handleExamContinue(event) {
+            if (!checkAuth()) return;
+
+            const configId = localStorage.getItem('currentConfigId');
+            if (!configId) {
+                showErrorMessage('No configuration found. Redirecting to start...');
+                setTimeout(() => window.location.href = 'preview1.html', 2000);
+                return;
+            }
+
+            const subject = document.getElementById('examSubject')?.value.trim();
+            const description = document.getElementById('examDescription')?.value.trim();
+            const examType = document.getElementById('examType')?.value;
+            const topics = Array.from(document.querySelectorAll('#topicsList .skill-tag'))
+                .map(tag => tag.firstChild.textContent.trim());
+            const questionsCount = parseInt(document.getElementById('questionsCount')?.value || 10);
+
+            if (!subject) {
+                showErrorMessage('Please enter the subject name');
+                document.getElementById('examSubject')?.focus();
+                return;
+            }
+
+            if (!description || description.length < 50) {
+                showErrorMessage('Please provide a detailed description (at least 50 characters)');
+                document.getElementById('examDescription')?.focus();
+                return;
+            }
+
+            const continueBtn = event.target;
+            const originalText = continueBtn.innerHTML;
+            continueBtn.disabled = true;
+            continueBtn.innerHTML = '<span class="loading-spinner"></span> Saving...';
+
+            try {
+                // Save exam data
+                saveExamDataToLocalStorage();
+                
+                const result = await apiCall('/interview-config/exam', 'POST', {
+                    configId: configId,
+                    subject: subject,
+                    examType: examType,
+                    description: description,
+                    topics: topics,
+                    questionsCount: questionsCount
+                });
+
+                console.log('Exam data saved:', result);
+                showSuccessMessage('Exam details saved successfully!');
+                
+                setTimeout(() => {
+                    window.location.href = 'preview3.html';
+                }, 500);
+            } catch (error) {
+                console.error('Error saving exam data:', error);
+                showErrorMessage(error.message || 'Failed to save exam details. Please try again.');
+                continueBtn.disabled = false;
+                continueBtn.innerHTML = originalText;
+            }
+        }
+
+        // Initialize on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            initializePage();
+            loadExamDataFromLocalStorage();
+        });
+    </script>
 </body>
 </html>

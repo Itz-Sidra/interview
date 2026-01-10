@@ -1,0 +1,250 @@
+/* Dashboard (list) page theme overrides to match glassmorphism site */
+
+.dash-wrap {
+  padding: 136px 24px 64px;
+}
+
+.dash-container {
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.dash-title {
+  font-family: var(--font-space);
+  color: var(--deep-navy);
+  letter-spacing: -0.02em;
+}
+
+.dash-subtitle {
+  color: var(--body);
+}
+
+.dash-search {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  padding: 10px 12px;
+}
+
+.dash-search input {
+  width: 100%;
+  border: 0;
+  outline: none;
+  background: transparent;
+  color: var(--deep-navy);
+  font-size: 14px;
+}
+
+.dash-search input::placeholder {
+  color: rgba(90, 107, 122, 0.75);
+}
+
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 16px;
+  margin-top: 20px;
+}
+
+.stat-card {
+  padding: 18px;
+  display: flex;
+  gap: 14px;
+  align-items: center;
+}
+
+.stat-icon {
+  width: 46px;
+  height: 46px;
+  border-radius: 14px;
+  display: grid;
+  place-items: center;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+}
+
+.stat-icon svg {
+  width: 22px;
+  height: 22px;
+  color: var(--deep-navy);
+}
+
+.stat-content h2 {
+  font-size: 26px;
+  line-height: 1.1;
+  font-weight: 800;
+  color: var(--deep-navy);
+}
+
+.stat-content p {
+  font-size: 12px;
+  color: var(--body);
+  margin-top: 3px;
+}
+
+.interviews-section {
+  margin-top: 26px;
+  padding: 22px;
+}
+
+.section-header {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  font-family: var(--font-space);
+  font-weight: 700;
+  color: var(--deep-navy);
+  margin-bottom: 14px;
+}
+
+.section-icon {
+  width: 18px;
+  height: 18px;
+  color: var(--deep-navy);
+}
+
+.interview-card {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 18px;
+  border-radius: 16px;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  backdrop-filter: blur(12px) saturate(120%);
+  -webkit-backdrop-filter: blur(12px) saturate(120%);
+  box-shadow: 0 8px 30px rgba(15, 34, 51, 0.10);
+  transition: transform var(--transition-fast), box-shadow var(--transition-fast), border-color var(--transition-fast);
+  cursor: pointer;
+}
+
+.interview-card:hover {
+  transform: translateY(-3px);
+  border-color: rgba(255, 255, 255, 0.18);
+  box-shadow: 0 14px 34px rgba(15, 34, 51, 0.14);
+}
+
+.interview-left {
+  display: flex;
+  gap: 14px;
+  align-items: center;
+}
+
+.avatar {
+  width: 52px;
+  height: 52px;
+  border-radius: 18px;
+  background: radial-gradient(circle at 30% 30%, var(--accent), var(--lavender-tint));
+  border: 1px solid rgba(255, 255, 255, 0.22);
+}
+
+.avatar.orange {
+  background: radial-gradient(circle at 30% 30%, var(--lavender-tint), var(--periwinkle));
+}
+
+.interview-info h3 {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--deep-navy);
+  margin-bottom: 2px;
+}
+
+.interview-info h2 {
+  font-size: 12px;
+  font-weight: 600;
+  color: rgba(15, 34, 51, 0.68);
+}
+
+.interview-meta {
+  display: flex;
+  gap: 14px;
+  margin-top: 8px;
+  flex-wrap: wrap;
+  color: var(--body);
+  font-size: 12px;
+}
+
+.meta-item {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+}
+
+.meta-icon {
+  width: 14px;
+  height: 14px;
+  color: rgba(15, 34, 51, 0.65);
+}
+
+.interview-right {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+}
+
+.score-value {
+  font-size: 26px;
+  font-weight: 800;
+  color: var(--deep-navy);
+  line-height: 1;
+}
+
+.score-value.good {
+  color: #0f766e;
+}
+
+.score-value.average {
+  color: #1d4ed8;
+}
+
+.score-label {
+  font-size: 12px;
+  color: var(--body);
+  margin-top: 3px;
+}
+
+.score-bars {
+  display: flex;
+  gap: 4px;
+  align-items: flex-end;
+  height: 40px;
+}
+
+.bar,
+.barg {
+  width: 8px;
+  border-radius: 3px;
+}
+
+.bar {
+  background: rgba(239, 68, 68, 0.75);
+}
+
+.barg {
+  background: rgba(16, 185, 129, 0.75);
+}
+
+@media (max-width: 1024px) {
+  .stats-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 640px) {
+  .dash-wrap {
+    padding: 84px 16px 40px;
+  }
+  .stats-grid {
+    grid-template-columns: 1fr;
+  }
+  .interview-card {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  .interview-right {
+    width: 100%;
+    justify-content: space-between;
+  }
+}
+
+

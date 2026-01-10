@@ -1,0 +1,1119 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Pricing - Evalvate | Choose Your Plan</title>
+    <meta
+      name="description"
+      content="Simple, transparent pricing for students and professionals. Start free, upgrade when you're ready."
+    />
+
+    <!-- Open Graph Tags -->
+    <meta property="og:title" content="Evalvate Pricing - Start Free Today" />
+    <meta
+      property="og:description"
+      content="Affordable interview practice plans for everyone. No hidden fees."
+    />
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Space+Grotesk:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="css/glassmorphism.css" />
+
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+      tailwind.config = {
+        theme: {
+          extend: {
+            colors: {
+              "deep-navy": "#0F2233",
+              "pale-frost": "#EEF3FF",
+              periwinkle: "#E6EEFF",
+              "lavender-tint": "#C7D5FF",
+              accent: "#F3F86A",
+              body: "#5A6B7A",
+            },
+          },
+        },
+      };
+    </script>
+  </head>
+  <body class="antialiased">
+    <!-- Animated Background -->
+    <div class="floating-shape shape-1"></div>
+    <div class="floating-shape shape-2"></div>
+
+    <!-- Navigation (Same as homepage) -->
+    <nav id="navbar" class="fixed top-0 left-0 right-0 z-50">
+      <div class="container mx-auto px-6 py-4">
+        <div class="flex items-center justify-between">
+          <div class="flex items-center space-x-2">
+            <div
+              class="w-10 h-10 bg-gradient-to-br from-deep-navy to-accent rounded-xl flex items-center justify-center"
+            >
+              <span class="text-white font-bold text-xl">E</span>
+            </div>
+            <span class="text-2xl font-bold font-space text-deep-navy"
+              >Evalvate</span
+            >
+          </div>
+
+          <div class="hidden lg:flex items-center space-x-8">
+            <a
+              href="index.html"
+              class="text-body hover:text-deep-navy transition-colors font-medium"
+              >Home</a
+            >
+            <a
+              href="dashboard.html"
+              class="text-body hover:text-deep-navy transition-colors font-medium"
+              >Dashboard</a
+            >
+            <a href="pricing.html" class="text-deep-navy font-semibold"
+              >Pricing</a
+            >
+            <a
+              href="blogs.html"
+              class="text-body hover:text-deep-navy transition-colors font-medium"
+              >Blogs</a
+            >
+            <a
+              href="#contact"
+              class="text-body hover:text-deep-navy transition-colors font-medium"
+              >Contact</a
+            >
+          </div>
+
+          <div class="hidden lg:flex items-center space-x-4">
+            <a href="login.html" class="btn-secondary">Login</a>
+            <a href="signup.html" class="btn-primary">Get Started</a>
+          </div>
+
+          <button id="mobile-menu-btn" class="lg:hidden p-2">
+            <svg
+              width="24"
+              height="24"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+            >
+              <path d="M3 12h18M3 6h18M3 18h18" />
+            </svg>
+          </button>
+        </div>
+      </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="pt-44 md:pt-48 pb-28 px-6">
+      <div class="container mx-auto text-center">
+        <h1
+          class="font-space text-deep-navy mb-4 text-4xl md:text-5xl font-semibold"
+        >
+          Simple Pricing for
+          <span class="text-gradient" style="color: #e4e87f">Everyone</span>
+        </h1>
+        <p class="text-xl md:text-2xl text-body max-w-2xl mx-auto mb-10">
+          Start free, upgrade when you're ready. No hidden fees, cancel anytime.
+        </p>
+
+        <!-- Billing Toggle -->
+        <div class="flex items-center justify-center gap-4 mb-12">
+          <span class="text-deep-navy font-semibold">Monthly</span>
+          <button
+            id="billing-toggle"
+            class="relative w-16 h-8 bg-white/25 rounded-full backdrop-blur-sm border border-white/25 transition-all"
+          >
+            <span
+              class="absolute top-1 left-1 w-6 h-6 bg-deep-navy rounded-full transition-transform duration-300"
+            ></span>
+          </button>
+          <span class="text-deep-navy font-semibold"
+            >Annual
+            <span class="font-bold" style="color: #3b4b6a">Save 20%</span></span
+          >
+        </div>
+      </div>
+    </section>
+
+    <!-- Pricing Cards -->
+    <section class="pb-20 px-6">
+      <div class="container mx-auto">
+        <div class="grid lg:grid-cols-3 gap-8 max-w-6xl mx-auto mt-8">
+          <!-- Free Plan -->
+          <div class="glass-card p-8 relative">
+            <div class="mb-8">
+              <h3 class="text-2xl font-bold text-deep-navy mb-2">Free</h3>
+              <p class="text-body mb-6">Perfect for getting started</p>
+              <div class="flex items-baseline gap-1">
+                <span class="text-4xl font-bold text-deep-navy">$0</span>
+                <span class="text-body">/month</span>
+              </div>
+            </div>
+
+            <ul class="space-y-4 mb-8">
+              <li class="flex items-start gap-3">
+                <svg
+                  class="w-5 h-5 text-green-500 mt-0.5"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    d="M5 13l4 4L19 7"
+                  />
+                </svg>
+                <span class="text-body">2 interviews</span>
+              </li>
+              <li class="flex items-start gap-3">
+                <svg
+                  class="w-5 h-5 text-green-500 mt-0.5"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    d="M5 13l4 4L19 7"
+                  />
+                </svg>
+                <span class="text-body">Basic AI feedback</span>
+              </li>
+              <li class="flex items-start gap-3">
+                <svg
+                  class="w-5 h-5 text-green-500 mt-0.5"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    d="M5 13l4 4L19 7"
+                  />
+                </svg>
+                <span class="text-body">Access to question bank</span>
+              </li>
+              <li class="flex items-start gap-3">
+                <svg
+                  class="w-5 h-5 text-gray-400 mt-0.5"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    d="M6 18L18 6M6 6l12 12"
+                  />
+                </svg>
+                <span class="text-gray-400">Detailed performance reports</span>
+              </li>
+              <li class="flex items-start gap-3">
+                <svg
+                  class="w-5 h-5 text-gray-400 mt-0.5"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    d="M6 18L18 6M6 6l12 12"
+                  />
+                </svg>
+                <span class="text-gray-400">Resume review</span>
+              </li>
+            </ul>
+
+            <a
+              href="interview.html"
+              class="w-full btn-secondary py-3 block text-center"
+              >Start Free</a
+            >
+          </div>
+
+          <!-- Pro Student Plan (Recommended) -->
+          <div
+            class="glass-card relative border-2 p-8 pt-16 pb-10"
+            style="
+              border-color: rgba(209, 215, 79, 0.22);
+              box-shadow: 0 12px 28px rgba(15, 34, 51, 0.08);
+            "
+          >
+            <div
+              class="absolute left-1/2 transform -translate-x-1/2 z-10"
+              style="top: 12px"
+            >
+              <span
+                class="px-4 py-1 rounded-full text-sm font-semibold"
+                style="
+                  background: #0f2233;
+                  color: #f7f9ff;
+                  box-shadow: 0 6px 16px rgba(15, 34, 51, 0.15);
+                "
+              >
+                MOST POPULAR
+              </span>
+            </div>
+
+            <div class="mb-8">
+              <h3 class="text-2xl font-bold text-deep-navy mb-2">
+                Pro Student
+              </h3>
+              <p class="text-body mb-6">Best for active job seekers</p>
+              <div class="flex items-baseline gap-1">
+                <span class="text-4xl font-bold text-deep-navy monthly-price"
+                  >$9</span
+                >
+                <span
+                  class="text-4xl font-bold text-deep-navy annual-price hidden"
+                  >$7</span
+                >
+                <span class="text-body">/month</span>
+              </div>
+            </div>
+
+            <ul class="space-y-4 mb-8">
+              <li class="flex items-start gap-3">
+                <svg
+                  class="w-5 h-5 text-green-500 mt-0.5"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    d="M5 13l4 4L19 7"
+                  />
+                </svg>
+                <span class="text-body"
+                  ><strong>5</strong> interviews per month</span
+                >
+              </li>
+              <li class="flex items-start gap-3">
+                <svg
+                  class="w-5 h-5 text-green-500 mt-0.5"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    d="M5 13l4 4L19 7"
+                  />
+                </svg>
+                <span class="text-body">Advanced AI analysis</span>
+              </li>
+              <li class="flex items-start gap-3">
+                <svg
+                  class="w-5 h-5 text-green-500 mt-0.5"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    d="M5 13l4 4L19 7"
+                  />
+                </svg>
+                <span class="text-body">Detailed performance reports</span>
+              </li>
+              <li class="flex items-start gap-3">
+                <svg
+                  class="w-5 h-5 text-green-500 mt-0.5"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    d="M5 13l4 4L19 7"
+                  />
+                </svg>
+                <span class="text-body">Industry-specific questions</span>
+              </li>
+              <li class="flex items-start gap-3">
+                <svg
+                  class="w-5 h-5 text-gray-400 mt-0.5"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    d="M6 18L18 6M6 6l12 12"
+                  />
+                </svg>
+                <span class="text-gray-400">Priority support</span>
+              </li>
+            </ul>
+
+            <button
+              class="w-full btn-primary py-3 text-lg"
+              id="buyNowBtn"
+              onclick="openPaymentModal('Pro Student', 9)"
+            >
+              Buy Now
+            </button>
+          </div>
+
+          <!-- Professional Plan -->
+          <div class="glass-card p-8 relative">
+            <div class="mb-8">
+              <h3 class="text-2xl font-bold text-deep-navy mb-2">
+                Professional
+              </h3>
+              <p class="text-body mb-6">For serious career growth</p>
+              <div class="flex items-baseline gap-1">
+                <span class="text-4xl font-bold text-deep-navy monthly-price"
+                  >$29</span
+                >
+                <span
+                  class="text-4xl font-bold text-deep-navy annual-price hidden"
+                  >$23</span
+                >
+                <span class="text-body">/month</span>
+              </div>
+            </div>
+
+            <ul class="space-y-4 mb-8">
+              <li class="flex items-start gap-3">
+                <svg
+                  class="w-5 h-5 text-green-500 mt-0.5"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    d="M5 13l4 4L19 7"
+                  />
+                </svg>
+                <span class="text-body"
+                  ><strong>Everything in Pro Student</strong></span
+                >
+              </li>
+              <li class="flex items-start gap-3">
+                <svg
+                  class="w-5 h-5 text-green-500 mt-0.5"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    d="M5 13l4 4L19 7"
+                  />
+                </svg>
+                <span class="text-body">Professional resume review</span>
+              </li>
+              <li class="flex items-start gap-3">
+                <svg
+                  class="w-5 h-5 text-green-500 mt-0.5"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    d="M5 13l4 4L19 7"
+                  />
+                </svg>
+                <span class="text-body">LinkedIn optimization</span>
+              </li>
+              <li class="flex items-start gap-3">
+                <svg
+                  class="w-5 h-5 text-green-500 mt-0.5"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    d="M5 13l4 4L19 7"
+                  />
+                </svg>
+                <span class="text-body">Priority scheduling</span>
+              </li>
+              <li class="flex items-start gap-3">
+                <svg
+                  class="w-5 h-5 text-green-500 mt-0.5"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    d="M5 13l4 4L19 7"
+                  />
+                </svg>
+                <span class="text-body">24/7 priority support</span>
+              </li>
+            </ul>
+
+            <button
+              class="w-full btn-secondary py-3"
+              onclick="openPaymentModal('Professional', 29)"
+            >
+              Buy Now
+            </button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Features Comparison -->
+    <section
+      class="py-20 px-6 bg-gradient-to-b from-transparent to-pale-frost/30"
+    >
+      <div class="container mx-auto">
+        <h2
+          class="font-space text-center text-deep-navy mb-12 text-3xl md:text-4xl font-semibold"
+        >
+          Compare
+          <span class="text-gradient" style="color: #e4e87f">Features</span>
+        </h2>
+
+        <div class="glass-card overflow-hidden max-w-5xl mx-auto">
+          <div class="overflow-x-auto">
+            <table class="w-full">
+              <thead>
+                <tr class="border-b border-white/10">
+                  <th class="text-left p-6 font-semibold text-deep-navy">
+                    Features
+                  </th>
+                  <th class="text-center p-6 font-semibold text-deep-navy">
+                    Free
+                  </th>
+                  <th
+                    class="text-center p-6 font-semibold text-deep-navy bg-accent/5"
+                  >
+                    Pro Student
+                  </th>
+                  <th class="text-center p-6 font-semibold text-deep-navy">
+                    Professional
+                  </th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr class="border-b border-white/5">
+                  <td class="p-6 text-body">Mock Interviews</td>
+                  <td class="text-center p-6">2</td>
+                  <td class="text-center p-6 bg-accent/5 font-semibold">
+                    5/month
+                  </td>
+                  <td class="text-center p-6 font-semibold">Unlimited</td>
+                </tr>
+                <tr class="border-b border-white/5">
+                  <td class="p-6 text-body">AI Feedback</td>
+                  <td class="text-center p-6">Basic</td>
+                  <td class="text-center p-6 bg-accent/5">Advanced</td>
+                  <td class="text-center p-6">Advanced</td>
+                </tr>
+                <tr class="border-b border-white/5">
+                  <td class="p-6 text-body">Performance Reports</td>
+                  <td class="text-center p-6">-</td>
+                  <td class="text-center p-6 bg-accent/5">✓</td>
+                  <td class="text-center p-6">✓</td>
+                </tr>
+                <tr class="border-b border-white/5">
+                  <td class="p-6 text-body">Resume Review</td>
+                  <td class="text-center p-6">-</td>
+                  <td class="text-center p-6 bg-accent/5">-</td>
+                  <td class="text-center p-6">✓</td>
+                </tr>
+                <tr>
+                  <td class="p-6 text-body">Support</td>
+                  <td class="text-center p-6">Email</td>
+                  <td class="text-center p-6 bg-accent/5">Email & Chat</td>
+                  <td class="text-center p-6">Priority 24/7</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- FAQ Section -->
+    <section class="py-20 px-6">
+      <div class="container mx-auto max-w-3xl">
+        <h2
+          class="font-space text-center text-deep-navy mb-12 text-3xl md:text-4xl font-semibold"
+        >
+          Frequently Asked
+          <span class="text-gradient" style="color: #e4e87f">Questions</span>
+        </h2>
+
+        <div class="space-y-4">
+          <!-- FAQ Item 1 -->
+          <div class="glass-card overflow-hidden faq-item">
+            <button
+              class="w-full text-left p-6 flex items-center justify-between faq-toggle"
+            >
+              <span class="font-semibold text-deep-navy"
+                >Can I switch plans anytime?</span
+              >
+              <svg
+                class="w-5 h-5 text-body transform transition-transform"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+              >
+                <path d="M19 9l-7 7-7-7" />
+              </svg>
+            </button>
+            <div class="faq-content hidden px-6 pb-6">
+              <p class="text-body">
+                Yes! You can upgrade or downgrade your plan at any time. Changes
+                take effect at the start of your next billing cycle.
+              </p>
+            </div>
+          </div>
+
+          <!-- FAQ Item 2 -->
+          <div class="glass-card overflow-hidden faq-item">
+            <button
+              class="w-full text-left p-6 flex items-center justify-between faq-toggle"
+            >
+              <span class="font-semibold text-deep-navy"
+                >Is there a student discount?</span
+              >
+              <svg
+                class="w-5 h-5 text-body transform transition-transform"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+              >
+                <path d="M19 9l-7 7-7-7" />
+              </svg>
+            </button>
+            <div class="faq-content hidden px-6 pb-6">
+              <p class="text-body">
+                The Pro Student plan is specifically designed for students with
+                student-friendly pricing. You can verify your student status to
+                unlock additional discounts.
+              </p>
+            </div>
+          </div>
+
+          <!-- FAQ Item 3 -->
+          <div class="glass-card overflow-hidden faq-item">
+            <button
+              class="w-full text-left p-6 flex items-center justify-between faq-toggle"
+            >
+              <span class="font-semibold text-deep-navy"
+                >What payment methods do you accept?</span
+              >
+              <svg
+                class="w-5 h-5 text-body transform transition-transform"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+              >
+                <path d="M19 9l-7 7-7-7" />
+              </svg>
+            </button>
+            <div class="faq-content hidden px-6 pb-6">
+              <p class="text-body">
+                We accept all major credit cards (Visa, Mastercard, American
+                Express), PayPal, and bank transfers for annual plans.
+              </p>
+            </div>
+          </div>
+
+          <!-- FAQ Item 4 -->
+          <div class="glass-card overflow-hidden faq-item">
+            <button
+              class="w-full text-left p-6 flex items-center justify-between faq-toggle"
+            >
+              <span class="font-semibold text-deep-navy"
+                >Do you offer refunds?</span
+              >
+              <svg
+                class="w-5 h-5 text-body transform transition-transform"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+              >
+                <path d="M19 9l-7 7-7-7" />
+              </svg>
+            </button>
+            <div class="faq-content hidden px-6 pb-6">
+              <p class="text-body">
+                We offer a 14-day money-back guarantee for all paid plans. If
+                you're not satisfied, contact our support team for a full
+                refund.
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Payment Modal -->
+    <div
+      id="paymentModal"
+      class="fixed inset-0 z-50 hidden flex items-center justify-center bg-black/50 backdrop-blur-sm"
+    >
+      <div class="glass-card p-8 max-w-md w-full mx-4">
+        <div class="flex justify-between items-center mb-6">
+          <h3 class="text-2xl font-bold text-deep-navy" id="modalPlanName">
+            Pro Student
+          </h3>
+          <button
+            onclick="closePaymentModal()"
+            class="text-body hover:text-deep-navy"
+          >
+            <svg
+              class="w-6 h-6"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M6 18L18 6M6 6l12 12"
+              />
+            </svg>
+          </button>
+        </div>
+
+        <div class="text-center mb-6">
+          <span class="text-4xl font-bold text-deep-navy"
+            >$<span id="modalPrice">9</span></span
+          >
+          <span class="text-body">/month</span>
+        </div>
+
+        <form id="paymentForm" onsubmit="processPayment(event)">
+          <div class="space-y-4">
+            <div>
+              <label class="block text-sm font-medium text-deep-navy mb-2"
+                >Card Number</label
+              >
+              <input
+                type="text"
+                id="cardNumber"
+                placeholder="4242 4242 4242 4242"
+                class="w-full px-4 py-3 glass-card bg-white/5 outline-none text-deep-navy placeholder-body rounded-lg"
+                maxlength="19"
+                required
+              />
+            </div>
+            <div class="grid grid-cols-2 gap-4">
+              <div>
+                <label class="block text-sm font-medium text-deep-navy mb-2"
+                  >Expiry</label
+                >
+                <input
+                  type="text"
+                  id="cardExpiry"
+                  placeholder="MM/YY"
+                  class="w-full px-4 py-3 glass-card bg-white/5 outline-none text-deep-navy placeholder-body rounded-lg"
+                  maxlength="5"
+                  required
+                />
+              </div>
+              <div>
+                <label class="block text-sm font-medium text-deep-navy mb-2"
+                  >CVV</label
+                >
+                <input
+                  type="text"
+                  id="cardCvv"
+                  placeholder="123"
+                  class="w-full px-4 py-3 glass-card bg-white/5 outline-none text-deep-navy placeholder-body rounded-lg"
+                  maxlength="3"
+                  required
+                />
+              </div>
+            </div>
+          </div>
+
+          <button
+            type="submit"
+            class="w-full btn-primary py-3 mt-6"
+            id="payBtn"
+          >
+            Process Payment
+          </button>
+        </form>
+
+        <div id="paymentSuccess" class="hidden text-center">
+          <svg
+            class="w-16 h-16 mx-auto text-green-500 mb-4"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
+            />
+          </svg>
+          <h4 class="text-xl font-bold text-deep-navy mb-2">
+            Payment Successful!
+          </h4>
+          <p class="text-body">Redirecting to your interview...</p>
+        </div>
+
+        <p class="text-xs text-center text-body mt-4">
+          This is a demo payment. No actual charges will be made.
+        </p>
+      </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="py-12 px-6 border-t border-white/10">
+      <div class="container mx-auto">
+        <div class="grid md:grid-cols-4 gap-8 mb-8">
+          <!-- Brand -->
+          <div>
+            <div class="flex items-center space-x-2 mb-4">
+              <div
+                class="w-10 h-10 bg-gradient-to-br from-deep-navy to-accent rounded-xl flex items-center justify-center"
+              >
+                <span class="text-white font-bold text-xl">E</span>
+              </div>
+              <span class="text-2xl font-bold font-space text-deep-navy"
+                >Evalvate</span
+              >
+            </div>
+            <p class="text-body text-sm mb-4">
+              Transform your interview skills and land your dream job with
+              AI-powered practice.
+            </p>
+            <!-- Social Links -->
+            <div class="flex space-x-4">
+              <a
+                href="#"
+                class="w-10 h-10 glass-card rounded-lg flex items-center justify-center hover:bg-white/20 transition-colors"
+              >
+                <svg
+                  class="w-5 h-5 text-deep-navy"
+                  fill="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"
+                  />
+                </svg>
+              </a>
+              <a
+                href="#"
+                class="w-10 h-10 glass-card rounded-lg flex items-center justify-center hover:bg-white/20 transition-colors"
+              >
+                <svg
+                  class="w-5 h-5 text-deep-navy"
+                  fill="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    d="M23.953 4.57a10 10 0 01-2.825.775 4.958 4.958 0 002.163-2.723c-.951.555-2.005.959-3.127 1.184a4.92 4.92 0 00-8.384 4.482C7.69 8.095 4.067 6.13 1.64 3.162a4.822 4.822 0 00-.666 2.475c0 1.71.87 3.213 2.188 4.096a4.904 4.904 0 01-2.228-.616v.06a4.923 4.923 0 003.946 4.827 4.996 4.996 0 01-2.212.085 4.936 4.936 0 004.604 3.417 9.867 9.867 0 01-6.102 2.105c-.39 0-.779-.023-1.17-.067a13.995 13.995 0 007.557 2.209c9.053 0 13.998-7.496 13.998-13.985 0-.21 0-.42-.015-.63A9.935 9.935 0 0024 4.59z"
+                  />
+                </svg>
+              </a>
+              <a
+                href="#"
+                class="w-10 h-10 glass-card rounded-lg flex items-center justify-center hover:bg-white/20 transition-colors"
+              >
+                <svg
+                  class="w-5 h-5 text-deep-navy"
+                  fill="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"
+                  />
+                </svg>
+              </a>
+            </div>
+          </div>
+
+          <!-- Product -->
+          <div>
+            <h4 class="font-semibold text-deep-navy mb-4">Product</h4>
+            <ul class="space-y-2">
+              <li>
+                <a
+                  href="#"
+                  class="text-body hover:text-deep-navy transition-colors"
+                  >Features</a
+                >
+              </li>
+              <li>
+                <a
+                  href="pricing.html"
+                  class="text-body hover:text-deep-navy transition-colors"
+                  >Pricing</a
+                >
+              </li>
+              <li>
+                <a
+                  href="dashboard.html"
+                  class="text-body hover:text-deep-navy transition-colors"
+                  >Dashboard</a
+                >
+              </li>
+              <li>
+                <a
+                  href="#"
+                  class="text-body hover:text-deep-navy transition-colors"
+                  >API</a
+                >
+              </li>
+            </ul>
+          </div>
+
+          <!-- Resources -->
+          <div>
+            <h4 class="font-semibold text-deep-navy mb-4">Resources</h4>
+            <ul class="space-y-2">
+              <li>
+                <a
+                  href="blogs.html"
+                  class="text-body hover:text-deep-navy transition-colors"
+                  >Blog</a
+                >
+              </li>
+              <li>
+                <a
+                  href="#"
+                  class="text-body hover:text-deep-navy transition-colors"
+                  >Guides</a
+                >
+              </li>
+              <li>
+                <a
+                  href="#"
+                  class="text-body hover:text-deep-navy transition-colors"
+                  >Case Studies</a
+                >
+              </li>
+              <li>
+                <a
+                  href="#"
+                  class="text-body hover:text-deep-navy transition-colors"
+                  >FAQ</a
+                >
+              </li>
+            </ul>
+          </div>
+
+          <!-- Company -->
+          <div>
+            <h4 class="font-semibold text-deep-navy mb-4">Company</h4>
+            <ul class="space-y-2">
+              <li>
+                <a
+                  href="#"
+                  class="text-body hover:text-deep-navy transition-colors"
+                  >About</a
+                >
+              </li>
+              <li>
+                <a
+                  href="#"
+                  class="text-body hover:text-deep-navy transition-colors"
+                  >Careers</a
+                >
+              </li>
+              <li>
+                <a
+                  href="#"
+                  class="text-body hover:text-deep-navy transition-colors"
+                  >Contact</a
+                >
+              </li>
+              <li>
+                <a
+                  href="terms.html"
+                  class="text-body hover:text-deep-navy transition-colors"
+                  >Terms</a
+                >
+              </li>
+            </ul>
+          </div>
+        </div>
+
+        <!-- Bottom Bar -->
+        <div
+          class="pt-8 border-t border-white/10 flex flex-col md:flex-row justify-between items-center"
+        >
+          <p class="text-body text-sm">© 2025 Evalvate. All rights reserved.</p>
+          <div class="flex space-x-6 mt-4 md:mt-0">
+            <a
+              href="privacy.html"
+              class="text-body hover:text-deep-navy transition-colors text-sm"
+              >Privacy Policy</a
+            >
+            <a
+              href="terms.html"
+              class="text-body hover:text-deep-navy transition-colors text-sm"
+              >Terms of Service</a
+            >
+            <a
+              href="#"
+              class="text-body hover:text-deep-navy transition-colors text-sm"
+              >Cookie Settings</a
+            >
+          </div>
+        </div>
+      </div>
+    </footer>
+
+    <!-- JavaScript -->
+    <script src="js/glassmorphism.js"></script>
+    <script>
+      // Billing Toggle
+      const billingToggle = document.getElementById("billing-toggle");
+      const monthlyPrices = document.querySelectorAll(".monthly-price");
+      const annualPrices = document.querySelectorAll(".annual-price");
+      const toggleIndicator = billingToggle.querySelector("span");
+
+      let isAnnual = false;
+
+      billingToggle.addEventListener("click", () => {
+        isAnnual = !isAnnual;
+
+        if (isAnnual) {
+          toggleIndicator.style.transform = "translateX(32px)";
+          toggleIndicator.classList.add("bg-accent");
+          toggleIndicator.classList.remove("bg-deep-navy");
+
+          monthlyPrices.forEach((el) => el.classList.add("hidden"));
+          annualPrices.forEach((el) => el.classList.remove("hidden"));
+        } else {
+          toggleIndicator.style.transform = "translateX(0)";
+          toggleIndicator.classList.remove("bg-accent");
+          toggleIndicator.classList.add("bg-deep-navy");
+
+          monthlyPrices.forEach((el) => el.classList.remove("hidden"));
+          annualPrices.forEach((el) => el.classList.add("hidden"));
+        }
+      });
+
+      // FAQ Accordion
+      document.querySelectorAll(".faq-toggle").forEach((button) => {
+        button.addEventListener("click", () => {
+          const content = button.nextElementSibling;
+          const icon = button.querySelector("svg");
+
+          content.classList.toggle("hidden");
+          icon.classList.toggle("rotate-180");
+        });
+      });
+
+      // Mobile Menu
+      const mobileMenuBtn = document.getElementById("mobile-menu-btn");
+      const mobileMenu = document.getElementById("mobile-menu");
+
+      mobileMenuBtn?.addEventListener("click", () => {
+        mobileMenu?.classList.toggle("hidden");
+      });
+
+      // Payment Modal Functions
+      function openPaymentModal(planName, price) {
+        document.getElementById("modalPlanName").textContent = planName;
+        document.getElementById("modalPrice").textContent = price;
+        document.getElementById("paymentModal").classList.remove("hidden");
+        document.getElementById("paymentForm").classList.remove("hidden");
+        document.getElementById("paymentSuccess").classList.add("hidden");
+      }
+
+      function closePaymentModal() {
+        document.getElementById("paymentModal").classList.add("hidden");
+      }
+
+      function processPayment(event) {
+        event.preventDefault();
+        const payBtn = document.getElementById("payBtn");
+        payBtn.textContent = "Processing...";
+        payBtn.disabled = true;
+
+        // Simulate payment processing
+        setTimeout(() => {
+          document.getElementById("paymentForm").classList.add("hidden");
+          document.getElementById("paymentSuccess").classList.remove("hidden");
+
+          // Redirect after 2 seconds
+          setTimeout(() => {
+            window.location.href = "interview.html";
+          }, 2000);
+        }, 1500);
+      }
+
+      // Format card number input
+      document.getElementById("cardNumber")?.addEventListener("input", (e) => {
+        let value = e.target.value.replace(/\s/g, "").replace(/\D/g, "");
+        value = value.match(/.{1,4}/g)?.join(" ") || value;
+        e.target.value = value;
+      });
+
+      // Format expiry input
+      document.getElementById("cardExpiry")?.addEventListener("input", (e) => {
+        let value = e.target.value.replace(/\D/g, "");
+        if (value.length >= 2) {
+          value = value.slice(0, 2) + "/" + value.slice(2);
+        }
+        e.target.value = value;
+      });
+
+      // Close modal on backdrop click
+      document
+        .getElementById("paymentModal")
+        ?.addEventListener("click", (e) => {
+          if (e.target.id === "paymentModal") {
+            closePaymentModal();
+          }
+        });
+    </script>
+  </body>
+</html>
