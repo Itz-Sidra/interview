@@ -442,6 +442,152 @@ async function handleSkillsContinue(event) {
     }
 }
 
+async function handleDetailsContinue(event) {
+    if (!checkAuth()) return;
+
+    const configId = localStorage.getItem('currentConfigId');
+    if (!configId) {
+        showErrorMessage('No configuration found. Redirecting...');
+        setTimeout(() => window.location.href = 'preview1.html', 2000);
+        return;
+    }
+
+    // Check which purpose is selected
+    const config = JSON.parse(localStorage.getItem('interviewConfig') || '{}');
+    const purpose = config.purpose || 'job';
+
+    if (purpose === 'job') {
+        // Handle job interview flow
+        await handleJobInterviewDetails(event);
+    } else if (purpose === 'exam') {
+        // Handle exam flow
+        await handleExamDetails(event);
+    }
+}
+
+// ============ Job Interview Details Handler ============
+async function handleJobInterviewDetails(event) {
+    const configId = localStorage.getItem('currentConfigId');
+    const role = targetRoleInput?.value.trim();
+    const skills = skillsList ? Array.from(skillsList.querySelectorAll('.skill-tag'))
+        .map(tag => tag.firstChild.textContent.trim()) : [];
+    const companyType = document.getElementById('companyType')?.value || '';
+
+    if (!role) {
+        showErrorMessage('Please enter a target role');
+        targetRoleInput?.focus();
+        return;
+    }
+
+    if (skills.length === 0) {
+        showErrorMessage('Please add at least one skill');
+        keySkillsInput?.focus();
+        return;
+    }
+
+    const continueBtn = event.target.closest('button');
+    const originalText = continueBtn.innerHTML;
+    continueBtn.disabled = true;
+    continueBtn.innerHTML = '<span class="loading-spinner"></span> Saving...';
+
+    try {
+        const result = await apiCall('/interview-config/skills', 'POST', {
+            configId: configId,
+            role: role,
+            skills: skills,
+            companyType: companyType
+        });
+
+        saveSkillsToLocalStorage();
+        showSuccessMessage('Skills saved!');
+        
+        setTimeout(() => {
+            window.location.href = 'preview3.html';
+        }, 500);
+    } catch (error) {
+        console.error('Error saving skills:', error);
+        showErrorMessage(error.message || 'Failed to save skills');
+        continueBtn.disabled = false;
+        continueBtn.innerHTML = originalText;
+    }
+}
+
+// ============ Exam Details Handler ============
+async function handleExamDetails(event) {
+    const configId = localStorage.getItem('currentConfigId');
+    
+    // Use the CORRECT IDs from preview2.html
+    const subjectInput = document.getElementById('examSubject'); // ✓ Correct ID
+    const examTypeSelect = document.getElementById('examType'); // ✓ Correct ID
+    const descriptionInput = document.getElementById('examDescription'); // ✓ Correct ID
+    const topicsList = document.getElementById('topicsList'); // ✓ Get topics from list
+    const questionsInput = document.getElementById('questionsCount'); // ✓ Correct ID
+
+    const subject = subjectInput?.value.trim();
+    const examType = examTypeSelect?.value || 'viva';
+    const description = descriptionInput?.value.trim();
+    
+    // Get topics from the skill tags (not from a single input)
+    const topics = topicsList ? 
+        Array.from(topicsList.querySelectorAll('.skill-tag'))
+            .map(tag => tag.firstChild.textContent.trim()) : [];
+    
+    const questionsCount = parseInt(questionsInput?.value || '10');
+
+    // Validation
+    if (!subject) {
+        showErrorMessage('Please enter the subject name');
+        subjectInput?.focus();
+        return;
+    }
+
+    if (!description || description.length < 50) {
+        showErrorMessage('Please provide at least 50 characters describing your exam requirements');
+        descriptionInput?.focus();
+        return;
+    }
+
+    const continueBtn = event.target.closest('button');
+    const originalText = continueBtn.innerHTML;
+    continueBtn.disabled = true;
+    continueBtn.innerHTML = '<span class="loading-spinner"></span> Saving...';
+
+    try {
+        const result = await apiCall('/interview-config/exam', 'POST', {
+            configId: configId,
+            subject: subject,
+            examType: examType,
+            description: description,
+            topics: topics, // Already an array
+            questionsCount: questionsCount
+        });
+
+        // Save to localStorage as well
+        const examData = {
+            subject,
+            examType,
+            description,
+            topics,
+            questionsCount
+        };
+        localStorage.setItem('interviewExamData', JSON.stringify(examData));
+
+        showSuccessMessage('Exam details saved!');
+        
+        setTimeout(() => {
+            window.location.href = 'preview3.html';
+        }, 500);
+    } catch (error) {
+        console.error('Error saving exam details:', error);
+        showErrorMessage(error.message || 'Failed to save exam details');
+        continueBtn.disabled = false;
+        continueBtn.innerHTML = originalText;
+    }
+}
+
+// Make the function globally available
+window.handleDetailsContinue = handleDetailsContinue;
+
 // ============ File Upload ============
 const uploadArea = document.getElementById('uploadArea');
 const fileInput = document.getElementById('fileInput');
@@ -604,3 +750,15 @@ window.addEventListener('DOMContentLoaded', () => {
 if (targetRoleInput) {
     targetRoleInput.addEventListener('input', saveSkillsToLocalStorage);
 }
+
+window.handleSkillsContinue = handleSkillsContinue;
+window.handleExamDetails = handleExamDetails;
+window.handleDetailsContinue = handleDetailsContinue;
+window.handleBasicsContinue = handleBasicsContinue;
+window.removeSkill = removeSkill;
+window.checkAuth = checkAuth;
+window.apiCall = apiCall;
+window.showSuccessMessage = showSuccessMessage;
+window.showErrorMessage = showErrorMessage;
+
+console.log('preview.js loaded - functions exposed globally');

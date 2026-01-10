@@ -3,7 +3,7 @@ import multer from 'multer';
 import path from 'path';
 import fs from 'fs';
 import { fileURLToPath } from 'url';
-import { handleBasics, handleSkills, handleResumeUpload, handleReview } from '../controllers/interviewConfigController.js';
+import { handleBasics, handleSkills, handleExam, handleResumeUpload,  handleAnalysis, handleReview } from '../controllers/interviewConfigController.js';
 import authenticateToken from '../middleware/auth.js';
 
 const router = express.Router();
@@ -58,6 +58,7 @@ const upload = multer({
 
 router.post('/basics', authenticateToken, handleBasics);
 router.post('/skills', authenticateToken, handleSkills);
+router.post('/exam', authenticateToken, handleExam);
 router.post(
   '/resume',
   authenticateToken,
@@ -73,6 +74,7 @@ router.post(
   },
   handleResumeUpload
 );
+router.post('/analysis', authenticateToken, handleAnalysis);
 router.post('/review', authenticateToken, handleReview);
 
 export default router;

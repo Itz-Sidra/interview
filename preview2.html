@@ -31,7 +31,7 @@
                 <p class="logo-subtitle">Configure Your Interview</p>
             </div>
         </div>
-        <a href="index.html" class="back-btn">
+        <a href="dashboard.html" class="back-btn">
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                 <path d="M19 12H5M12 19l-7-7 7-7"/>
             </svg>
@@ -89,7 +89,7 @@
                 </div>
 
                 <!-- Page Content -->
-                <div class="page-content">
+                 <form class="page-content" onsubmit="return false;">
                     <h2 class="page-title" id="pageTitle">Skills & Role</h2>
                     <p class="page-description" id="pageDescription">Define the role and skills to focus on during the interview</p>
 
@@ -182,14 +182,14 @@
                         <div class="form-group">
                             <label for="examDescription">Describe Your Exam Requirements</label>
                             <textarea id="examDescription" class="textarea-input" 
-                                placeholder="Be specific about what you want to practice. For example:
+                                                                placeholder="Be specific about what you want to practice. For example:
 
-• 'OOP viva covering classes, inheritance, polymorphism, encapsulation. Focus on practical implementation and design patterns.'
+                                • 'OOP viva covering classes, inheritance, polymorphism, encapsulation. Focus on practical implementation and design patterns.'
 
-• 'Data Structures exam focusing on trees, graphs, and their algorithms. Include complexity analysis questions.'
+                                • 'Data Structures exam focusing on trees, graphs, and their algorithms. Include complexity analysis questions.'
 
-• 'Database Management viva with SQL queries, normalization, and transaction management.'"
-                                rows="6"></textarea>
+                                • 'Database Management viva with SQL queries, normalization, and transaction management.'"
+                                                                rows="6"></textarea>
                             <div class="char-counter" id="descCharCounter">0 / 50 minimum characters</div>
                             <p class="help-text">The more specific you are, the better we can tailor your interview</p>
                         </div>
@@ -235,14 +235,14 @@
                             </svg>
                             Back
                         </button>
-                        <button class="btn btn-primary" onclick="handleDetailsContinue(event)">
+                        <button class="btn btn-primary" id="detailsContinueBtn">
                             Continue
                             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                 <path d="M5 12h14M12 5l7 7-7 7"/>
                             </svg>
                         </button>
                     </div>
-                </div>
+                </form>
             </div>
 
             <!-- Right Panel -->
@@ -318,7 +318,6 @@
 
     <script src="preview.js"></script>
     <script>
-        // Load purpose from localStorage and show appropriate section
         function initializePage() {
             const config = JSON.parse(localStorage.getItem('interviewConfig') || '{}');
             const purpose = config.purpose || 'job';
@@ -350,50 +349,56 @@
             }
         }
 
-        // Character counter for exam description
-        const examDescription = document.getElementById('examDescription');
-        const descCharCounter = document.getElementById('descCharCounter');
-        
-        if (examDescription && descCharCounter) {
-            examDescription.addEventListener('input', function() {
-                const count = this.value.length;
-                descCharCounter.textContent = `${count} / 50 minimum characters`;
-                
-                if (count < 50) {
-                    descCharCounter.classList.add('warning');
-                    descCharCounter.classList.remove('error');
-                } else {
-                    descCharCounter.classList.remove('warning', 'error');
-                }
-            });
-        }
+        // Character counter for exam description (use existing elements, don't redeclare)
+        (function setupExamDescriptionCounter() {
+            const examDescription = document.getElementById('examDescription');
+            const descCharCounter = document.getElementById('descCharCounter');
 
-        // Questions count slider
-        const questionsSlider = document.getElementById('questionsCount');
-        const questionsValue = document.getElementById('questionsValue');
-        
-        if (questionsSlider && questionsValue) {
-            questionsSlider.addEventListener('input', function() {
-                questionsValue.textContent = `${this.value} questions`;
-            });
-        }
+            if (examDescription && descCharCounter) {
+                examDescription.addEventListener('input', function() {
+                    const count = this.value.length;
+                    descCharCounter.textContent = `${count} / 50 minimum characters`;
+                    
+                    if (count < 50) {
+                        descCharCounter.classList.add('warning');
+                        descCharCounter.classList.remove('error');
+                    } else {
+                        descCharCounter.classList.remove('warning', 'error');
+                    }
+                });
+            }
+        })();
 
-        // Topic management for exam mode
-        const addTopicBtn = document.getElementById('addTopicBtn');
-        const topicInput = document.getElementById('topicFocus');
-        const topicsList = document.getElementById('topicsList');
-        
-        if (addTopicBtn && topicInput && topicsList) {
-            addTopicBtn.addEventListener('click', addTopic);
-            topicInput.addEventListener('keypress', function(e) {
-                if (e.key === 'Enter') {
-                    e.preventDefault();
-                    addTopic();
-                }
-            });
-        }
+        // Questions count slider (use existing elements, don't redeclare)
+        (function setupQuestionsSlider() {
+            const questionsSlider = document.getElementById('questionsCount');
+            const questionsValue = document.getElementById('questionsValue');
 
-        function addTopic() {
+            if (questionsSlider && questionsValue) {
+                questionsSlider.addEventListener('input', function() {
+                    questionsValue.textContent = `${this.value} questions`;
+                });
+            }
+        })();
+
+        // Topic management for exam mode (use existing elements, don't redeclare)
+        (function setupTopicManagement() {
+            const addTopicBtn = document.getElementById('addTopicBtn');
+            const topicInput = document.getElementById('topicFocus');
+            const topicsList = document.getElementById('topicsList');
+
+            if (addTopicBtn && topicInput && topicsList) {
+                addTopicBtn.addEventListener('click', () => addTopic(topicInput, topicsList));
+                topicInput.addEventListener('keypress', function(e) {
+                    if (e.key === 'Enter') {
+                        e.preventDefault();
+                        addTopic(topicInput, topicsList);
+                    }
+                });
+            }
+        })();
+
+        function addTopic(topicInput, topicsList) {
             const value = topicInput.value.trim();
             if (value) {
                 const existing = Array.from(topicsList.querySelectorAll('.skill-tag'))
@@ -420,25 +425,29 @@
             }
         }
 
-        // Update role summary in real-time
-        const targetRoleInput = document.getElementById('targetRole');
-        const summaryRole = document.getElementById('summaryRole');
-        
-        if (targetRoleInput && summaryRole) {
-            targetRoleInput.addEventListener('input', function() {
-                summaryRole.textContent = this.value || 'Not set';
-            });
-        }
+        // Update role summary in real-time (use existing elements, don't redeclare)
+        (function setupRoleSummary() {
+            const targetRoleInput = document.getElementById('targetRole');
+            const summaryRole = document.getElementById('summaryRole');
 
-        // Update subject summary in real-time
-        const examSubjectInput = document.getElementById('examSubject');
-        const summarySubject = document.getElementById('summarySubject');
-        
-        if (examSubjectInput && summarySubject) {
-            examSubjectInput.addEventListener('input', function() {
-                summarySubject.textContent = this.value || 'Not set';
-            });
-        }
+            if (targetRoleInput && summaryRole) {
+                targetRoleInput.addEventListener('input', function() {
+                    summaryRole.textContent = this.value || 'Not set';
+                });
+            }
+        })();
+
+        // Update subject summary in real-time (use existing elements, don't redeclare)
+        (function setupSubjectSummary() {
+            const examSubjectInput = document.getElementById('examSubject');
+            const summarySubject = document.getElementById('summarySubject');
+
+            if (examSubjectInput && summarySubject) {
+                examSubjectInput.addEventListener('input', function() {
+                    summarySubject.textContent = this.value || 'Not set';
+                });
+            }
+        })();
 
         // Save exam data to localStorage
         function saveExamDataToLocalStorage() {
@@ -459,22 +468,31 @@
             if (savedData) {
                 const data = JSON.parse(savedData);
                 
-                if (document.getElementById('examSubject')) {
-                    document.getElementById('examSubject').value = data.subject || '';
+                const examSubject = document.getElementById('examSubject');
+                const summarySubject = document.getElementById('summarySubject');
+                const examType = document.getElementById('examType');
+                const examDescription = document.getElementById('examDescription');
+                const descCharCounter = document.getElementById('descCharCounter');
+                const questionsCount = document.getElementById('questionsCount');
+                const questionsValue = document.getElementById('questionsValue');
+                const topicsList = document.getElementById('topicsList');
+                
+                if (examSubject) {
+                    examSubject.value = data.subject || '';
                     if (summarySubject) summarySubject.textContent = data.subject || 'Not set';
                 }
-                if (document.getElementById('examType')) {
-                    document.getElementById('examType').value = data.examType || 'viva';
+                if (examType) {
+                    examType.value = data.examType || 'viva';
                 }
-                if (document.getElementById('examDescription')) {
-                    document.getElementById('examDescription').value = data.description || '';
+                if (examDescription) {
+                    examDescription.value = data.description || '';
                     const count = (data.description || '').length;
                     if (descCharCounter) {
                         descCharCounter.textContent = `${count} / 50 minimum characters`;
                     }
                 }
-                if (document.getElementById('questionsCount')) {
-                    document.getElementById('questionsCount').value = data.questionsCount || 10;
+                if (questionsCount) {
+                    questionsCount.value = data.questionsCount || 10;
                     if (questionsValue) {
                         questionsValue.textContent = `${data.questionsCount || 10} questions`;
                     }
@@ -500,84 +518,53 @@
             }
         }
 
-        // Handle continue button based on purpose
-        async function handleDetailsContinue(event) {
-            const config = JSON.parse(localStorage.getItem('interviewConfig') || '{}');
-            const purpose = config.purpose || 'job';
-            
-            if (purpose === 'job') {
-                await handleSkillsContinue(event);
-            } else {
-                await handleExamContinue(event);
-            }
-        }
-
-        // Handle exam continue
-        async function handleExamContinue(event) {
-            if (!checkAuth()) return;
-
-            const configId = localStorage.getItem('currentConfigId');
-            if (!configId) {
-                showErrorMessage('No configuration found. Redirecting to start...');
-                setTimeout(() => window.location.href = 'preview1.html', 2000);
-                return;
-            }
-
-            const subject = document.getElementById('examSubject')?.value.trim();
-            const description = document.getElementById('examDescription')?.value.trim();
-            const examType = document.getElementById('examType')?.value;
-            const topics = Array.from(document.querySelectorAll('#topicsList .skill-tag'))
-                .map(tag => tag.firstChild.textContent.trim());
-            const questionsCount = parseInt(document.getElementById('questionsCount')?.value || 10);
-
-            if (!subject) {
-                showErrorMessage('Please enter the subject name');
-                document.getElementById('examSubject')?.focus();
-                return;
-            }
-
-            if (!description || description.length < 50) {
-                showErrorMessage('Please provide a detailed description (at least 50 characters)');
-                document.getElementById('examDescription')?.focus();
-                return;
-            }
-
-            const continueBtn = event.target;
-            const originalText = continueBtn.innerHTML;
-            continueBtn.disabled = true;
-            continueBtn.innerHTML = '<span class="loading-spinner"></span> Saving...';
-
-            try {
-                // Save exam data
-                saveExamDataToLocalStorage();
-                
-                const result = await apiCall('/interview-config/exam', 'POST', {
-                    configId: configId,
-                    subject: subject,
-                    examType: examType,
-                    description: description,
-                    topics: topics,
-                    questionsCount: questionsCount
-                });
-
-                console.log('Exam data saved:', result);
-                showSuccessMessage('Exam details saved successfully!');
-                
-                setTimeout(() => {
-                    window.location.href = 'preview3.html';
-                }, 500);
-            } catch (error) {
-                console.error('Error saving exam data:', error);
-                showErrorMessage(error.message || 'Failed to save exam details. Please try again.');
-                continueBtn.disabled = false;
-                continueBtn.innerHTML = originalText;
-            }
-        }
-
         // Initialize on page load
-        document.addEventListener('DOMContentLoaded', function() {
+        document.addEventListener('DOMContentLoaded', () => {
+            console.log('DOMContentLoaded - preview2.html inline script');
+            
+            // Initialize the page based on purpose
             initializePage();
+            
+            // Load saved exam data
             loadExamDataFromLocalStorage();
+            
+            // Attach click handler to continue button
+            const btn = document.getElementById('detailsContinueBtn');
+            if (btn) {
+                console.log('Continue button found, attaching handler');
+                
+                btn.addEventListener('click', async (event) => {
+                    event.preventDefault();
+                    console.log('Continue button clicked!');
+
+                    const config = JSON.parse(localStorage.getItem('interviewConfig') || '{}');
+                    const purpose = config.purpose || 'job';
+                    
+                    console.log('Purpose:', purpose);
+
+                    if (purpose === 'job') {
+                        console.log('Calling handleSkillsContinue');
+                        // Call the function from preview.js
+                        if (typeof window.handleSkillsContinue === 'function') {
+                            await window.handleSkillsContinue(event);
+                        } else {
+                            console.error('handleSkillsContinue not found in window');
+                            showErrorMessage('Error: Function not loaded. Please refresh the page.');
+                        }
+                    } else {
+                        console.log('Calling handleExamDetails');
+                        // Call the function from preview.js
+                        if (typeof window.handleExamDetails === 'function') {
+                            await window.handleExamDetails(event);
+                        } else {
+                            console.error('handleExamDetails not found in window');
+                            showErrorMessage('Error: Function not loaded. Please refresh the page.');
+                        }
+                    }
+                });
+            } else {
+                console.error('Continue button not found!');
+            }
         });
     </script>
 </body>

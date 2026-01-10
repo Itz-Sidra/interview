@@ -50,7 +50,7 @@ export const handleBasics = async (req, res) => {
 
 // ---------------- PART 2: SKILLS ----------------
 export const handleSkills = async (req, res) => {
-  const { configId, role, skills } = req.body;
+  const { configId, role, skills, companyType  } = req.body;
 
   try {
     if (!configId) {
@@ -67,7 +67,8 @@ export const handleSkills = async (req, res) => {
       where: { id: configId },
       data: { 
         role: role.trim(), 
-        skills: skills.map(s => s.trim())
+        skills: skills.map(s => s.trim()),
+        companyType: companyType || null
       },
     });
 
@@ -79,6 +80,68 @@ export const handleSkills = async (req, res) => {
       return res.status(404).json({ error: 'Configuration not found' });
     }
     
+    res.status(500).json({ error: err.message });
+  }
+};
+
+// ---------------- PART 2B: EXAM ----------------
+export const handleExam = async (req, res) => {
+  const {
+    configId,
+    subject,
+    examType,
+    description,
+    topics,
+    questionsCount
+  } = req.body;
+
+  try {
+    if (!configId) {
+      return res.status(400).json({ error: 'configId is required' });
+    }
+
+    if (!subject || !subject.trim()) {
+      return res.status(400).json({ error: 'subject is required' });
+    }
+
+    if (!description || description.length < 50) {
+      return res.status(400).json({ error: 'description must be at least 50 characters' });
+    }
+
+    const config = await prisma.interviewConfig.findUnique({
+      where: { id: configId }
+    });
+
+    if (!config) {
+      return res.status(404).json({ error: 'Interview config not found' });
+    }
+
+    const exam = await prisma.examConfig.upsert({
+      where: { configId },
+      update: {
+        subject: subject.trim(),
+        examType,
+        description,
+        topics: topics || [],
+        questionsCount: questionsCount || 10
+      },
+      create: {
+        configId,
+        subject: subject.trim(),
+        examType,
+        description,
+        topics: topics || [],
+        questionsCount: questionsCount || 10
+      }
+    });
+
+    res.json({
+      message: 'Exam details saved',
+      exam
+    });
+
+  } catch (err) {
+    console.error('Error in handleExam:', err);
     res.status(500).json({ error: err.message });
   }
 };
@@ -157,6 +220,58 @@ export const handleResumeUpload = async (req, res) => {
   }
 };
 
+// ---------------- PART 3B: ANALYSIS ----------------
+export const handleAnalysis = async (req, res) => {
+  const {
+    configId,
+    analysisFacial,
+    analysisTechnical,
+    analysisVocal,
+    analysisLinguistic,
+    analysisIntensity
+  } = req.body;
+
+  try {
+    if (!configId) {
+      return res.status(400).json({ error: 'configId is required' });
+    }
+
+    const config = await prisma.interviewConfig.findUnique({
+      where: { id: configId }
+    });
+
+    if (!config) {
+      return res.status(404).json({ error: 'Interview config not found' });
+    }
+
+    const analysis = await prisma.analysisConfig.upsert({
+      where: { configId },
+      update: {
+        facial: !!analysisFacial,
+        technical: !!analysisTechnical,
+        vocal: !!analysisVocal,
+        linguistic: !!analysisLinguistic,
+        intensity: analysisIntensity || 'detailed'
+      },
+      create: {
+        configId,
+        facial: !!analysisFacial,
+        technical: !!analysisTechnical,
+        vocal: !!analysisVocal,
+        linguistic: !!analysisLinguistic,
+        intensity: analysisIntensity || 'detailed'
+      }
+    });
+
+    res.json({
+      message: 'Analysis configuration saved',
+      analysis
+    });
+  } catch (err) {
+    console.error('Error in handleAnalysis:', err);
+    res.status(500).json({ error: err.message });
+  }
+};
 
 // ---------------- PART 4: REVIEW ----------------
 export const handleReview = async (req, res) => {
