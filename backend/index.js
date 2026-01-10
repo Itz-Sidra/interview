@@ -9,7 +9,14 @@ import interviewConfigRoutes from './src/routes/interviewConfig.js';
 const app = express();
 
 app.use(cors({
-  origin:"*",
+  origin:[
+    "http://localhost:5500",
+    "http://127.0.0.1:5500",
+    "http://localhost:3000",
+    "https://evalvate.dev",
+    "https://www.evalvate.dev",
+    "https://interview-git-master-sidra-jahangirs-projects.vercel.app"
+  ],
   credentials: true
 }));
 
