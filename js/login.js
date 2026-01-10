@@ -1,4 +1,5 @@
-const API_BASE = "https://evalvate-backend-862980960928.asia-south1.run.app";
+//const API_BASE = "https://evalvate-backend-862980960928.asia-south1.run.app";
+const API_BASE = "http://localhost:3000";
 
 document.addEventListener('DOMContentLoaded', () => {
     const loginForm = document.getElementById('loginForm');

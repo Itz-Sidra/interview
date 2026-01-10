@@ -41,7 +41,7 @@ export async function startInterview(req, res) {
       interviewId,
       userId: interview.userId,
       configId: interview.configId,
-      role: role || interview.config.role,
+      role: interview.config.role,
       company: company || "Unknown",
       difficulty: interview.config.difficulty,
       type: interview.config.type,

@@ -1,5 +1,5 @@
-const API_BASE = "https://evalvate-backend-862980960928.asia-south1.run.app";
-
+//const API_BASE = "https://evalvate-backend-862980960928.asia-south1.run.app";
+const API_BASE = "http://localhost:3000";
 class InterviewBot {
             constructor() {
                 this.ttsQueue = [];
@@ -326,12 +326,7 @@ class InterviewBot {
             addWelcomeMessage() {
                 const welcomeMessage = `
                     <strong>Welcome to AI Interview Bot!</strong><br><br>
-                    I'm here to help you practice for your upcoming interview. Here's how we can get started:<br><br>
-                    1. <strong>Upload your resume</strong> (optional) – This helps me ask more relevant questions<br>
-                    2. <strong>Set your preferred time limit</strong> using the timer options above<br>
-                    3. <strong>Tell me about the position</strong> you're interviewing for<br><br>
-                    <em>For example:</em><br>
-                    <code>"I want to practice for my interview at Google for the role Software Engineer"</code><br><br>
+                    I'm here to help you practice for your upcoming interview. 
                     Ready when you are!
                 `;
 
