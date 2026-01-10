@@ -9,7 +9,9 @@ import interviewConfigRoutes from './src/routes/interviewConfig.js';
 const app = express();
 
 app.use(cors({
-  origin: '*', 
+  origin: [
+    "https://evalvate.dev"
+  ], 
   credentials: true
 }));
 
