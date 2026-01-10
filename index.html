@@ -54,88 +54,6 @@
         },
       };
     </script>
-    <style>
-      /* AI Feedback Tab Styles */
-      .analysis-nav-item {
-        background: rgba(255, 255, 255, 0.1);
-        backdrop-filter: blur(10px);
-        border: 1px solid rgba(255, 255, 255, 0.2);
-        padding: 1rem;
-        cursor: pointer;
-        transition: all 0.2s ease;
-        border-radius: 0.75rem;
-      }
-      .analysis-nav-item:hover {
-        background: rgba(255, 255, 255, 0.15);
-        transform: scale(1.02);
-      }
-      .analysis-nav-item.active {
-        background: rgba(243, 248, 106, 0.2);
-        border: 2px solid rgba(243, 248, 106, 0.4);
-        box-shadow: 0 4px 6px rgba(243, 248, 106, 0.1);
-      }
-      .analysis-panel {
-        opacity: 0;
-        transition: opacity 0.2s ease;
-        position: absolute;
-        top: 0;
-        left: 0;
-        right: 0;
-      }
-      .analysis-panel.active {
-        opacity: 1;
-        position: relative;
-      }
-      .analysis-panel.hidden {
-        position: absolute;
-        pointer-events: none;
-      }
-      @media (max-width: 768px) {
-        .analysis-panel.hidden {
-          display: none;
-        }
-      }
-      /* Progress Tracking Tab Styles */
-      .progress-nav-item {
-        background: rgba(255, 255, 255, 0.1);
-        backdrop-filter: blur(10px);
-        border: 1px solid rgba(255, 255, 255, 0.2);
-        padding: 1rem;
-        cursor: pointer;
-        transition: all 0.2s ease;
-        border-radius: 0.75rem;
-      }
-      .progress-nav-item:hover {
-        background: rgba(255, 255, 255, 0.15);
-        transform: scale(1.02);
-      }
-      .progress-nav-item.active {
-        background: rgba(243, 248, 106, 0.2);
-        border: 2px solid rgba(243, 248, 106, 0.4);
-        box-shadow: 0 4px 6px rgba(243, 248, 106, 0.1);
-      }
-      .progress-panel {
-        opacity: 0;
-        transition: opacity 0.2s ease;
-        position: absolute;
-        top: 0;
-        left: 0;
-        right: 0;
-      }
-      .progress-panel.active {
-        opacity: 1;
-        position: relative;
-      }
-      .progress-panel.hidden {
-        position: absolute;
-        pointer-events: none;
-      }
-      @media (max-width: 768px) {
-        .progress-panel.hidden {
-          display: none;
-        }
-      }
-    </style>
   </head>
   <body class="antialiased">
     <!-- Animated Background Shapes -->
@@ -404,1060 +322,133 @@
         </div>
 
         <!-- Feature Cards -->
-        <div class="grid md:grid-cols-2 gap-8">
-          <!-- AI Feedback - Converted to full tabbed section with left navigation and right content panels
-               Features: Technical, Linguistic, Vocal, and Facial (coming soon) analysis types
-               Includes tab switching, responsive layout, and privacy links on all panels -->
-          <div class="glass-card p-8 md:p-12 col-span-2">
-            <h2
-              class="font-space text-deep-navy mb-6 text-3xl md:text-4xl lg:text-5xl font-semibold"
+        <div class="grid md:grid-cols-3 gap-8">
+          <!-- 'Mock Interviews' feature removed per request -->
+
+          <!-- AI Feedback -->
+          <div class="glass-card p-8 hover:scale-105 transition-transform">
+            <div
+              class="w-16 h-16 bg-gradient-to-br from-accent/20 to-accent/10 rounded-2xl flex items-center justify-center mb-6"
             >
-              How AI Feedback <span class="text-gradient">Works</span>
-            </h2>
-            <p class="text-lg text-body mb-8 max-w-2xl">
-              Get instant, detailed analysis on your performance with actionable
-              insights that help you improve with every interview session.
-            </p>
-
-            <!-- Two-column layout: Left nav / Right panel -->
-            <div class="grid md:grid-cols-12 gap-8">
-              <!-- Left Column: Analysis Type Navigation -->
-              <div class="md:col-span-3 space-y-3">
-                <div class="analysis-nav-item active" data-tab="technical">
-                  <div class="flex items-center gap-3">
-                    <svg
-                      class="w-5 h-5 text-deep-navy"
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      stroke="currentColor"
-                      stroke-width="2"
-                    >
-                      <path
-                        d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"
-                      />
-                    </svg>
-                    <span class="font-medium text-deep-navy"
-                      >Technical Analysis</span
-                    >
-                  </div>
-                </div>
-
-                <div class="analysis-nav-item" data-tab="linguistic">
-                  <div class="flex items-center gap-3">
-                    <svg
-                      class="w-5 h-5 text-deep-navy"
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      stroke="currentColor"
-                      stroke-width="2"
-                    >
-                      <path
-                        d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"
-                      />
-                      <polyline points="14 2 14 8 20 8" />
-                      <line x1="16" y1="13" x2="8" y2="13" />
-                      <line x1="16" y1="17" x2="8" y2="17" />
-                    </svg>
-                    <span class="font-medium text-deep-navy"
-                      >Linguistic Analysis</span
-                    >
-                  </div>
-                </div>
-
-                <div class="analysis-nav-item" data-tab="vocal">
-                  <div class="flex items-center gap-3">
-                    <svg
-                      class="w-5 h-5 text-deep-navy"
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      stroke="currentColor"
-                      stroke-width="2"
-                    >
-                      <path
-                        d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"
-                      />
-                      <path d="M19 10v2a7 7 0 0 1-14 0v-2" />
-                      <line x1="12" y1="19" x2="12" y2="23" />
-                      <line x1="8" y1="23" x2="16" y2="23" />
-                    </svg>
-                    <span class="font-medium text-deep-navy"
-                      >Vocal Analysis</span
-                    >
-                  </div>
-                </div>
-
-                <div class="analysis-nav-item" data-tab="facial">
-                  <div class="flex items-center gap-3">
-                    <svg
-                      class="w-5 h-5 text-deep-navy"
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      stroke="currentColor"
-                      stroke-width="2"
-                    >
-                      <circle cx="12" cy="12" r="10" />
-                      <path d="M8 14s1.5 2 4 2 4-2 4-2" />
-                      <line x1="9" y1="9" x2="9.01" y2="9" />
-                      <line x1="15" y1="9" x2="15.01" y2="9" />
-                    </svg>
-                    <span class="font-medium text-deep-navy"
-                      >Facial Analysis</span
-                    >
-                    <span
-                      class="ml-auto px-2 py-0.5 text-xs font-semibold bg-accent/20 text-deep-navy rounded-full"
-                      >Coming soon</span
-                    >
-                  </div>
-                </div>
-              </div>
-
-              <!-- Right Column: Content Panels -->
-              <div class="md:col-span-9 relative min-h-[500px]">
-                <!-- Technical Analysis Panel -->
-                <div class="analysis-panel active" id="panel-technical">
-                  <div class="flex items-center gap-3 mb-6">
-                    <svg
-                      class="w-6 h-6 text-deep-navy"
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      stroke="currentColor"
-                      stroke-width="2"
-                    >
-                      <path
-                        d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"
-                      />
-                    </svg>
-                    <h3 class="text-2xl font-bold text-deep-navy">
-                      Technical Analysis
-                    </h3>
-                  </div>
-
-                  <p class="text-body mb-6">
-                    Analyzes your problem approach, correctness, and code
-                    quality. Provides line-level hints and suggested tests.
-                  </p>
-
-                  <h4 class="text-lg font-semibold text-deep-navy mb-3">
-                    How we measure it
-                  </h4>
-                  <ul
-                    class="list-disc list-inside text-body space-y-2 mb-6 ml-4"
-                  >
-                    <li>
-                      <strong>Problem decomposition</strong> — Is the approach
-                      broken into correct sub-problems?
-                    </li>
-                    <li>
-                      <strong>Correctness & Edge Cases</strong> — Does the
-                      solution handle corner cases?
-                    </li>
-                    <li>
-                      <strong>Complexity Awareness</strong> — Estimates
-                      time/space complexity and flags inefficiencies.
-                    </li>
-                  </ul>
-
-                  <h4 class="text-lg font-semibold text-deep-navy mb-3">
-                    Example Highlights
-                  </h4>
-                  <div class="grid md:grid-cols-2 gap-4 mb-6">
-                    <div class="glass-card p-4 bg-white/5">
-                      <h5 class="font-semibold text-deep-navy mb-2">
-                        Strengths
-                      </h5>
-                      <ul class="text-body text-sm space-y-1">
-                        <li>• Clear approach</li>
-                        <li>• Handled base cases</li>
-                        <li>• Readable variable names</li>
-                      </ul>
-                    </div>
-                    <div class="glass-card p-4 bg-white/5">
-                      <h5 class="font-semibold text-deep-navy mb-2">
-                        Suggestions
-                      </h5>
-                      <ul class="text-body text-sm space-y-1">
-                        <li>• Add boundary checks</li>
-                        <li>• Optimize nested loops</li>
-                        <li>• Include more testcases</li>
-                      </ul>
-                    </div>
-                  </div>
-
-                  <div class="pt-6 border-t border-white/10">
-                    <p class="text-body text-sm mb-2">
-                      🔒 Audio and transcripts are processed securely and
-                      deleted per our
-                      <a
-                        href="privacy.html"
-                        class="text-deep-navy font-semibold hover:underline"
-                        >Privacy Policy</a
-                      >.
-                      <a
-                        href="privacy.html"
-                        class="text-deep-navy font-semibold hover:underline"
-                        >Read more</a
-                      >.
-                    </p>
-                  </div>
-                </div>
-
-                <!-- Linguistic Analysis Panel -->
-                <div class="analysis-panel hidden" id="panel-linguistic">
-                  <div class="flex items-center gap-3 mb-6">
-                    <svg
-                      class="w-6 h-6 text-deep-navy"
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      stroke="currentColor"
-                      stroke-width="2"
-                    >
-                      <path
-                        d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"
-                      />
-                      <polyline points="14 2 14 8 20 8" />
-                      <line x1="16" y1="13" x2="8" y2="13" />
-                      <line x1="16" y1="17" x2="8" y2="17" />
-                    </svg>
-                    <h3 class="text-2xl font-bold text-deep-navy">
-                      Linguistic Analysis
-                    </h3>
-                  </div>
-
-                  <p class="text-body mb-6">
-                    Checks clarity, structure and technical vocabulary; suggests
-                    phrasing for concise answers.
-                  </p>
-
-                  <h4 class="text-lg font-semibold text-deep-navy mb-3">
-                    How we measure it
-                  </h4>
-                  <ul
-                    class="list-disc list-inside text-body space-y-2 mb-6 ml-4"
-                  >
-                    <li>
-                      <strong>Structure score</strong> — Intro → Approach →
-                      Example → Conclusion
-                    </li>
-                    <li>
-                      <strong>Jargon usage</strong> — Proper use of domain terms
-                    </li>
-                    <li>
-                      <strong>Concision</strong> — Redundant or long sentences
-                      flagged.
-                    </li>
-                  </ul>
-
-                  <h4 class="text-lg font-semibold text-deep-navy mb-3">
-                    Example Highlights
-                  </h4>
-                  <div class="grid md:grid-cols-2 gap-4 mb-6">
-                    <div class="glass-card p-4 bg-white/5">
-                      <h5 class="font-semibold text-deep-navy mb-2">
-                        Strengths
-                      </h5>
-                      <ul class="text-body text-sm space-y-1">
-                        <li>• Good intro</li>
-                        <li>• Used key terms well</li>
-                        <li>• Clear conclusion</li>
-                      </ul>
-                    </div>
-                    <div class="glass-card p-4 bg-white/5">
-                      <h5 class="font-semibold text-deep-navy mb-2">
-                        Suggestions
-                      </h5>
-                      <ul class="text-body text-sm space-y-1">
-                        <li>• Shorten long sentences</li>
-                        <li>• Use active voice</li>
-                        <li>• Quantify claims</li>
-                      </ul>
-                    </div>
-                  </div>
-
-                  <div class="pt-6 border-t border-white/10">
-                    <p class="text-body text-sm mb-2">
-                      🔒 Audio and transcripts are processed securely and
-                      deleted per our
-                      <a
-                        href="privacy.html"
-                        class="text-deep-navy font-semibold hover:underline"
-                        >Privacy Policy</a
-                      >.
-                      <a
-                        href="privacy.html"
-                        class="text-deep-navy font-semibold hover:underline"
-                        >Read more</a
-                      >.
-                    </p>
-                  </div>
-                </div>
-
-                <!-- Vocal Analysis Panel -->
-                <div class="analysis-panel hidden" id="panel-vocal">
-                  <div class="flex items-center gap-3 mb-6">
-                    <svg
-                      class="w-6 h-6 text-deep-navy"
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      stroke="currentColor"
-                      stroke-width="2"
-                    >
-                      <path
-                        d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"
-                      />
-                      <path d="M19 10v2a7 7 0 0 1-14 0v-2" />
-                      <line x1="12" y1="19" x2="12" y2="23" />
-                      <line x1="8" y1="23" x2="16" y2="23" />
-                    </svg>
-                    <h3 class="text-2xl font-bold text-deep-navy">
-                      Vocal Analysis
-                    </h3>
-                  </div>
-
-                  <p class="text-body mb-6">
-                    Analyzes speaking pace, fillers and pitch variation to
-                    improve delivery and confidence.
-                  </p>
-
-                  <h4 class="text-lg font-semibold text-deep-navy mb-3">
-                    How we measure it
-                  </h4>
-                  <ul
-                    class="list-disc list-inside text-body space-y-2 mb-6 ml-4"
-                  >
-                    <li>
-                      <strong>Pace (wpm)</strong> — Words per minute vs
-                      recommended range.
-                    </li>
-                    <li>
-                      <strong>Fillers count</strong> — Like 'um', 'you know'
-                      occurrences.
-                    </li>
-                    <li>
-                      <strong>Pitch & Energy</strong> — Monotone detection and
-                      suggestions.
-                    </li>
-                  </ul>
-
-                  <h4 class="text-lg font-semibold text-deep-navy mb-3">
-                    Example Highlights
-                  </h4>
-                  <div class="grid md:grid-cols-2 gap-4 mb-6">
-                    <div class="glass-card p-4 bg-white/5">
-                      <h5 class="font-semibold text-deep-navy mb-2">
-                        Strengths
-                      </h5>
-                      <ul class="text-body text-sm space-y-1">
-                        <li>• Stable volume</li>
-                        <li>• Good energy in intro</li>
-                      </ul>
-                    </div>
-                    <div class="glass-card p-4 bg-white/5">
-                      <h5 class="font-semibold text-deep-navy mb-2">
-                        Suggestions
-                      </h5>
-                      <ul class="text-body text-sm space-y-1">
-                        <li>• Reduce filler words near the end</li>
-                        <li>• Slow down during explanation</li>
-                      </ul>
-                    </div>
-                  </div>
-
-                  <div class="pt-6 border-t border-white/10">
-                    <p class="text-body text-sm mb-2">
-                      🔒 Audio and transcripts are processed securely and
-                      deleted per our
-                      <a
-                        href="privacy.html"
-                        class="text-deep-navy font-semibold hover:underline"
-                        >Privacy Policy</a
-                      >.
-                      <a
-                        href="privacy.html"
-                        class="text-deep-navy font-semibold hover:underline"
-                        >Read more</a
-                      >.
-                    </p>
-                  </div>
-                </div>
-
-                <!-- Facial Analysis Panel -->
-                <div class="analysis-panel hidden" id="panel-facial">
-                  <div class="flex items-center gap-3 mb-6">
-                    <svg
-                      class="w-6 h-6 text-deep-navy"
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      stroke="currentColor"
-                      stroke-width="2"
-                    >
-                      <circle cx="12" cy="12" r="10" />
-                      <path d="M8 14s1.5 2 4 2 4-2 4-2" />
-                      <line x1="9" y1="9" x2="9.01" y2="9" />
-                      <line x1="15" y1="9" x2="15.01" y2="9" />
-                    </svg>
-                    <h3 class="text-2xl font-bold text-deep-navy">
-                      Facial Analysis
-                    </h3>
-                    <span
-                      class="px-2 py-1 text-xs font-semibold bg-accent/20 text-deep-navy rounded-full"
-                      >Coming soon</span
-                    >
-                  </div>
-
-                  <p class="text-body mb-6">
-                    Coming soon — non-invasive facial cues to help presence and
-                    eye contact.
-                  </p>
-
-                  <div class="glass-card p-6 bg-white/5 mb-6">
-                    <p class="text-body mb-4">
-                      We're working on advanced facial analysis features that
-                      will help you improve your non-verbal communication during
-                      interviews.
-                    </p>
-                    <button class="btn-primary">
-                      Notify me when facial analysis is available
-                    </button>
-                  </div>
-
-                  <div class="pt-6 border-t border-white/10">
-                    <p class="text-body text-sm mb-2">
-                      🔒 Audio and transcripts are processed securely and
-                      deleted per our
-                      <a
-                        href="privacy.html"
-                        class="text-deep-navy font-semibold hover:underline"
-                        >Privacy Policy</a
-                      >.
-                      <a
-                        href="privacy.html"
-                        class="text-deep-navy font-semibold hover:underline"
-                        >Read more</a
-                      >.
-                    </p>
-                  </div>
-                </div>
-              </div>
+              <svg
+                class="w-8 h-8 text-deep-navy"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+              >
+                <path
+                  d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"
+                />
+              </svg>
             </div>
+            <h3 class="text-xl font-semibold text-deep-navy mb-3">
+              AI Feedback
+            </h3>
+            <p class="text-body mb-6">
+              Get instant, detailed analysis on your performance with actionable
+              insights.
+            </p>
+            <a
+              href="#"
+              class="text-deep-navy font-semibold flex items-center gap-2 hover:gap-3 transition-all"
+            >
+              Learn More
+              <svg
+                width="16"
+                height="16"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+              >
+                <path d="M5 12h14M12 5l7 7-7 7" />
+              </svg>
+            </a>
           </div>
 
-          <!-- How Progress Tracking Works - Converted to full tabbed section -->
-          <div class="glass-card p-8 md:p-12 col-span-2 mt-8">
-            <h2
-              class="font-space text-deep-navy mb-6 text-3xl md:text-4xl lg:text-5xl font-semibold"
+          <!-- Live Coaching -->
+          <div class="glass-card p-8 hover:scale-105 transition-transform">
+            <div
+              class="w-16 h-16 bg-gradient-to-br from-accent/20 to-accent/10 rounded-2xl flex items-center justify-center mb-6"
             >
-              How Progress Tracking <span class="text-gradient">Works</span>
-            </h2>
-            <p class="text-lg text-body mb-8 max-w-2xl">
-              Every interview session is automatically recorded and analyzed.
-              Review your performance, track improvement over time, and access
-              detailed reports anytime.
-            </p>
-
-            <!-- Two-column layout: Left nav / Right panel -->
-            <div class="grid md:grid-cols-12 gap-8">
-              <!-- Left Column: Navigation -->
-              <div class="md:col-span-3 space-y-3">
-                <div class="progress-nav-item active" data-tab="recordings">
-                  <div class="flex items-center gap-3">
-                    <svg
-                      class="w-5 h-5 text-deep-navy"
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      stroke="currentColor"
-                      stroke-width="2"
-                    >
-                      <polygon points="5 3 19 12 5 21 5 3" />
-                    </svg>
-                    <span class="font-medium text-deep-navy"
-                      >Session Recordings</span
-                    >
-                  </div>
-                </div>
-
-                <div class="progress-nav-item" data-tab="analytics">
-                  <div class="flex items-center gap-3">
-                    <svg
-                      class="w-5 h-5 text-deep-navy"
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      stroke="currentColor"
-                      stroke-width="2"
-                    >
-                      <path d="M3 3v18h18" />
-                      <path d="M18 17l-5-5-5 5-5-5" />
-                    </svg>
-                    <span class="font-medium text-deep-navy"
-                      >Progress Analytics</span
-                    >
-                  </div>
-                </div>
-
-                <div class="progress-nav-item" data-tab="reports">
-                  <div class="flex items-center gap-3">
-                    <svg
-                      class="w-5 h-5 text-deep-navy"
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      stroke="currentColor"
-                      stroke-width="2"
-                    >
-                      <path
-                        d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"
-                      />
-                      <polyline points="14 2 14 8 20 8" />
-                      <line x1="16" y1="13" x2="8" y2="13" />
-                      <line x1="16" y1="17" x2="8" y2="17" />
-                    </svg>
-                    <span class="font-medium text-deep-navy"
-                      >Reports & Exports</span
-                    >
-                  </div>
-                </div>
-              </div>
-
-              <!-- Right Column: Content Panels -->
-              <div class="md:col-span-9 relative min-h-[500px]">
-                <!-- Session Recordings Panel -->
-                <div class="progress-panel active" id="panel-recordings">
-                  <div class="flex items-center gap-3 mb-6">
-                    <svg
-                      class="w-6 h-6 text-deep-navy"
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      stroke="currentColor"
-                      stroke-width="2"
-                    >
-                      <polygon points="5 3 19 12 5 21 5 3" />
-                    </svg>
-                    <h3 class="text-2xl font-bold text-deep-navy">
-                      Session Recordings
-                    </h3>
-                  </div>
-
-                  <p class="text-body mb-6">
-                    Access complete recordings of all your interview sessions
-                    with AI-flagged mistakes marked with timestamps for easy
-                    navigation and review.
-                  </p>
-
-                  <div class="glass-card p-6 bg-white/5 mb-6">
-                    <div
-                      class="relative rounded-lg overflow-hidden bg-gradient-to-br from-periwinkle to-lavender-tint mb-4"
-                    >
-                      <div
-                        class="aspect-video bg-deep-navy/10 flex items-center justify-center"
-                      >
-                        <div class="text-center">
-                          <svg
-                            class="w-16 h-16 text-deep-navy/40 mx-auto mb-2"
-                            viewBox="0 0 24 24"
-                            fill="none"
-                            stroke="currentColor"
-                            stroke-width="2"
-                          >
-                            <polygon points="5 3 19 12 5 21 5 3" />
-                          </svg>
-                          <p class="text-body text-sm">
-                            Interview Recording Player
-                          </p>
-                        </div>
-                      </div>
-                    </div>
-
-                    <div class="space-y-3">
-                      <h4 class="font-semibold text-deep-navy mb-3">
-                        Flagged Issues with Timestamps
-                      </h4>
-
-                      <div
-                        class="issue-item p-3 bg-white/5 rounded-lg cursor-pointer hover:bg-white/10 transition-colors"
-                        data-timestamp="82"
-                      >
-                        <div class="flex items-center justify-between mb-2">
-                          <span class="text-sm font-semibold text-deep-navy"
-                            >Vocal Issue</span
-                          >
-                          <span
-                            class="text-xs text-body px-2 py-1 bg-accent/20 rounded-full"
-                            >1:22</span
-                          >
-                        </div>
-                        <p class="text-body text-sm mb-1">
-                          "Slight decrease in energy detected"
-                        </p>
-                        <p class="text-body text-xs">
-                          Click to jump to this moment in recording
-                        </p>
-                      </div>
-
-                      <div
-                        class="issue-item p-3 bg-white/5 rounded-lg cursor-pointer hover:bg-white/10 transition-colors"
-                        data-timestamp="156"
-                      >
-                        <div class="flex items-center justify-between mb-2">
-                          <span class="text-sm font-semibold text-deep-navy"
-                            >Technical Issue</span
-                          >
-                          <span
-                            class="text-xs text-body px-2 py-1 bg-accent/20 rounded-full"
-                            >2:36</span
-                          >
-                        </div>
-                        <p class="text-body text-sm mb-1">
-                          "Minor conceptual gap identified"
-                        </p>
-                        <p class="text-body text-xs">
-                          Click to jump to this moment in recording
-                        </p>
-                      </div>
-
-                      <div
-                        class="issue-item p-3 bg-white/5 rounded-lg cursor-pointer hover:bg-white/10 transition-colors"
-                        data-timestamp="245"
-                      >
-                        <div class="flex items-center justify-between mb-2">
-                          <span class="text-sm font-semibold text-deep-navy"
-                            >Linguistic Issue</span
-                          >
-                          <span
-                            class="text-xs text-body px-2 py-1 bg-accent/20 rounded-full"
-                            >4:05</span
-                          >
-                        </div>
-                        <p class="text-body text-sm mb-1">
-                          "Use active voice instead of passive"
-                        </p>
-                        <p class="text-body text-xs">
-                          Click to jump to this moment in recording
-                        </p>
-                      </div>
-                    </div>
-                  </div>
-
-                  <h4 class="text-lg font-semibold text-deep-navy mb-3">
-                    Key Features
-                  </h4>
-                  <ul
-                    class="list-disc list-inside text-body space-y-2 mb-6 ml-4"
-                  >
-                    <li>
-                      Full session recordings stored securely for all interviews
-                    </li>
-                    <li>
-                      AI-flagged mistakes automatically timestamped for quick
-                      access
-                    </li>
-                    <li>
-                      One-click navigation to specific moments in your recording
-                    </li>
-                    <li>
-                      Download recordings or share with mentors for review
-                    </li>
-                  </ul>
-
-                  <div class="pt-6 border-t border-white/10">
-                    <p class="text-body text-sm mb-2">
-                      🔒 All recordings are encrypted and stored securely per
-                      our
-                      <a
-                        href="privacy.html"
-                        class="text-deep-navy font-semibold hover:underline"
-                        >Privacy Policy</a
-                      >.
-                      <a
-                        href="privacy.html"
-                        class="text-deep-navy font-semibold hover:underline"
-                        >Read more</a
-                      >.
-                    </p>
-                  </div>
-                </div>
-
-                <!-- Progress Analytics Panel -->
-                <div class="progress-panel hidden" id="panel-analytics">
-                  <div class="flex items-center gap-3 mb-6">
-                    <svg
-                      class="w-6 h-6 text-deep-navy"
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      stroke="currentColor"
-                      stroke-width="2"
-                    >
-                      <path d="M3 3v18h18" />
-                      <path d="M18 17l-5-5-5 5-5-5" />
-                    </svg>
-                    <h3 class="text-2xl font-bold text-deep-navy">
-                      Progress Analytics
-                    </h3>
-                  </div>
-
-                  <p class="text-body mb-6">
-                    Visualize your improvement journey with comprehensive
-                    analytics showing trends, patterns, and performance metrics
-                    over the past months.
-                  </p>
-
-                  <div class="glass-card p-6 bg-white/5 mb-6">
-                    <h4 class="font-semibold text-deep-navy mb-4">
-                      Overall Progress Trend (Past 6 Months)
-                    </h4>
-
-                    <!-- Simple Chart Representation -->
-                    <div class="chart-container mb-6">
-                      <div class="flex items-end justify-between h-48 gap-2">
-                        <div class="flex flex-col items-center flex-1">
-                          <div
-                            class="w-full bg-gradient-to-t from-accent/60 to-accent/30 rounded-t"
-                            style="height: 60%; min-height: 40px"
-                          ></div>
-                          <span class="text-xs text-body mt-2">Jan</span>
-                        </div>
-                        <div class="flex flex-col items-center flex-1">
-                          <div
-                            class="w-full bg-gradient-to-t from-accent/60 to-accent/30 rounded-t"
-                            style="height: 65%; min-height: 45px"
-                          ></div>
-                          <span class="text-xs text-body mt-2">Feb</span>
-                        </div>
-                        <div class="flex flex-col items-center flex-1">
-                          <div
-                            class="w-full bg-gradient-to-t from-accent/60 to-accent/30 rounded-t"
-                            style="height: 70%; min-height: 50px"
-                          ></div>
-                          <span class="text-xs text-body mt-2">Mar</span>
-                        </div>
-                        <div class="flex flex-col items-center flex-1">
-                          <div
-                            class="w-full bg-gradient-to-t from-accent/60 to-accent/30 rounded-t"
-                            style="height: 75%; min-height: 55px"
-                          ></div>
-                          <span class="text-xs text-body mt-2">Apr</span>
-                        </div>
-                        <div class="flex flex-col items-center flex-1">
-                          <div
-                            class="w-full bg-gradient-to-t from-accent/60 to-accent/30 rounded-t"
-                            style="height: 82%; min-height: 60px"
-                          ></div>
-                          <span class="text-xs text-body mt-2">May</span>
-                        </div>
-                        <div class="flex flex-col items-center flex-1">
-                          <div
-                            class="w-full bg-gradient-to-t from-accent/80 to-accent/50 rounded-t"
-                            style="height: 90%; min-height: 65px"
-                          ></div>
-                          <span class="text-xs text-body mt-2">Jun</span>
-                        </div>
-                      </div>
-                      <div
-                        class="flex justify-between items-center mt-4 pt-4 border-t border-white/10"
-                      >
-                        <div class="text-center">
-                          <p class="text-2xl font-bold text-deep-navy">+15%</p>
-                          <p class="text-xs text-body">Improvement</p>
-                        </div>
-                        <div class="text-center">
-                          <p class="text-2xl font-bold text-deep-navy">24</p>
-                          <p class="text-xs text-body">Sessions</p>
-                        </div>
-                        <div class="text-center">
-                          <p class="text-2xl font-bold text-deep-navy">89</p>
-                          <p class="text-xs text-body">Avg Score</p>
-                        </div>
-                      </div>
-                    </div>
-
-                    <div class="grid md:grid-cols-2 gap-4 mb-6">
-                      <div class="p-4 bg-white/5 rounded-lg">
-                        <h5 class="font-semibold text-deep-navy mb-2 text-sm">
-                          Performance by Category
-                        </h5>
-                        <div class="space-y-2">
-                          <div>
-                            <div class="flex justify-between text-xs mb-1">
-                              <span class="text-body">Technical</span>
-                              <span class="text-deep-navy font-semibold"
-                                >89%</span
-                              >
-                            </div>
-                            <div class="w-full bg-white/10 rounded-full h-2">
-                              <div
-                                class="bg-accent h-2 rounded-full"
-                                style="width: 89%"
-                              ></div>
-                            </div>
-                          </div>
-                          <div>
-                            <div class="flex justify-between text-xs mb-1">
-                              <span class="text-body">Communication</span>
-                              <span class="text-deep-navy font-semibold"
-                                >92%</span
-                              >
-                            </div>
-                            <div class="w-full bg-white/10 rounded-full h-2">
-                              <div
-                                class="bg-accent h-2 rounded-full"
-                                style="width: 92%"
-                              ></div>
-                            </div>
-                          </div>
-                          <div>
-                            <div class="flex justify-between text-xs mb-1">
-                              <span class="text-body">Confidence</span>
-                              <span class="text-deep-navy font-semibold"
-                                >87%</span
-                              >
-                            </div>
-                            <div class="w-full bg-white/10 rounded-full h-2">
-                              <div
-                                class="bg-accent h-2 rounded-full"
-                                style="width: 87%"
-                              ></div>
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-
-                      <div class="p-4 bg-white/5 rounded-lg">
-                        <h5 class="font-semibold text-deep-navy mb-2 text-sm">
-                          Weekly Activity
-                        </h5>
-                        <div class="space-y-2">
-                          <div class="flex justify-between text-sm">
-                            <span class="text-body">This Week</span>
-                            <span class="text-deep-navy font-semibold"
-                              >4 sessions</span
-                            >
-                          </div>
-                          <div class="flex justify-between text-sm">
-                            <span class="text-body">Last Week</span>
-                            <span class="text-deep-navy font-semibold"
-                              >3 sessions</span
-                            >
-                          </div>
-                          <div class="flex justify-between text-sm">
-                            <span class="text-body">Best Streak</span>
-                            <span class="text-deep-navy font-semibold"
-                              >7 days</span
-                            >
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-
-                  <h4 class="text-lg font-semibold text-deep-navy mb-3">
-                    Tracking Features
-                  </h4>
-                  <ul
-                    class="list-disc list-inside text-body space-y-2 mb-6 ml-4"
-                  >
-                    <li>
-                      Monthly and weekly performance trends with visual graphs
-                    </li>
-                    <li>
-                      Category-wise breakdown showing strengths and areas for
-                      improvement
-                    </li>
-                    <li>
-                      Consistency tracking to monitor your practice frequency
-                    </li>
-                    <li>
-                      Comparative analysis showing progress over different time
-                      periods
-                    </li>
-                  </ul>
-
-                  <div class="pt-6 border-t border-white/10">
-                    <p class="text-body text-sm mb-2">
-                      🔒 All analytics data is processed securely and used only
-                      for your improvement per our
-                      <a
-                        href="privacy.html"
-                        class="text-deep-navy font-semibold hover:underline"
-                        >Privacy Policy</a
-                      >.
-                      <a
-                        href="privacy.html"
-                        class="text-deep-navy font-semibold hover:underline"
-                        >Read more</a
-                      >.
-                    </p>
-                  </div>
-                </div>
-
-                <!-- Reports & Exports Panel -->
-                <div class="progress-panel hidden" id="panel-reports">
-                  <div class="flex items-center gap-3 mb-6">
-                    <svg
-                      class="w-6 h-6 text-deep-navy"
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      stroke="currentColor"
-                      stroke-width="2"
-                    >
-                      <path
-                        d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"
-                      />
-                      <polyline points="14 2 14 8 20 8" />
-                      <line x1="16" y1="13" x2="8" y2="13" />
-                      <line x1="16" y1="17" x2="8" y2="17" />
-                    </svg>
-                    <h3 class="text-2xl font-bold text-deep-navy">
-                      Reports & Exports
-                    </h3>
-                  </div>
-
-                  <p class="text-body mb-6">
-                    Generate comprehensive PDF reports of your interviews,
-                    download session recordings, and export your progress data
-                    for offline review or sharing with mentors.
-                  </p>
-
-                  <div class="grid md:grid-cols-2 gap-4 mb-6">
-                    <div class="glass-card p-6 bg-white/5">
-                      <div class="flex items-center gap-3 mb-4">
-                        <div
-                          class="w-12 h-12 bg-accent/20 rounded-lg flex items-center justify-center"
-                        >
-                          <svg
-                            class="w-6 h-6 text-deep-navy"
-                            viewBox="0 0 24 24"
-                            fill="none"
-                            stroke="currentColor"
-                            stroke-width="2"
-                          >
-                            <path
-                              d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"
-                            />
-                            <polyline points="14 2 14 8 20 8" />
-                          </svg>
-                        </div>
-                        <div>
-                          <h4 class="font-semibold text-deep-navy">
-                            Interview Reports
-                          </h4>
-                          <p class="text-xs text-body">
-                            Comprehensive PDF analysis
-                          </p>
-                        </div>
-                      </div>
-                      <ul class="text-body text-sm space-y-1 mb-4">
-                        <li>• Complete performance breakdown</li>
-                        <li>• AI feedback and recommendations</li>
-                        <li>• Timestamped issue highlights</li>
-                        <li>• Improvement suggestions</li>
-                      </ul>
-                      <button class="btn-primary w-full text-sm">
-                        Download PDF Report
-                      </button>
-                    </div>
-
-                    <div class="glass-card p-6 bg-white/5">
-                      <div class="flex items-center gap-3 mb-4">
-                        <div
-                          class="w-12 h-12 bg-accent/20 rounded-lg flex items-center justify-center"
-                        >
-                          <svg
-                            class="w-6 h-6 text-deep-navy"
-                            viewBox="0 0 24 24"
-                            fill="none"
-                            stroke="currentColor"
-                            stroke-width="2"
-                          >
-                            <path
-                              d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"
-                            />
-                            <polyline points="7 10 12 15 17 10" />
-                            <line x1="12" y1="15" x2="12" y2="3" />
-                          </svg>
-                        </div>
-                        <div>
-                          <h4 class="font-semibold text-deep-navy">
-                            Progress Summary
-                          </h4>
-                          <p class="text-xs text-body">
-                            Monthly & yearly exports
-                          </p>
-                        </div>
-                      </div>
-                      <ul class="text-body text-sm space-y-1 mb-4">
-                        <li>• Multi-session comparison charts</li>
-                        <li>• Trend analysis over time</li>
-                        <li>• Category-wise performance</li>
-                        <li>• CSV/JSON data export</li>
-                      </ul>
-                      <button class="btn-secondary w-full text-sm">
-                        Export Progress Data
-                      </button>
-                    </div>
-                  </div>
-
-                  <div class="glass-card p-6 bg-white/5 mb-6">
-                    <h4 class="font-semibold text-deep-navy mb-3">
-                      Available Export Formats
-                    </h4>
-                    <div class="grid md:grid-cols-3 gap-4">
-                      <div class="text-center p-3 bg-white/5 rounded-lg">
-                        <p class="text-2xl mb-1">📄</p>
-                        <p class="text-sm font-semibold text-deep-navy">PDF</p>
-                        <p class="text-xs text-body">Formatted reports</p>
-                      </div>
-                      <div class="text-center p-3 bg-white/5 rounded-lg">
-                        <p class="text-2xl mb-1">📊</p>
-                        <p class="text-sm font-semibold text-deep-navy">CSV</p>
-                        <p class="text-xs text-body">Raw data analysis</p>
-                      </div>
-                      <div class="text-center p-3 bg-white/5 rounded-lg">
-                        <p class="text-2xl mb-1">🎥</p>
-                        <p class="text-sm font-semibold text-deep-navy">MP4</p>
-                        <p class="text-xs text-body">Session recordings</p>
-                      </div>
-                    </div>
-                  </div>
-
-                  <h4 class="text-lg font-semibold text-deep-navy mb-3">
-                    Export Features
-                  </h4>
-                  <ul
-                    class="list-disc list-inside text-body space-y-2 mb-6 ml-4"
-                  >
-                    <li>
-                      Generate detailed PDF reports for any interview session
-                      with one click
-                    </li>
-                    <li>
-                      Export progress data in CSV/JSON formats for custom
-                      analysis
-                    </li>
-                    <li>
-                      Download full session recordings in standard video formats
-                    </li>
-                    <li>
-                      Share reports directly with mentors or save for your
-                      portfolio
-                    </li>
-                  </ul>
-
-                  <div class="pt-6 border-t border-white/10">
-                    <p class="text-body text-sm mb-2">
-                      🔒 All exports are generated on-demand and processed
-                      securely per our
-                      <a
-                        href="privacy.html"
-                        class="text-deep-navy font-semibold hover:underline"
-                        >Privacy Policy</a
-                      >.
-                      <a
-                        href="privacy.html"
-                        class="text-deep-navy font-semibold hover:underline"
-                        >Read more</a
-                      >.
-                    </p>
-                  </div>
-                </div>
-              </div>
+              <svg
+                class="w-8 h-8 text-deep-navy"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+              >
+                <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
+                <circle cx="9" cy="7" r="4" />
+                <path d="M23 21v-2a4 4 0 0 0-3-3.87" />
+                <path d="M16 3.13a4 4 0 0 1 0 7.75" />
+              </svg>
             </div>
+            <h3 class="text-xl font-semibold text-deep-navy mb-3">
+              Live Coaching
+            </h3>
+            <p class="text-body mb-6">
+              Connect with expert interviewers for personalized guidance and
+              tips.
+            </p>
+            <a
+              href="#"
+              class="text-deep-navy font-semibold flex items-center gap-2 hover:gap-3 transition-all"
+            >
+              Learn More
+              <svg
+                width="16"
+                height="16"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+              >
+                <path d="M5 12h14M12 5l7 7-7 7" />
+              </svg>
+            </a>
+          </div>
+
+          <!-- Progress Tracking (restored) -->
+          <div class="glass-card p-8 hover:scale-105 transition-transform">
+            <div
+              class="w-16 h-16 bg-gradient-to-br from-accent/20 to-accent/10 rounded-2xl flex items-center justify-center mb-6"
+            >
+              <svg
+                class="w-8 h-8 text-deep-navy"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+              >
+                <circle cx="12" cy="12" r="9" />
+                <path d="M12 6v6l4 2" />
+              </svg>
+            </div>
+            <h3 class="text-xl font-semibold text-deep-navy mb-3">
+              Progress Tracking
+            </h3>
+            <p class="text-body mb-6">
+              Monitor your improvement over time with detailed analytics and
+              insights.
+            </p>
+            <a
+              href="#"
+              class="text-deep-navy font-semibold flex items-center gap-2 hover:gap-3 transition-all"
+            >
+              Learn More
+              <svg
+                width="16"
+                height="16"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+              >
+                <path d="M5 12h14M12 5l7 7-7 7" />
+              </svg>
+            </a>
           </div>
         </div>
       </div>
@@ -2043,7 +1034,7 @@
         <div
           class="pt-8 border-t border-white/10 flex flex-col md:flex-row justify-between items-center"
         >
-          <p class="text-body text-sm">© 2026 Evalvate. All rights reserved.</p>
+          <p class="text-body text-sm">© 2025 Evalvate. All rights reserved.</p>
           <div class="flex space-x-6 mt-4 md:mt-0">
             <a
               href="privacy.html"
@@ -2166,102 +1157,6 @@
           setPauseIcon();
         }
       }
-
-      // AI Feedback Tab Switching
-      const navItems = document.querySelectorAll(".analysis-nav-item");
-      const panels = document.querySelectorAll(".analysis-panel");
-
-      navItems.forEach((item) => {
-        item.addEventListener("click", () => {
-          const tab = item.getAttribute("data-tab");
-
-          // Remove active class from all nav items and panels
-          navItems.forEach((nav) => nav.classList.remove("active"));
-          panels.forEach((panel) => {
-            panel.classList.remove("active");
-            panel.classList.add("hidden");
-          });
-
-          // Add active class to clicked nav item
-          item.classList.add("active");
-
-          // Show corresponding panel
-          const targetPanel = document.getElementById(`panel-${tab}`);
-          if (targetPanel) {
-            setTimeout(() => {
-              targetPanel.classList.remove("hidden");
-              targetPanel.classList.add("active");
-            }, 50);
-          }
-
-          // Scroll to panel on mobile
-          if (window.innerWidth < 768 && targetPanel) {
-            setTimeout(() => {
-              targetPanel.scrollIntoView({
-                behavior: "smooth",
-                block: "start",
-              });
-            }, 100);
-          }
-        });
-      });
-
-      // Progress Tracking Tab Switching
-      const progressNavItems = document.querySelectorAll(".progress-nav-item");
-      const progressPanels = document.querySelectorAll(".progress-panel");
-
-      progressNavItems.forEach((item) => {
-        item.addEventListener("click", () => {
-          const tab = item.getAttribute("data-tab");
-
-          // Remove active class from all nav items and panels
-          progressNavItems.forEach((nav) => nav.classList.remove("active"));
-          progressPanels.forEach((panel) => {
-            panel.classList.remove("active");
-            panel.classList.add("hidden");
-          });
-
-          // Add active class to clicked nav item
-          item.classList.add("active");
-
-          // Show corresponding panel
-          const targetPanel = document.getElementById(`panel-${tab}`);
-          if (targetPanel) {
-            setTimeout(() => {
-              targetPanel.classList.remove("hidden");
-              targetPanel.classList.add("active");
-            }, 50);
-          }
-
-          // Scroll to panel on mobile
-          if (window.innerWidth < 768 && targetPanel) {
-            setTimeout(() => {
-              targetPanel.scrollIntoView({
-                behavior: "smooth",
-                block: "start",
-              });
-            }, 100);
-          }
-        });
-      });
-
-      // Timestamp navigation for issue items (similar to dashboard)
-      const issueItems = document.querySelectorAll(".issue-item");
-      issueItems.forEach((item) => {
-        item.addEventListener("click", () => {
-          const timestamp = parseInt(item.getAttribute("data-timestamp"));
-          // This would navigate to the specific timestamp in the video player
-          // For demo purposes, we'll just show an alert or console log
-          const minutes = Math.floor(timestamp / 60);
-          const seconds = timestamp % 60;
-          console.log(
-            `Navigate to ${minutes}:${seconds.toString().padStart(2, "0")}`
-          );
-          // In real implementation, this would control the video player:
-          // videoPlayer.currentTime = timestamp;
-          // videoPlayer.play();
-        });
-      });
     </script>
   </body>
 </html>
