@@ -170,7 +170,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 showSuccessMessage('Login successful! Redirecting...');
                 
                 setTimeout(() => {
-                    window.location.href = 'preview1.html';
+                    window.location.href = 'dashboard.html';
                 }, 1000);
             } else if (response.status === 400) {
                 const errorMessage = data.message || data.error || data.detail || '';
