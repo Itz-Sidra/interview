@@ -1,9 +1,4 @@
-/**
- * Evalvate - Preview Pages JavaScript
- * Handles interview configuration flow with glassmorphism UI
- */
-
-const API_BASE_URL = 'http://localhost:3000';
+import { API_BASE } from "./config.js";
 
 // ============ Authentication ============
 const getAuthToken = () => {
@@ -43,7 +38,7 @@ const apiCall = async (endpoint, method = 'GET', data = null, isFormData = false
     }
 
     try {
-        const response = await fetch(`${API_BASE_URL}${endpoint}`, options);
+        const response = await fetch(`${API_BASE}${endpoint}`, options);
         
         if (response.status === 401 || response.status === 403) {
             showErrorMessage('Session expired. Please login again.');

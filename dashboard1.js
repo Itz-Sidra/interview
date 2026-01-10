@@ -1,4 +1,4 @@
-const API_URL = "http://localhost:3000/";
+import { API_BASE } from "./config.js";
 const params = new URLSearchParams(window.location.search);
 const interviewId = params.get("id");
 
