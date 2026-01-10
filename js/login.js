@@ -161,16 +161,24 @@ document.addEventListener('DOMContentLoaded', () => {
             }
             
             if (response.ok) {
-                const { accessToken, refreshToken } = data;
+                const { accessToken, refreshToken, user } = data;
                 
                 const storage = rememberMeCheckbox.checked ? localStorage : sessionStorage;
                 storage.setItem('accessToken', accessToken);
                 storage.setItem('refreshToken', refreshToken);
+                
+                // Set EvalvateAuth state for consistent login across pages
+                if (typeof EvalvateAuth !== 'undefined') {
+                    EvalvateAuth.setUser({
+                        name: user?.name || emailInput.value.split('@')[0].replace(/[._]/g, ' ').replace(/\b\w/g, c => c.toUpperCase()),
+                        email: emailInput.value.trim()
+                    });
+                }
                
                 showSuccessMessage('Login successful! Redirecting...');
                 
                 setTimeout(() => {
-                    window.location.href = 'dashboard.html';
+                    window.location.href = 'dashboard-home.html';
                 }, 1000);
             } else if (response.status === 400) {
                 const errorMessage = data.message || data.error || data.detail || '';

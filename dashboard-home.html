@@ -1,0 +1,854 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Dashboard - Evalvate</title>
+    <meta
+      name="description"
+      content="Your Evalvate dashboard - view past interviews, start new sessions, and track your progress."
+    />
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Space+Grotesk:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="css/glassmorphism.css" />
+    <link rel="stylesheet" href="css/dashboard-glass.css" />
+
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+      tailwind.config = {
+        theme: {
+          extend: {
+            colors: {
+              "deep-navy": "#0F2233",
+              "pale-frost": "#EEF3FF",
+              periwinkle: "#E6EEFF",
+              "lavender-tint": "#C7D5FF",
+              accent: "#F3F86A",
+              body: "#5A6B7A",
+            },
+          },
+        },
+      };
+    </script>
+
+    <style>
+      /* Dashboard-specific styles */
+      .profile-dropdown {
+        position: relative;
+      }
+
+      .profile-avatar {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, var(--deep-navy) 0%, #1a3a52 100%);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-weight: 600;
+        font-size: 14px;
+        cursor: pointer;
+        border: 2px solid rgba(255, 255, 255, 0.2);
+        transition: all 0.3s;
+      }
+
+      .profile-avatar:hover {
+        border-color: var(--accent);
+        transform: scale(1.05);
+      }
+
+      .profile-avatar img {
+        width: 100%;
+        height: 100%;
+        border-radius: 50%;
+        object-fit: cover;
+      }
+
+      .dropdown-menu {
+        position: absolute;
+        top: calc(100% + 8px);
+        right: 0;
+        width: 280px;
+        background: rgba(255, 255, 255, 0.95);
+        backdrop-filter: blur(20px);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        border-radius: 16px;
+        box-shadow: 0 10px 40px rgba(15, 34, 51, 0.15);
+        opacity: 0;
+        visibility: hidden;
+        transform: translateY(-10px);
+        transition: all 0.2s ease;
+        z-index: 1000;
+        overflow: hidden;
+      }
+
+      .dropdown-menu.active {
+        opacity: 1;
+        visibility: visible;
+        transform: translateY(0);
+      }
+
+      .dropdown-header {
+        padding: 16px;
+        border-bottom: 1px solid rgba(15, 34, 51, 0.1);
+      }
+
+      .dropdown-item {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 12px 16px;
+        color: var(--deep-navy);
+        font-size: 14px;
+        cursor: pointer;
+        transition: background 0.2s;
+      }
+
+      .dropdown-item:hover {
+        background: rgba(15, 34, 51, 0.05);
+      }
+
+      .dropdown-item svg {
+        width: 18px;
+        height: 18px;
+        color: var(--body);
+      }
+
+      .dropdown-divider {
+        height: 1px;
+        background: rgba(15, 34, 51, 0.1);
+        margin: 4px 0;
+      }
+
+      .credits-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        padding: 6px 12px;
+        background: rgba(243, 248, 106, 0.2);
+        border: 1px solid rgba(243, 248, 106, 0.4);
+        border-radius: 20px;
+        font-size: 13px;
+        font-weight: 600;
+        color: var(--deep-navy);
+      }
+
+      .interview-card {
+        background: rgba(255, 255, 255, 0.06);
+        border: 1px solid rgba(255, 255, 255, 0.12);
+        backdrop-filter: blur(12px);
+        border-radius: 16px;
+        padding: 20px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        transition: all 0.3s;
+        cursor: pointer;
+      }
+
+      .interview-card:hover {
+        transform: translateY(-2px);
+        border-color: rgba(243, 248, 106, 0.3);
+        box-shadow: 0 8px 30px rgba(15, 34, 51, 0.1);
+      }
+
+      .score-circle {
+        width: 50px;
+        height: 50px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 700;
+        font-size: 16px;
+      }
+
+      .score-excellent {
+        background: rgba(16, 185, 129, 0.15);
+        color: #10b981;
+        border: 2px solid rgba(16, 185, 129, 0.3);
+      }
+
+      .score-good {
+        background: rgba(59, 130, 246, 0.15);
+        color: #3b82f6;
+        border: 2px solid rgba(59, 130, 246, 0.3);
+      }
+
+      .score-average {
+        background: rgba(245, 158, 11, 0.15);
+        color: #f59e0b;
+        border: 2px solid rgba(245, 158, 11, 0.3);
+      }
+
+      .score-pending {
+        background: rgba(107, 114, 128, 0.15);
+        color: #6b7280;
+        border: 2px solid rgba(107, 114, 128, 0.3);
+      }
+
+      .stat-card {
+        text-align: center;
+        padding: 24px;
+      }
+
+      .stat-number {
+        font-size: 2.5rem;
+        font-weight: 700;
+        color: var(--deep-navy);
+        font-family: var(--font-space);
+      }
+
+      .stat-label {
+        font-size: 14px;
+        color: var(--body);
+        margin-top: 4px;
+      }
+
+      .empty-state {
+        text-align: center;
+        padding: 60px 20px;
+      }
+
+      .empty-state svg {
+        width: 80px;
+        height: 80px;
+        color: var(--body);
+        opacity: 0.5;
+        margin-bottom: 20px;
+      }
+
+      @keyframes fadeIn {
+        from {
+          opacity: 0;
+          transform: translateY(20px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+
+      .animate-fade-in {
+        animation: fadeIn 0.5s ease-out forwards;
+      }
+
+      .stagger-1 { animation-delay: 0.1s; opacity: 0; }
+      .stagger-2 { animation-delay: 0.2s; opacity: 0; }
+      .stagger-3 { animation-delay: 0.3s; opacity: 0; }
+      .stagger-4 { animation-delay: 0.4s; opacity: 0; }
+    </style>
+  </head>
+  <body class="antialiased">
+    <!-- Animated Background -->
+    <div class="floating-shape shape-1"></div>
+    <div class="floating-shape shape-2"></div>
+    <div class="floating-shape shape-3"></div>
+
+    <!-- Navigation with Profile Menu -->
+    <nav id="navbar" class="fixed top-0 left-0 right-0 z-50">
+      <div class="container mx-auto px-6 py-4">
+        <div class="flex items-center justify-between">
+          <!-- Logo -->
+          <a href="index.html" class="flex items-center space-x-2">
+            <div
+              class="w-10 h-10 bg-gradient-to-br from-deep-navy to-accent rounded-xl flex items-center justify-center"
+            >
+              <span class="text-white font-bold text-xl">E</span>
+            </div>
+            <span class="text-2xl font-bold font-space text-deep-navy"
+              >Evalvate</span
+            >
+          </a>
+
+          <!-- Desktop Navigation -->
+          <div class="hidden lg:flex items-center space-x-8">
+            <a
+              href="index.html"
+              class="text-body hover:text-deep-navy transition-colors font-medium"
+              >Home</a
+            >
+            <a href="dashboard-home.html" class="text-deep-navy font-semibold"
+              >Dashboard</a
+            >
+            <a
+              href="pricing.html"
+              class="text-body hover:text-deep-navy transition-colors font-medium"
+              >Pricing</a
+            >
+            <a
+              href="blogs.html"
+              class="text-body hover:text-deep-navy transition-colors font-medium"
+              >Blogs</a
+            >
+          </div>
+
+          <!-- Profile Menu (visible when logged in) -->
+          <div class="flex items-center gap-4">
+            <!-- Credits Badge -->
+            <div class="credits-badge hidden md:flex" id="navCredits">
+              <svg
+                width="16"
+                height="16"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+              >
+                <circle cx="12" cy="12" r="10" />
+                <path d="M12 6v6l4 2" />
+              </svg>
+              <span id="navCreditsCount">2</span> Credits
+            </div>
+
+            <!-- Profile Dropdown -->
+            <div class="profile-dropdown">
+              <div class="profile-avatar" id="profileAvatar">
+                <span id="avatarInitials">U</span>
+              </div>
+
+              <div class="dropdown-menu" id="dropdownMenu">
+                <!-- User Info Header -->
+                <div class="dropdown-header">
+                  <div class="flex items-center gap-3">
+                    <div
+                      class="w-12 h-12 rounded-full bg-gradient-to-br from-deep-navy to-accent flex items-center justify-center text-white font-semibold"
+                    >
+                      <span id="dropdownInitials">U</span>
+                    </div>
+                    <div>
+                      <p
+                        class="font-semibold text-deep-navy"
+                        id="dropdownUserName"
+                      >
+                        User
+                      </p>
+                      <p class="text-sm text-body" id="dropdownUserEmail">
+                        user@email.com
+                      </p>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Credits & Plan -->
+                <div class="p-4 bg-accent/10">
+                  <div class="flex items-center justify-between mb-2">
+                    <span class="text-sm text-body">Current Plan</span>
+                    <span
+                      class="text-sm font-semibold text-deep-navy"
+                      id="dropdownPlan"
+                      >Free Trial</span
+                    >
+                  </div>
+                  <div class="flex items-center justify-between">
+                    <span class="text-sm text-body">Remaining Credits</span>
+                    <span
+                      class="text-sm font-semibold text-deep-navy"
+                      id="dropdownCredits"
+                      >2</span
+                    >
+                  </div>
+                  <a
+                    href="pricing.html"
+                    class="block mt-3 text-center text-sm font-semibold text-deep-navy hover:text-accent transition-colors"
+                  >
+                    Upgrade Plan →
+                  </a>
+                </div>
+
+                <div class="dropdown-divider"></div>
+
+                <!-- Menu Items -->
+                <div class="dropdown-item" onclick="location.href='#account'">
+                  <svg
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                  >
+                    <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
+                    <circle cx="12" cy="7" r="4" />
+                  </svg>
+                  Account Settings
+                </div>
+
+                <div class="dropdown-item" onclick="location.href='dashboard.html'">
+                  <svg
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                  >
+                    <rect x="3" y="3" width="18" height="18" rx="2" ry="2" />
+                    <line x1="3" y1="9" x2="21" y2="9" />
+                    <line x1="9" y1="21" x2="9" y2="9" />
+                  </svg>
+                  Interview History
+                </div>
+
+                <div class="dropdown-divider"></div>
+
+                <div
+                  class="dropdown-item text-red-500"
+                  id="logoutBtn"
+                  style="color: #ef4444"
+                >
+                  <svg
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                  >
+                    <path
+                      d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"
+                    />
+                    <polyline points="16 17 21 12 16 7" />
+                    <line x1="21" y1="12" x2="9" y2="12" />
+                  </svg>
+                  Logout
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="pt-28 pb-20 px-6">
+      <div class="container mx-auto max-w-6xl">
+        <!-- Welcome Section -->
+        <div class="mb-12 animate-fade-in stagger-1">
+          <h1
+            class="font-space text-deep-navy mb-2 text-3xl md:text-4xl lg:text-5xl"
+          >
+            Welcome back, <span class="text-gradient" id="welcomeName">User</span>!
+          </h1>
+          <p class="text-lg text-body">
+            Ready to ace your next interview? Let's practice.
+          </p>
+        </div>
+
+        <!-- Stats Cards -->
+        <div
+          class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-12 animate-fade-in stagger-2"
+        >
+          <div class="glass-card stat-card">
+            <div class="stat-number" id="statInterviews">0</div>
+            <div class="stat-label">Interviews</div>
+          </div>
+          <div class="glass-card stat-card">
+            <div class="stat-number" id="statAvgScore">--</div>
+            <div class="stat-label">Avg. Score</div>
+          </div>
+          <div class="glass-card stat-card">
+            <div class="stat-number" id="statCredits">2</div>
+            <div class="stat-label">Credits Left</div>
+          </div>
+          <div class="glass-card stat-card">
+            <div class="stat-number" id="statStreak">0</div>
+            <div class="stat-label">Day Streak</div>
+          </div>
+        </div>
+
+        <!-- Main Actions -->
+        <div class="grid md:grid-cols-3 gap-6 mb-12 animate-fade-in stagger-3">
+          <!-- Start Interview CTA -->
+          <div class="glass-card p-8 md:col-span-2">
+            <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-6">
+              <div>
+                <h2 class="text-2xl font-bold text-deep-navy mb-2">
+                  Start New Interview
+                </h2>
+                <p class="text-body mb-4">
+                  Practice with AI-powered mock interviews and get instant
+                  feedback on your performance.
+                </p>
+                <div class="flex items-center gap-2 text-sm text-body">
+                  <svg
+                    width="16"
+                    height="16"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                  >
+                    <circle cx="12" cy="12" r="10" />
+                    <path d="M12 6v6l4 2" />
+                  </svg>
+                  <span>1 credit will be used</span>
+                </div>
+              </div>
+              <button
+                class="btn-primary text-lg px-8 py-4 whitespace-nowrap"
+                id="startInterviewBtn"
+              >
+                Start Interview
+                <svg
+                  width="20"
+                  height="20"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                >
+                  <path d="M5 12h14M12 5l7 7-7 7" />
+                </svg>
+              </button>
+            </div>
+          </div>
+
+          <!-- Credits Card -->
+          <div class="glass-card p-8">
+            <div class="text-center">
+              <div
+                class="w-16 h-16 mx-auto mb-4 bg-accent/20 rounded-full flex items-center justify-center"
+              >
+                <svg
+                  width="32"
+                  height="32"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  class="text-deep-navy"
+                >
+                  <circle cx="12" cy="12" r="10" />
+                  <path d="M12 6v6l4 2" />
+                </svg>
+              </div>
+              <div class="text-4xl font-bold text-deep-navy mb-1" id="creditsDisplay">
+                2
+              </div>
+              <p class="text-body text-sm mb-4">Credits Remaining</p>
+              <a
+                href="pricing.html"
+                class="text-deep-navy font-semibold text-sm hover:text-accent transition-colors"
+              >
+                Get More Credits →
+              </a>
+            </div>
+          </div>
+        </div>
+
+        <!-- Past Interviews Section -->
+        <div class="animate-fade-in stagger-4">
+          <div class="flex items-center justify-between mb-6">
+            <h2 class="text-2xl font-bold text-deep-navy">Recent Interviews</h2>
+            <a
+              href="dashboard.html"
+              class="text-deep-navy font-semibold text-sm hover:text-accent transition-colors"
+            >
+              View All →
+            </a>
+          </div>
+
+          <!-- Interviews List -->
+          <div class="space-y-4" id="interviewsList">
+            <!-- Empty state (shown when no interviews) -->
+            <div class="glass-card empty-state" id="emptyState">
+              <svg
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="1.5"
+                class="mx-auto"
+              >
+                <rect x="3" y="4" width="18" height="18" rx="2" ry="2" />
+                <line x1="16" y1="2" x2="16" y2="6" />
+                <line x1="8" y1="2" x2="8" y2="6" />
+                <line x1="3" y1="10" x2="21" y2="10" />
+              </svg>
+              <h3 class="text-xl font-semibold text-deep-navy mb-2">
+                No interviews yet
+              </h3>
+              <p class="text-body mb-6">
+                Start your first mock interview to see your history here.
+              </p>
+              <button
+                class="btn-primary"
+                onclick="document.getElementById('startInterviewBtn').click()"
+              >
+                Start Your First Interview
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="py-8 px-6 border-t border-white/10">
+      <div class="container mx-auto">
+        <div class="flex flex-col md:flex-row justify-between items-center gap-4">
+          <p class="text-body text-sm">© 2026 Evalvate. All rights reserved.</p>
+          <div class="flex space-x-6">
+            <a
+              href="privacy.html"
+              class="text-body hover:text-deep-navy transition-colors text-sm"
+              >Privacy Policy</a
+            >
+            <a
+              href="terms.html"
+              class="text-body hover:text-deep-navy transition-colors text-sm"
+              >Terms of Service</a
+            >
+          </div>
+        </div>
+      </div>
+    </footer>
+
+    <!-- Auth Script -->
+    <script src="js/auth.js"></script>
+    <script>
+      // Check if user is logged in, redirect to login if not
+      if (!EvalvateAuth.isLoggedIn()) {
+        window.location.href = 'login.html';
+      }
+
+      // Populate user data
+      function initDashboard() {
+        const user = EvalvateAuth.getUser();
+        const credits = EvalvateAuth.getCredits();
+        const interviews = EvalvateAuth.getInterviews();
+
+        // Update welcome name
+        if (user && user.name) {
+          document.getElementById('welcomeName').textContent = user.name.split(' ')[0];
+          document.getElementById('dropdownUserName').textContent = user.name;
+          document.getElementById('dropdownUserEmail').textContent = user.email || '';
+          
+          // Set initials
+          const initials = EvalvateAuth.getUserInitials();
+          document.getElementById('avatarInitials').textContent = initials;
+          document.getElementById('dropdownInitials').textContent = initials;
+        }
+
+        // Update credits
+        document.getElementById('navCreditsCount').textContent = credits;
+        document.getElementById('dropdownCredits').textContent = credits;
+        document.getElementById('creditsDisplay').textContent = credits;
+        document.getElementById('statCredits').textContent = credits;
+
+        // Update plan
+        if (user && user.plan) {
+          document.getElementById('dropdownPlan').textContent = user.plan;
+        }
+
+        // Update stats
+        document.getElementById('statInterviews').textContent = interviews.length;
+        
+        // Calculate average score
+        const scoredInterviews = interviews.filter(i => i.score !== null);
+        if (scoredInterviews.length > 0) {
+          const avgScore = Math.round(
+            scoredInterviews.reduce((sum, i) => sum + i.score, 0) / scoredInterviews.length
+          );
+          document.getElementById('statAvgScore').textContent = avgScore;
+        }
+
+        // Render interviews list
+        renderInterviews(interviews);
+      }
+
+      // Helper function to format interview date
+      function formatInterviewDate(dateString) {
+        const date = new Date(dateString);
+        const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+        const month = months[date.getMonth()];
+        const day = date.getDate();
+        const year = date.getFullYear();
+        let hours = date.getHours();
+        const minutes = date.getMinutes();
+        const ampm = hours >= 12 ? 'PM' : 'AM';
+        hours = hours % 12;
+        hours = hours ? hours : 12;
+        const mins = minutes < 10 ? '0' + minutes : minutes;
+        return `${month} ${day}, ${year}, ${hours}:${mins} ${ampm}`;
+      }
+
+      // Helper function to generate score bars
+      function generateScoreBars(score) {
+        if (score === null || score === undefined) {
+          // Return default bars for pending scores
+          return { heights: [70, 75, 65, 72], classes: ['bar', 'barg', 'bar', 'barg'] };
+        }
+        // Generate 4 bar heights that average around the score
+        const baseHeight = score;
+        const variations = [-5, 5, -3, 3]; // Variations for each bar
+        const heights = variations.map(v => Math.max(60, Math.min(100, baseHeight + v)));
+        
+        // Determine bar classes based on score quality
+        // Higher scores get more green bars (barg), lower scores get more red bars (bar)
+        let classes;
+        if (score >= 85) {
+          // Excellent scores: mostly green bars
+          classes = ['barg', 'barg', 'barg', 'barg'];
+        } else if (score >= 70) {
+          // Good scores: mix of green and red
+          classes = ['bar', 'barg', 'bar', 'barg'];
+        } else {
+          // Average scores: mostly red bars
+          classes = ['bar', 'bar', 'bar', 'barg'];
+        }
+        
+        return { heights, classes };
+      }
+
+      // Helper function to get report page URL based on index
+      function getReportPageUrl(index) {
+        const reportPages = ['dashboard1.html', 'dashboard2.html', 'dashboard3.html'];
+        return reportPages[index % reportPages.length];
+      }
+
+      function renderInterviews(interviews) {
+        const listEl = document.getElementById('interviewsList');
+        const emptyState = document.getElementById('emptyState');
+
+        // Clear any existing interview cards (except empty state)
+        const existingCards = listEl.querySelectorAll('.interview-card');
+        existingCards.forEach(card => card.remove());
+
+        if (interviews.length === 0) {
+          emptyState.style.display = 'block';
+          return;
+        }
+
+        emptyState.style.display = 'none';
+
+        // Get user name from auth
+        const user = EvalvateAuth.getUser();
+        const userName = user ? user.name : 'User';
+
+        // Show only last 5 interviews
+        const recentInterviews = interviews.slice(0, 5);
+        
+        recentInterviews.forEach((interview, index) => {
+          const card = document.createElement('div');
+          card.className = 'interview-card';
+          card.onclick = () => location.href = getReportPageUrl(index);
+
+          const formattedDate = formatInterviewDate(interview.date);
+          const duration = interview.duration || 'N/A';
+
+          // Determine score class and value
+          let scoreClass = 'average';
+          let scoreValue = '--';
+          if (interview.score !== null && interview.score !== undefined) {
+            scoreValue = interview.score;
+            scoreClass = interview.score >= 85 ? 'good' : 'average';
+          }
+
+          // Generate score bars
+          const scoreBars = generateScoreBars(interview.score);
+          
+          // Alternate avatar colors
+          const avatarClass = index % 2 === 0 ? 'avatar' : 'avatar orange';
+
+          card.innerHTML = `
+            <div class="interview-left">
+              <div class="${avatarClass}"></div>
+              <div class="interview-info">
+                <span>
+                  <h3>${userName}</h3>
+                  <h2>${interview.role || 'General'}</h2>
+                </span>
+                <div class="interview-meta">
+                  <span class="meta-item">
+                    <svg class="meta-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                      <path stroke-linecap="round" stroke-linejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+                    </svg>
+                    ${formattedDate}
+                  </span>
+                  <span class="meta-item">
+                    <svg class="meta-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                      <path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                    </svg>
+                    ${duration}
+                  </span>
+                </div>
+              </div>
+            </div>
+            <div class="interview-right">
+              <div class="score">
+                <div class="score-value ${scoreClass}">${scoreValue}</div>
+                <div class="score-label">Overall Score</div>
+              </div>
+              <div class="score-bars">
+                ${scoreBars.heights.map((height, i) => 
+                  `<div class="${scoreBars.classes[i]}" style="height: ${height}%"></div>`
+                ).join('')}
+              </div>
+            </div>
+          `;
+
+          listEl.insertBefore(card, emptyState);
+        });
+      }
+
+      // Profile dropdown toggle
+      const profileAvatar = document.getElementById('profileAvatar');
+      const dropdownMenu = document.getElementById('dropdownMenu');
+
+      profileAvatar.addEventListener('click', (e) => {
+        e.stopPropagation();
+        dropdownMenu.classList.toggle('active');
+      });
+
+      // Close dropdown when clicking outside
+      document.addEventListener('click', () => {
+        dropdownMenu.classList.remove('active');
+      });
+
+      dropdownMenu.addEventListener('click', (e) => {
+        e.stopPropagation();
+      });
+
+      // Logout handler
+      document.getElementById('logoutBtn').addEventListener('click', () => {
+        EvalvateAuth.logout();
+        window.location.href = 'login.html';
+      });
+
+      // Start Interview handler
+      document.getElementById('startInterviewBtn').addEventListener('click', () => {
+        const credits = EvalvateAuth.getCredits();
+        
+        if (credits <= 0) {
+          alert('You have no credits remaining. Please purchase more credits to continue.');
+          window.location.href = 'pricing.html';
+          return;
+        }
+
+        // Deduct credit
+        if (EvalvateAuth.useCredit()) {
+          // Redirect to interview flow
+          window.location.href = 'preview1.html';
+        }
+      });
+
+      // Initialize dashboard
+      initDashboard();
+
+      // Navbar scroll effect
+      const navbar = document.getElementById("navbar");
+      window.addEventListener("scroll", () => {
+        if (window.scrollY > 50) {
+          navbar.classList.add("scrolled");
+        } else {
+          navbar.classList.remove("scrolled");
+        }
+      });
+    </script>
+  </body>
+</html>
