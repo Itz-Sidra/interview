@@ -67,13 +67,23 @@ export async function evaluateAndGenerateNextQuestion(session, candidateAnswer) 
     console.log("DEBUG: Raw Gemini response (first 300 chars):", rawText.substring(0, 300));
     
     const evaluation = safeParseJSON(rawText);
-    validateGeminiResponse(evaluation);
+    validateGeminiResponse(evaluation, session);
     
     return evaluation;
   } catch (error) {
-    console.error("Gemini API error:", error);
-    throw new Error(`Failed to evaluate answer: ${error.message}`);
+  const isRateLimit =
+    error?.status === 429 ||
+    error?.message?.includes("429") ||
+    error?.message?.includes("Quota");
+
+  if (isRateLimit) {
+    console.warn("Gemini rate limit hit — using fallback logic");
+    throw new Error("GEMINI_RATE_LIMIT");
   }
+
+  console.error("Gemini API error:", error);
+  throw new Error(`Failed to evaluate answer: ${error.message}`);
+}
 }
 
 /**
@@ -125,12 +135,17 @@ ${previousQA || "This is the first question"}
 CURRENT ANSWER TO EVALUATE:
 "${candidateAnswer}"
 
-EVALUATION INSTRUCTIONS:
-1. Score the answer (0-100) on: relevance, clarity, completeness, technical depth
-2. Identify issues related to clarity, structure, correctness, or missing concepts.
-3. Do NOT penalize natural filler words unless they severely reduce understanding.
-4. Generate ONE follow-up question that builds on this answer
-5. Explain why you chose this question
+EVALUATION INSTRUCTIONS (FOLLOW EXACTLY):
+1. FIRST: Generate ONE specific follow-up interview question based on the candidate’s answer.
+2. THEN: Score the answer on relevance(0-100), clarity(0-100), completeness(0-100), and technical depth(0-100).
+3. Identify at most ONE important issue (optional).
+4. Briefly explain why you chose the follow-up question (1 sentence max).
+
+CRITICAL RULES:
+- The follow-up question MUST always be present.
+- If unsure, ask a question that probes reasoning, decisions, or examples.
+- If no issues exist, return an empty detectedIssues array.
+- Do NOT write long issue description
 
 Return ONLY valid JSON. Keep descriptions under 200 characters each.
 
@@ -165,11 +180,38 @@ function normalizeSeverity(severity) {
   return 3; // clamp everything else (3,4,5,10…)
 }
 
-function validateGeminiResponse(evaluation) {
-  if (!evaluation.evaluation) throw new Error("Missing 'evaluation'");
-  if (!evaluation.nextQuestion) throw new Error("Missing 'nextQuestion'");
-  if (!Array.isArray(evaluation.detectedIssues)) {
-    evaluation.detectedIssues = [];
+function generateFallbackQuestion(session) {
+  const n = session.questionsAnswered;
+
+  if (n === 0) {
+    return "Can you walk me through a recent project you worked on and your role in it?";
+  }
+
+  if (n === 1) {
+    return "What was the reasoning behind one of the technical decisions you mentioned?";
+  }
+
+  if (n === 2) {
+    return "What challenges did you face in that situation, and how did you overcome them?";
+  }
+
+  if (n === 3) {
+    return "How would you improve the approach if you had more time?";
+  }
+
+  return "Can you give a concrete example from your experience to support that point?";
+}
+
+function validateGeminiResponse(evaluation, session) {
+  // --- evaluation object ---
+  if (!evaluation.evaluation) {
+    evaluation.evaluation = {
+      answerQuality: 60,
+      relevance: 60,
+      clarity: 60,
+      completeness: 60,
+      technicalDepth: 60
+    };
   }
 
   function normalizeScore(score) {
@@ -181,10 +223,30 @@ function validateGeminiResponse(evaluation) {
     evaluation.evaluation[key] = normalizeScore(evaluation.evaluation[key]);
   });
 
+  // --- detected issues ---
+  if (!Array.isArray(evaluation.detectedIssues)) {
+    evaluation.detectedIssues = [];
+  }
+
   evaluation.detectedIssues = evaluation.detectedIssues.map(issue => ({
     ...issue,
     severity: normalizeSeverity(issue.severity)
   }));
+
+  // --- next question (CRITICAL FIX) ---
+  if (!evaluation.nextQuestion || typeof evaluation.nextQuestion !== "string") {
+    evaluation.nextQuestion = generateFallbackQuestion(session);
+  }
+
+  // --- follow-up category ---
+  if (!evaluation.followUpCategory) {
+    evaluation.followUpCategory = "GENERAL";
+  }
+
+  // --- rationale ---
+  if (!evaluation.questionRationale) {
+    evaluation.questionRationale = "Fallback follow-up due to incomplete model output";
+  }
 }
 
 export default { evaluateAndGenerateNextQuestion };

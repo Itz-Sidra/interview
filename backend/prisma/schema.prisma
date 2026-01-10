@@ -169,7 +169,10 @@ model Question {
   interview      Interview? @relation(fields: [interviewId], references: [id])
   interviewId    String?
   prompt         String     @db.Text
-  expectedAnswer Json?
+
+  evaluation     Json?      
+  scoreAverage   Float?      
+
   createdAt      DateTime   @default(now())
 }
 
