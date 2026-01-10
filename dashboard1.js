@@ -1,99 +1,133 @@
-const videoPlayer = document.getElementById('videoPlayer');
-const playButton = document.getElementById('playButton');
-const videoOverlay = document.getElementById('videoOverlay');
+const API_URL = "http://localhost:3000/";
+const params = new URLSearchParams(window.location.search);
+const interviewId = params.get("id");
 
-playButton.addEventListener('click', () => {
-    videoPlayer.play();
-    videoOverlay.classList.add('hidden');
-});
+if (!interviewId) {
+  alert("No interview ID found");
+  window.location.href = "dashboard.html";
+}
 
-videoPlayer.addEventListener('click', () => {
-    if (videoPlayer.paused) {
-        videoPlayer.play();
-        videoOverlay.classList.add('hidden');
+/* ---------------- DOM REFS ---------------- */
+const candidateName = document.getElementById("candidateName");
+const interviewDate = document.getElementById("interviewDate");
+const overallScore = document.getElementById("overallScore");
+const overallScoreLarge = document.getElementById("overallScoreLarge");
+const flaggedTitle = document.getElementById("flaggedTitle");
+const flaggedContainer = document.getElementById("flaggedContainer");
+const metricsGrid = document.getElementById("metricsGrid");
+
+/* ---------------- METRICS ---------------- */
+
+function renderMetrics(report) {
+  metricsGrid.innerHTML = "";
+
+  const metrics = [
+    { label: "Communication", score: report.ratings?.content ?? 0 },
+    { label: "Grammar", score: report.grammar?.score ?? 0 },
+    { label: "Filler Words", score: calcFiller(report) },
+    { label: "Confidence", score: report.ratings?.confidence ?? 0 },
+    { label: "Technical", score: calcTechnical(report) },
+    { label: "Vocal", score: calcVocal(report) }
+  ];
+
+  metrics.forEach(m => {
+    const card = document.createElement("div");
+    card.className = "metric-card";
+
+    card.innerHTML = `
+      <div class="metric-header">
+        <span>${m.label}</span>
+      </div>
+      <div class="metric-bar">
+        <div class="bar-fill" style="width:${m.score}%"></div>
+      </div>
+      <div class="metric-score">${m.score}</div>
+    `;
+
+    metricsGrid.appendChild(card);
+  });
+}
+
+function calcFiller(report) {
+  const n = report.flagged?.filter(i => i.category === "FILLER_WORDS").length || 0;
+  return Math.max(100 - n * 10, 60);
+}
+
+function calcTechnical(report) {
+  const n = report.flagged?.filter(i => i.category === "TECHNICAL").length || 0;
+  return Math.max(90 - n * 5, 60);
+}
+
+function calcVocal(report) {
+  const n = report.flagged?.filter(i => i.category === "VOCAL").length || 0;
+  return Math.max(90 - n * 5, 60);
+}
+
+/* ---------------- LOAD REPORT ---------------- */
+
+async function loadReport() {
+  try {
+    const token =
+      localStorage.getItem("accessToken") ||
+      sessionStorage.getItem("accessToken");
+
+    if (!token) {
+      window.location.href = "login.html";
+      return;
+    }
+
+    const res = await fetch(`${API_URL}interview/report/${interviewId}`, {
+      headers: { Authorization: `Bearer ${token}` }
+    });
+
+    if (!res.ok) throw new Error(await res.text());
+
+    const report = await res.json();
+    console.log("REPORT:", report);
+
+    /* Header */
+    candidateName.textContent = report.candidate.name;
+    interviewDate.textContent = new Date(report.interview.date).toLocaleString();
+
+    /* Overall score */
+    overallScore.textContent = report.ratings.overall;
+    overallScoreLarge.textContent = report.ratings.overall;
+
+    /* Metrics */
+    renderMetrics(report);
+
+    /* Flagged issues */
+    const issues = report.flagged || [];
+    flaggedTitle.textContent = `Flagged Issues (${issues.length})`;
+    flaggedContainer.innerHTML = "";
+
+    if (issues.length === 0) {
+      flaggedContainer.innerHTML = `
+        <p style="color:#5A6B7A;">No issues flagged 🎉</p>
+      `;
     } else {
-        videoPlayer.pause();
-        videoOverlay.classList.remove('hidden');
+      issues.forEach(issue => {
+        const div = document.createElement("div");
+        div.className = "issue-card";
+
+        div.innerHTML = `
+          <div class="issue-header">
+            <span class="issue-title">${issue.category}</span>
+            <span class="issue-severity">Severity ${issue.severity}</span>
+          </div>
+          <div class="issue-content">
+            <p class="issue-description">${issue.description}</p>
+          </div>
+        `;
+
+        flaggedContainer.appendChild(div);
+      });
     }
-});
 
-videoPlayer.addEventListener('pause', () => {
-    videoOverlay.classList.remove('hidden');
-});
+  } catch (err) {
+    console.error("Report load failed:", err);
+    alert("Failed to load report");
+  }
+}
 
-videoPlayer.addEventListener('play', () => {
-    videoOverlay.classList.add('hidden');
-});
-
-const uploadButton = document.getElementById('uploadButton');
-const videoUpload = document.getElementById('videoUpload');
-const uploadInfo = document.getElementById('uploadInfo');
-
-uploadButton.addEventListener('click', () => {
-    videoUpload.click();
-});
-
-videoUpload.addEventListener('change', (event) => {
-    const file = event.target.files[0];
-    
-    if (file) {
-        if (!file.type.startsWith('video/')) {
-            uploadInfo.textContent = 'Please select a valid video file';
-            uploadInfo.style.color = '#ef4444';
-            return;
-        }
-
-        const fileSize = (file.size / (1024 * 1024)).toFixed(2);
-        uploadInfo.textContent = `Selected: ${file.name} (${fileSize} MB)`;
-        uploadInfo.style.color = '#10b981';
-
-        const videoURL = URL.createObjectURL(file);
-        videoPlayer.src = videoURL;
-        
-        setTimeout(() => {
-            uploadInfo.textContent = 'Video loaded successfully! Click play to preview.';
-        }, 500);
-
-        videoPlayer.addEventListener('loadeddata', () => {
-            URL.revokeObjectURL(videoURL);
-        }, { once: true });
-    }
-});
-
-const viewButtons = document.querySelectorAll('.view-button');
-viewButtons.forEach(button => {
-    button.addEventListener('click', (e) => {
-        const timeText = e.target.textContent;
-        const timeMatch = timeText.match(/(\d+):(\d+)/);
-        
-        if (timeMatch) {
-            const minutes = parseInt(timeMatch[1]);
-            const seconds = parseInt(timeMatch[2]);
-            const totalSeconds = minutes * 60 + seconds;
-            
-            videoPlayer.currentTime = totalSeconds;
-            videoPlayer.play();
-            
-            videoPlayer.scrollIntoView({ behavior: 'smooth', block: 'center' });
-        }
-    });
-});
-
-const actionButtons = document.querySelectorAll('.action-button');
-actionButtons.forEach(button => {
-    button.addEventListener('click', () => {
-        const action = button.textContent;
-        alert(`${action} functionality would be implemented here`);
-    });
-});
-
-window.addEventListener('load', () => {
-    const metricBars = document.querySelectorAll('.bar-fill');
-    metricBars.forEach(bar => {
-        const width = bar.style.width;
-        bar.style.width = '0%';
-        setTimeout(() => {
-            bar.style.width = width;
-        }, 100);
-    });
-});
+loadReport();

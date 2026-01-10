@@ -137,90 +137,64 @@
         </div>
 
         <div class="stats-grid">
-          <div class="glass-card stat-card">
-            <div class="stat-icon">
-              <svg
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-                stroke-width="2"
-              >
-                <path
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
-                ></path>
-              </svg>
-            </div>
-            <div class="stat-content">
-              <h2>3</h2>
-              <p>Total Interviews</p>
-            </div>
-          </div>
 
-          <div class="glass-card stat-card">
-            <div class="stat-icon">
-              <svg
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-                stroke-width="2"
-              >
-                <path
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"
-                ></path>
-              </svg>
-            </div>
-            <div class="stat-content">
-              <h2>85</h2>
-              <p>Avg Score</p>
-            </div>
-          </div>
+  <!-- Total Interviews -->
+  <div class="glass-card stat-card">
+    <div class="stat-icon">
+      <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+        <path stroke-linecap="round" stroke-linejoin="round"
+          d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+      </svg>
+    </div>
+    <div class="stat-content">
+      <h2 id="kpiTotal">0</h2>
+      <p>Total Interviews</p>
+    </div>
+  </div>
 
-          <div class="glass-card stat-card">
-            <div class="stat-icon">
-              <svg
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-                stroke-width="2"
-              >
-                <path
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  d="M12 9v2m0 4h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
-                ></path>
-              </svg>
-            </div>
-            <div class="stat-content">
-              <h2>8</h2>
-              <p>Issues Flagged</p>
-            </div>
-          </div>
+  <!-- Avg Score -->
+  <div class="glass-card stat-card">
+    <div class="stat-icon">
+      <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+        <path stroke-linecap="round" stroke-linejoin="round"
+          d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
+      </svg>
+    </div>
+    <div class="stat-content">
+      <h2 id="kpiAvgScore">0</h2>
+      <p>Avg Score</p>
+    </div>
+  </div>
 
-          <div class="glass-card stat-card">
-            <div class="stat-icon">
-              <svg
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-                stroke-width="2"
-              >
-                <path
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
-                ></path>
-              </svg>
-            </div>
-            <div class="stat-content">
-              <h2>24m</h2>
-              <p>Total Duration</p>
-            </div>
-          </div>
-        </div>
+  <!-- Issues Flagged -->
+  <div class="glass-card stat-card">
+    <div class="stat-icon">
+      <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+        <path stroke-linecap="round" stroke-linejoin="round"
+          d="M12 9v2m0 4h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+      </svg>
+    </div>
+    <div class="stat-content">
+      <h2 id="kpiIssues">0</h2>
+      <p>Issues Flagged</p>
+    </div>
+  </div>
+
+  <!-- Total Duration -->
+  <div class="glass-card stat-card">
+    <div class="stat-icon">
+      <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+        <path stroke-linecap="round" stroke-linejoin="round"
+          d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+      </svg>
+    </div>
+    <div class="stat-content">
+      <h2 id="kpiDuration">0m</h2>
+      <p>Total Duration</p>
+    </div>
+  </div>
+
+</div>
 
         <section class="glass-card interviews-section">
           <div class="section-header">
@@ -240,183 +214,11 @@
             Recent Interviews
           </div>
 
-          <div class="interview-card" onclick="location.href='dashboard1.html'">
-            <div class="interview-left">
-              <div class="avatar"></div>
-              <div class="interview-info">
-                <span
-                  ><h3>Sidra Jahangir</h3>
-                  <h2>AI Engineer</h2></span
-                >
-                <div class="interview-meta">
-                  <span class="meta-item"
-                    ><svg
-                      class="meta-icon"
-                      fill="none"
-                      stroke="currentColor"
-                      viewBox="0 0 24 24"
-                      stroke-width="2"
-                    >
-                      <path
-                        stroke-linecap="round"
-                        stroke-linejoin="round"
-                        d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
-                      ></path>
-                    </svg>
-                    Sep 30, 2025, 02:15 PM</span
-                  >
-                  <span class="meta-item"
-                    ><svg
-                      class="meta-icon"
-                      fill="none"
-                      stroke="currentColor"
-                      viewBox="0 0 24 24"
-                      stroke-width="2"
-                    >
-                      <path
-                        stroke-linecap="round"
-                        stroke-linejoin="round"
-                        d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
-                      ></path>
-                    </svg>
-                    10:00</span
-                  >
-                </div>
-              </div>
-            </div>
-            <div class="interview-right">
-              <div class="score">
-                <div class="score-value good">93</div>
-                <div class="score-label">Overall Score</div>
-              </div>
-              <div class="score-bars">
-                <div class="barg" style="height: 95%"></div>
-                <div class="barg" style="height: 85%"></div>
-                <div class="barg" style="height: 90%"></div>
-                <div class="barg" style="height: 80%"></div>
-              </div>
-            </div>
-          </div>
-
-          <div class="interview-card" onclick="location.href='dashboard2.html'">
-            <div class="interview-left">
-              <div class="avatar orange"></div>
-              <div class="interview-info">
-                <span
-                  ><h3>Sidra Jahangir</h3>
-                  <h2>JavaScript Developer</h2></span
-                >
-                <div class="interview-meta">
-                  <span class="meta-item"
-                    ><svg
-                      class="meta-icon"
-                      fill="none"
-                      stroke="currentColor"
-                      viewBox="0 0 24 24"
-                      stroke-width="2"
-                    >
-                      <path
-                        stroke-linecap="round"
-                        stroke-linejoin="round"
-                        d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
-                      ></path>
-                    </svg>
-                    Sep 25, 2025, 10:34 AM</span
-                  >
-                  <span class="meta-item"
-                    ><svg
-                      class="meta-icon"
-                      fill="none"
-                      stroke="currentColor"
-                      viewBox="0 0 24 24"
-                      stroke-width="2"
-                    >
-                      <path
-                        stroke-linecap="round"
-                        stroke-linejoin="round"
-                        d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
-                      ></path>
-                    </svg>
-                    7:00</span
-                  >
-                </div>
-              </div>
-            </div>
-            <div class="interview-right">
-              <div class="score">
-                <div class="score-value average">84</div>
-                <div class="score-label">Overall Score</div>
-              </div>
-              <div class="score-bars">
-                <div class="bar" style="height: 70%"></div>
-                <div class="barg" style="height: 85%"></div>
-                <div class="bar" style="height: 60%"></div>
-                <div class="barg" style="height: 90%"></div>
-              </div>
-            </div>
-          </div>
-
-          <div class="interview-card" onclick="location.href='dashboard3.html'">
-            <div class="interview-left">
-              <div class="avatar"></div>
-              <div class="interview-info">
-                <span
-                  ><h3>Sidra Jahangir</h3>
-                  <h2>Frontend Developer</h2></span
-                >
-                <div class="interview-meta">
-                  <span class="meta-item"
-                    ><svg
-                      class="meta-icon"
-                      fill="none"
-                      stroke="currentColor"
-                      viewBox="0 0 24 24"
-                      stroke-width="2"
-                    >
-                      <path
-                        stroke-linecap="round"
-                        stroke-linejoin="round"
-                        d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
-                      ></path>
-                    </svg>
-                    Sep 20, 2025, 11:34 AM</span
-                  >
-                  <span class="meta-item"
-                    ><svg
-                      class="meta-icon"
-                      fill="none"
-                      stroke="currentColor"
-                      viewBox="0 0 24 24"
-                      stroke-width="2"
-                    >
-                      <path
-                        stroke-linecap="round"
-                        stroke-linejoin="round"
-                        d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
-                      ></path>
-                    </svg>
-                    7:00</span
-                  >
-                </div>
-              </div>
-            </div>
-            <div class="interview-right">
-              <div class="score">
-                <div class="score-value average">78</div>
-                <div class="score-label">Overall Score</div>
-              </div>
-              <div class="score-bars">
-                <div class="bar" style="height: 60%"></div>
-                <div class="barg" style="height: 85%"></div>
-                <div class="bar" style="height: 60%"></div>
-                <div class="bar" style="height: 65%"></div>
-              </div>
-            </div>
-          </div>
+          <div id="interviewsContainer"></div>
         </section>
       </div>
     </main>
-
+    <script src="dashboard.js"></script>
     <script>
       // Search functionality (by name or role)
       const searchInput = document.getElementById("searchInput");

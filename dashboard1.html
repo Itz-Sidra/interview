@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Interview Report - Sidra Jahangir | Evalvate</title>
+    <title>Interview Report | Evalvate</title>
 
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -31,8 +31,8 @@
                 </a>
                 <a href="dashboard.html" class="back-link">← Back to Dashboard</a>
                 <div class="user-info">
-                    <h1>Sidra Jahangir</h1>
-                    <p class="timestamp">Sep 30, 2025, 02:15 PM</p>
+                    <h1 id="candidateName"></h1>
+                    <p class="timestamp" id="interviewDate"></p>
                 </div>
             </div>
             <div class="header-right">
@@ -65,7 +65,7 @@
             <div class="left-column">
                 <div class="performance-card">
                     <div class="score-circle">
-                        <div class="score-number">93</div>
+                        <div class="score-number" id="overallScore"></div>
                         <div class="score-label">Score</div>
                     </div>
                     <div class="performance-info">
@@ -77,99 +77,12 @@
                         </div>
                     </div>
                     <div class="score-display">
-                        <div class="score-large">93</div>
+                        <div class="score-large" id="overallScoreLarge"></div>
                         <div class="score-max">/ 100</div>
                     </div>
                 </div>
 
-                <div class="metrics-grid">
-                    <div class="metric-card">
-                        <div class="metric-header">
-                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
-                            </svg>
-                            <span>Communication</span>
-                        </div>
-                        <div class="metric-bar">
-                            <div class="bar-fill" style="width: 95%"></div>
-                        </div>
-                        <div class="metric-score">95</div>
-                    </div>
-
-                    <div class="metric-card">
-                        <div class="metric-header">
-                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path>
-                                <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path>
-                            </svg>
-                            <span>Grammar</span>
-                        </div>
-                        <div class="metric-bar">
-                            <div class="bar-fill" style="width: 90%"></div>
-                        </div>
-                        <div class="metric-score">90</div>
-                    </div>
-
-                    <div class="metric-card">
-                        <div class="metric-header">
-                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"></path>
-                                <path d="M19 10v2a7 7 0 0 1-14 0v-2"></path>
-                                <line x1="12" y1="19" x2="12" y2="23"></line>
-                                <line x1="8" y1="23" x2="16" y2="23"></line>
-                            </svg>
-                            <span>Filler Words</span>
-                        </div>
-                        <div class="metric-bar">
-                            <div class="bar-fill" style="width: 88%"></div>
-                        </div>
-                        <div class="metric-score">88</div>
-                    </div>
-
-                    <div class="metric-card">
-                        <div class="metric-header">
-                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
-                                <polyline points="22 4 12 14.01 9 11.01"></polyline>
-                            </svg>
-                            <span>Confidence</span>
-                        </div>
-                        <div class="metric-bar">
-                            <div class="bar-fill" style="width: 94%"></div>
-                        </div>
-                        <div class="metric-score">94</div>
-                    </div>
-
-                    <div class="metric-card">
-                        <div class="metric-header">
-                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <polyline points="16 18 22 12 16 6"></polyline>
-                                <polyline points="8 6 2 12 8 18"></polyline>
-                            </svg>
-                            <span>Technical</span>
-                        </div>
-                        <div class="metric-bar">
-                            <div class="bar-fill" style="width: 89%"></div>
-                        </div>
-                        <div class="metric-score">89</div>
-                    </div>
-
-                    <div class="metric-card">
-                        <div class="metric-header">
-                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"></path>
-                                <path d="M19 10v2a7 7 0 0 1-14 0v-2"></path>
-                                <line x1="12" y1="19" x2="12" y2="23"></line>
-                                <line x1="8" y1="23" x2="16" y2="23"></line>
-                            </svg>
-                            <span>Vocal</span>
-                        </div>
-                        <div class="metric-bar">
-                            <div class="bar-fill" style="width: 91%"></div>
-                        </div>
-                        <div class="metric-score">91</div>
-                    </div>
-                </div>
+                <div class="metrics-grid" id="metricsGrid"></div>
 
                 <div class="video-container">
                     <video id="videoPlayer" controls poster="assests/thumbnail.jpg">
@@ -188,39 +101,11 @@
 
             <div class="right-column">
                 <div class="flagged-section">
-                    <h3>
-                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"></path>
-                            <line x1="4" y1="22" x2="4" y2="15"></line>
-                        </svg>
-                        Flagged Issues (2)
-                    </h3>
-
-                    <div class="issue-card success">
-                        <div class="issue-header">
-                            <span class="issue-icon">✓</span>
-                            <span class="issue-title">Vocal</span>
-                            <span class="issue-time">1:22</span>
-                        </div>
-                        <div class="issue-content">
-                            <p class="issue-quote">"slight decrease in energy"</p>
-                            <p class="issue-description">Maintain consistent energy throughout</p>
-                        </div>
-                    </div>
-
-                    <div class="issue-card success">
-                        <div class="issue-header">
-                            <span class="issue-icon">✓</span>
-                            <span class="issue-title">Technical</span>
-                            <span class="issue-time">2:36</span>
-                        </div>
-                        <div class="issue-content">
-                            <p class="issue-quote">"minor conceptual gap"</p>
-                            <p class="issue-description">Review microservices architecture patterns</p>
-                        </div>
-                    </div>
+                    <h3 id="flaggedTitle"></h3>
+                    <div id="flaggedContainer"></div>
                 </div>
 
+                
                 <div class="assessment-section">
                     <h3>
                         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">

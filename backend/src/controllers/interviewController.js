@@ -338,7 +338,8 @@ export async function getAllReports(req, res) {
       where: { userId },
       include: {
         config: true,
-        user: true
+        user: true,
+        questions: true
       },
       orderBy: { createdAt: 'desc' }
     });
@@ -349,6 +350,16 @@ export async function getAllReports(req, res) {
         : 0;
 
       const durationMinutes = Math.floor(durationMs / 60000);
+      const questionScores = interview.questions
+  .filter(q => typeof q.scoreAverage === "number" && q.scoreAverage > 0);
+
+const overall =
+  questionScores.length > 0
+    ? Math.round(
+        questionScores.reduce((sum, q) => sum + q.scoreAverage, 0) /
+        questionScores.length
+      )
+    : 60;
 
       return {
         id: interview.id,
@@ -362,7 +373,7 @@ export async function getAllReports(req, res) {
           type: interview.config.type
         },
         ratings: {
-          overall: Math.round(interview.overallScore || 0)
+          overall
         },
         issuesCount: 0
       };
