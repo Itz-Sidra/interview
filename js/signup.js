@@ -225,14 +225,23 @@ document.addEventListener('DOMContentLoaded', () => {
             }
             
             if (response.ok) {
+                const { userId, credits } = data;
                 showSuccessMessage('Account created successfully! Setting up your account...');
                 
-                // Set user state with new account (includes 2 free credits)
+                // Set user state with new account (includes 200 credits)
                 if (typeof EvalvateAuth !== 'undefined') {
                     EvalvateAuth.setUser({
                         name: formData.name,
-                        email: formData.email
+                        email: formData.email,
+                        credits: credits || 200
                     });
+                    // Sync credits from backend
+                    if (credits !== undefined) {
+                        EvalvateAuth.setCredits(credits);
+                    } else {
+                        // Fallback: initialize to default if not in response
+                        EvalvateAuth.setCredits(200);
+                    }
                 }
                 
                 // Redirect to dashboard instead of login

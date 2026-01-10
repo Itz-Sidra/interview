@@ -161,7 +161,7 @@ document.addEventListener('DOMContentLoaded', () => {
             }
             
             if (response.ok) {
-                const { accessToken, refreshToken, user } = data;
+                const { accessToken, refreshToken, user, credits } = data;
                 
                 const storage = rememberMeCheckbox.checked ? localStorage : sessionStorage;
                 storage.setItem('accessToken', accessToken);
@@ -171,8 +171,13 @@ document.addEventListener('DOMContentLoaded', () => {
                 if (typeof EvalvateAuth !== 'undefined') {
                     EvalvateAuth.setUser({
                         name: user?.name || emailInput.value.split('@')[0].replace(/[._]/g, ' ').replace(/\b\w/g, c => c.toUpperCase()),
-                        email: emailInput.value.trim()
+                        email: emailInput.value.trim(),
+                        credits: credits || user?.credits || 200
                     });
+                    // Sync credits from backend
+                    if (credits !== undefined || user?.credits !== undefined) {
+                        EvalvateAuth.setCredits(credits || user.credits);
+                    }
                 }
                
                 showSuccessMessage('Login successful! Redirecting...');

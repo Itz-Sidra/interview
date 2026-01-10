@@ -24,13 +24,31 @@ function cleanGeminiJSON(rawText) {
 
 export async function startInterview(req, res) {
   const { interviewId, role, company } = req.body;
+  const userId = req.user?.userId;
+  
   try {
+    // Check user credits first
+    const user = await prisma.user.findUnique({
+      where: { id: userId },
+      select: { credits: true },
+    });
+
+    if (!user || user.credits < 1) {
+      return res.status(400).json({
+        error: "Insufficient credits. Please purchase more credits to start an interview.",
+      });
+    }
+
     const interview = await prisma.interview.findUnique({
       where: { id: interviewId },
       include: { config: true }
     });
     if (!interview) {
       return res.status(404).json({ error: "Interview not found" });
+    }
+
+    if (interview.userId !== userId) {
+      return res.status(403).json({ error: "Unauthorized access to interview" });
     }
 
     const resume = await prisma.resume.findUnique({
@@ -54,11 +72,24 @@ export async function startInterview(req, res) {
 
     const firstQuestion = await generateFirstQuestion(session);
 
-    await prisma.question.create({
-      data: {
-        interviewId,
-        prompt: firstQuestion
-      }
+    // Deduct credit and create question in transaction
+    const result = await prisma.$transaction(async (tx) => {
+      // Deduct credit
+      const updatedUser = await tx.user.update({
+        where: { id: userId },
+        data: { credits: { decrement: 1 } },
+        select: { credits: true },
+      });
+
+      // Create question
+      await tx.question.create({
+        data: {
+          interviewId,
+          prompt: firstQuestion
+        }
+      });
+
+      return updatedUser;
     });
 
     global.interviewSessions = global.interviewSessions || {};
@@ -67,7 +98,8 @@ export async function startInterview(req, res) {
     res.json({
       interviewId,
       question: firstQuestion,
-      questionNumber: 1
+      questionNumber: 1,
+      credits: result.credits
     });
   } catch (error) {
     console.error("Start interview error:", error);

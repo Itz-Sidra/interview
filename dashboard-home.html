@@ -824,17 +824,16 @@
       document.getElementById('startInterviewBtn').addEventListener('click', () => {
         const credits = EvalvateAuth.getCredits();
         
+        // Frontend UX check
         if (credits <= 0) {
           alert('You have no credits remaining. Please purchase more credits to continue.');
           window.location.href = 'pricing.html';
           return;
         }
 
-        // Deduct credit
-        if (EvalvateAuth.useCredit()) {
-          // Redirect to interview flow
-          window.location.href = 'preview1.html';
-        }
+        // Navigate to interview flow - credit will be deducted by backend
+        // when interview actually starts (first question asked)
+        window.location.href = 'preview1.html';
       });
 
       // Initialize dashboard

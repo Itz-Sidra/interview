@@ -14,7 +14,7 @@ const EvalvateAuth = {
 
   // Default values for new users
   DEFAULTS: {
-    CREDITS: 2,
+    CREDITS: 200,
     PLAN: 'Free Trial'
   },
 

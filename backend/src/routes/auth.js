@@ -21,7 +21,11 @@ router.post("/signup", async (req, res) => {
       data: { name, email, passwordHash },
     });
 
-    res.status(201).json({ message: "User created", userId: user.id });
+    res.status(201).json({ 
+      message: "User created", 
+      userId: user.id,
+      credits: user.credits 
+    });
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
@@ -52,12 +56,40 @@ router.post("/login", async (req, res) => {
       },
     });
 
-    res.json({ accessToken, refreshToken });
+    res.json({ 
+      accessToken, 
+      refreshToken,
+      user: {
+        id: user.id,
+        name: user.name,
+        email: user.email,
+        credits: user.credits
+      },
+      credits: user.credits
+    });
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
 });
 
+
+// ---------------- GET CREDITS ----------------
+router.get("/credits", authMiddleware, async (req, res) => {
+  try {
+    const user = await prisma.user.findUnique({
+      where: { id: req.user.userId },
+      select: { credits: true },
+    });
+
+    if (!user) {
+      return res.status(404).json({ error: "User not found" });
+    }
+
+    res.json({ credits: user.credits });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
 
 // ---------------- PROTECTED ROUTE SAMPLE TESTING ----------------
 router.get("/me", authMiddleware, async (req, res) => {

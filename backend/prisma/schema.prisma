@@ -41,6 +41,7 @@ model User {
   name             String
   email            String            @unique
   passwordHash     String
+  credits          Int               @default(200)
   createdAt        DateTime          @default(now())
   updatedAt        DateTime          @updatedAt
   resumes          Resume[]
