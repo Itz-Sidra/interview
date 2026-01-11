@@ -439,8 +439,13 @@ export const speakText = async (req, res) => {
       return res.status(400).json({ error: "No text provided" });
     }
 
+    const VOICE_ID = process.env.ELEVENLABS_VOICE_ID;
+    if (!VOICE_ID) {
+      return res.status(500).json({ error: "ElevenLabs voice ID not configured" });
+    }
+
     const response = await axios.post(
-      "https://api.elevenlabs.io/v1/text-to-speech/stream",
+      `https://api.elevenlabs.io/v1/text-to-speech/${VOICE_ID}`,
       {
         text,
         model_id: "eleven_monolingual_v1",
@@ -454,7 +459,7 @@ export const speakText = async (req, res) => {
           "xi-api-key": ELEVENLABS_API_KEY,
           "Content-Type": "application/json"
         },
-        responseType: "arraybuffer" // 🔥 CRITICAL CHANGE
+        responseType: "arraybuffer"
       }
     );
 
@@ -464,11 +469,9 @@ export const speakText = async (req, res) => {
   } catch (err) {
     console.error(
       "TTS ERROR:",
-      err.response?.data || err.message
+      err.response?.data?.toString() || err.message
     );
-    res.status(500).json({
-      error: "Text-to-speech failed"
-    });
+    res.status(500).json({ error: "Text-to-speech failed" });
   }
 };
 
