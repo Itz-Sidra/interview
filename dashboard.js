@@ -18,7 +18,7 @@ async function loadDashboard() {
       return;
     }
 
-    const res = await fetch(`${API_URL}/interview/reports`, {
+    const res = await fetch(`${API_BASE}/interview/reports`, {
       headers: { Authorization: `Bearer ${token}` }
     });
 
