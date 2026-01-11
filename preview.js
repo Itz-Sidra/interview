@@ -1,5 +1,4 @@
-import { API_BASE } from "./config.js";
-
+import { API_BASE } from "./js/config.js";
 // ============ Authentication ============
 const getAuthToken = () => {
     return localStorage.getItem('accessToken') || sessionStorage.getItem('accessToken');

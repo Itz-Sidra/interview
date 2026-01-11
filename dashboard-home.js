@@ -1,4 +1,4 @@
-import { API_BASE } from "./config.js";
+import { API_BASE } from "./js/config.js";
       async function syncCreditsFromBackend() {
   const token =
     localStorage.getItem('accessToken') ||
