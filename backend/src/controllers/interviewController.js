@@ -440,35 +440,34 @@ export const speakText = async (req, res) => {
     }
 
     const response = await axios.post(
-      `https://api.elevenlabs.io/v1/text-to-speech/21m00Tcm4TlvDq8ikWAM/stream`,
+      "https://api.elevenlabs.io/v1/text-to-speech/stream",
       {
         text,
-        model_id: "eleven_turbo_v2_5",
-        voice_settings: { 
-          stability: 0.5, 
-          similarity_boost: 0.75 
+        model_id: "eleven_monolingual_v1",
+        voice_settings: {
+          stability: 0.5,
+          similarity_boost: 0.75
         }
       },
       {
         headers: {
-          'xi-api-key': ELEVENLABS_API_KEY,
-          'Content-Type': 'application/json'
+          "xi-api-key": ELEVENLABS_API_KEY,
+          "Content-Type": "application/json"
         },
-        responseType: 'stream'
+        responseType: "arraybuffer" // 🔥 CRITICAL CHANGE
       }
     );
 
-    if (!response?.data) {
-      throw new Error("No audio stream returned from ElevenLabs");
-    }
-
-    res.setHeader('Content-Type', 'audio/mpeg');
-    response.data.pipe(res);
+    res.setHeader("Content-Type", "audio/mpeg");
+    res.send(Buffer.from(response.data));
 
   } catch (err) {
-    console.error("TTS ERROR:", err.response?.data || err.message);
-    res.status(500).json({ 
-      error: `Text-to-speech failed: ${err.response?.data?.detail || err.message}` 
+    console.error(
+      "TTS ERROR:",
+      err.response?.data || err.message
+    );
+    res.status(500).json({
+      error: "Text-to-speech failed"
     });
   }
 };
