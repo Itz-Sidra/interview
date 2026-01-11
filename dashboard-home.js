@@ -1,4 +1,5 @@
 import { API_BASE } from "./js/config.js";
+import EvalvateAuth from "./js/dauth.js";
       async function syncCreditsFromBackend() {
   const token =
     localStorage.getItem('accessToken') ||
