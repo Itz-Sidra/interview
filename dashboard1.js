@@ -76,7 +76,7 @@ async function loadReport() {
       return;
     }
 
-    const res = await fetch(`${API_BASE}interview/report/${interviewId}`, {
+    const res = await fetch(`${API_BASE}/interview/report/${interviewId}`, {
       headers: { Authorization: `Bearer ${token}` }
     });
 
