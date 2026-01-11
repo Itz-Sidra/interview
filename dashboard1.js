@@ -1,4 +1,4 @@
-import { API_BASE } from "./config.js";
+import { API_BASE } from "./js/config.js";
 const params = new URLSearchParams(window.location.search);
 const interviewId = params.get("id");
 
