@@ -18,6 +18,18 @@ enum InterviewType {
   TECHNICAL
   BEHAVIORAL
   SYSTEM_DESIGN
+  MIXED
+}
+
+enum InterviewPurpose {
+  JOB
+  EXAM
+}
+
+enum AnalysisIntensity {
+  STANDARD
+  DETAILED
+  COMPREHENSIVE
 }
 
 enum MediaType {
@@ -37,18 +49,20 @@ enum AnalysisCategory {
 }
 
 model User {
-  id               String            @id @default(uuid())
-  name             String
-  email            String            @unique
-  passwordHash     String
-  credits          Int               @default(200)
-  createdAt        DateTime          @default(now())
-  updatedAt        DateTime          @updatedAt
+  id           String   @id @default(uuid())
+  name         String
+  email        String   @unique
+  passwordHash String?
+  provider     String   @default("local") // local | google
+  providerId   String? // Google sub ID
+  credits      Int      @default(200)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
   resumes          Resume[]
   interviewConfigs InterviewConfig[]
   interviews       Interview[]
-
-  refreshTokens RefreshToken[]
+  refreshTokens    RefreshToken[]
 }
 
 model Resume {
@@ -64,20 +78,34 @@ model Resume {
 }
 
 model InterviewConfig {
-  id              String        @id @default(uuid())
-  user            User          @relation(fields: [userId], references: [id])
+  id              String           @id @default(uuid())
+  user            User             @relation(fields: [userId], references: [id])
   userId          String
-  role            String
+  role            String?
   skills          String[]
   companyType     String?
   durationMinutes Int
   difficulty      Difficulty
   type            InterviewType
-  createdAt       DateTime      @default(now())
-  resume          Resume?
-  interviews      Interview[]
-  examConfig      ExamConfig?
-  analysisConfig  AnalysisConfig?
+  purpose         InterviewPurpose @default(JOB)
+  createdAt       DateTime         @default(now())
+
+  examSubject     String?
+  examType        String?
+  examDescription String?  @db.Text
+  examTopics      String[]
+  questionsCount  Int?
+
+  analysisFacial     Boolean           @default(true)
+  analysisTechnical  Boolean           @default(true)
+  analysisVocal      Boolean           @default(true)
+  analysisLinguistic Boolean           @default(true)
+  analysisIntensity  AnalysisIntensity @default(DETAILED)
+
+  interviews     Interview[]
+  resume         Resume?
+  examConfig     ExamConfig?
+  analysisConfig AnalysisConfig?
 }
 
 model ExamConfig {
@@ -101,11 +129,11 @@ model AnalysisConfig {
   config   InterviewConfig @relation(fields: [configId], references: [id])
   configId String          @unique
 
-  facial      Boolean
-  technical   Boolean
-  vocal       Boolean
-  linguistic  Boolean
-  intensity   String
+  facial     Boolean
+  technical  Boolean
+  vocal      Boolean
+  linguistic Boolean
+  intensity  String
 
   createdAt DateTime @default(now())
 }
@@ -198,13 +226,13 @@ model FlaggedIssue {
 }
 
 model Question {
-  id             String     @id @default(uuid())
-  interview      Interview? @relation(fields: [interviewId], references: [id])
-  interviewId    String?
-  prompt         String     @db.Text
-  evaluation     Json?      
-  scoreAverage   Float?    
-  createdAt      DateTime   @default(now())
+  id           String     @id @default(uuid())
+  interview    Interview? @relation(fields: [interviewId], references: [id])
+  interviewId  String?
+  prompt       String     @db.Text
+  evaluation   Json?
+  scoreAverage Float?
+  createdAt    DateTime   @default(now())
 }
 
 model RefreshToken {
@@ -215,4 +243,22 @@ model RefreshToken {
   createdAt DateTime @default(now())
   expiresAt DateTime
   revoked   Boolean  @default(false)
+}
+
+model BlogPost {
+  id            String   @id @default(uuid())
+  title         String
+  content       String   @db.Text
+  excerpt       String?
+  authorName    String
+  authorEmail   String?
+  category      String
+  featuredImage String?
+  readTime      Int?
+  published     Boolean  @default(true)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  @@index([category])
+  @@index([createdAt])
 }
