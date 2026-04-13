@@ -1,5 +1,5 @@
 import { PrismaClient } from "../generated/index.js";
-import { GoogleGenerativeAI } from "@google/generative-ai";
+import Groq from "groq-sdk";
 import {
   getInterviewSession,
   saveQuestionAndEvaluation,
@@ -17,7 +17,7 @@ import { aggregateScores }    from "../service/aggregator.js";
 // ───────────────────────────────────────────────────────────────────────────
 
 const prisma = new PrismaClient();
-const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
+const groq = new Groq({ apiKey: process.env.GROQ_API_KEY });
 const ELEVENLABS_API_KEY = process.env.ELEVENLABS_API_KEY;
 
 function cleanForEvaluation(text) {
@@ -33,7 +33,7 @@ function cleanForEvaluation(text) {
 export async function startInterview(req, res) {
   const { interviewId, role, company } = req.body;
   const userId = req.user?.userId;
-  
+
   try {
     const user = await prisma.user.findUnique({
       where: { id: userId },
@@ -116,48 +116,53 @@ export async function startInterview(req, res) {
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
-// generateFirstQuestion — UNCHANGED (still calls Gemini directly; this
-// generates the opening question before any answer exists, so it sits
-// outside the evaluator pipeline)
+// generateFirstQuestion — now uses Groq instead of Gemini
 // ─────────────────────────────────────────────────────────────────────────────
 async function generateFirstQuestion(session) {
-  const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
-
   const prompt = `You are starting a ${session.difficulty} difficulty ${session.type} interview for a ${session.role} position.
 
 Generate ONE opening interview question.
-Return ONLY valid JSON:
-{
-  "question": "Your opening question"
-}`;
+Return ONLY valid JSON with no markdown, no extra text:
+{"question": "Your opening question here"}`;
 
   async function attempt() {
-    const response = await model.generateContent({
-      contents: [{ role: "user", parts: [{ text: prompt }] }],
-      generationConfig: {
-        temperature: 0.6,
-        maxOutputTokens: 256,
-        responseMimeType: "application/json"
-      }
+    const response = await groq.chat.completions.create({
+      model: "llama-3.1-8b-instant",
+      messages: [
+        {
+          role: "system",
+          content: "You are an expert technical interviewer. Respond with valid JSON only. No markdown."
+        },
+        {
+          role: "user",
+          content: prompt
+        }
+      ],
+      temperature: 0.6,
+      max_tokens: 256
     });
 
-    const rawText = await response.response.text();
-    console.log("DEBUG: Raw Gemini response:", rawText);
+    const rawText = response.choices[0].message.content
+      .replace(/```json/gi, "")
+      .replace(/```/g, "")
+      .trim();
+
+    console.log("DEBUG: Raw Groq first-question response:", rawText);
     return JSON.parse(rawText);
   }
 
   try {
     const result = await attempt();
     if (result?.question) return result.question;
-    throw new Error("Missing question");
+    throw new Error("Missing question field");
   } catch (err) {
-    console.warn("Retrying first question generation...");
+    console.warn("Retrying first question generation...", err.message);
     try {
       const result = await attempt();
       if (result?.question) return result.question;
       throw new Error("Retry failed");
     } catch (err2) {
-      console.error("Gemini failed twice, using fallback");
+      console.error("Groq failed twice, using fallback");
       return `Tell me about your experience with ${session.role} development and what drew you to this role.`;
     }
   }
@@ -169,8 +174,10 @@ Return ONLY valid JSON:
 export async function handleCandidateAnswer(req, res) {
   const { interviewId, answer } = req.body;
 
-  const rawAnswer = answer;                // REAL interview
-  const cleanedAnswer = cleanForEvaluation(answer); // LLM-safe
+  const rawAnswer = answer;
+  const cleanedAnswer = cleanForEvaluation(answer);
+
+  let evaluation;
 
   try {
     if (!global.interviewSessions || !global.interviewSessions[interviewId]) {
@@ -185,11 +192,10 @@ export async function handleCandidateAnswer(req, res) {
       submittedAt: Date.now()
     });
 
-    let evaluation;
     try {
       evaluation = await evaluateAndGenerateNextQuestion(session, cleanedAnswer);
-    } catch (geminiError) {
-      console.error("Gemini evaluation error:", geminiError.message);
+    } catch (groqError) {
+      console.error("Groq evaluation error:", groqError.message);
       evaluation = {
         evaluation: {
           answerQuality: 60,
@@ -226,14 +232,14 @@ export async function handleCandidateAnswer(req, res) {
         ? "Interview complete! Click 'Generate Report' for analysis."
         : null
     });
-    } catch (geminiError) {
-    const isRateLimit = geminiError.message === "GEMINI_RATE_LIMIT";
+  } catch (err) {
+    const isRateLimit = err.message === "GEMINI_RATE_LIMIT";
 
     console.error(
       isRateLimit
-        ? "Gemini quota exhausted — falling back"
-        : "Gemini evaluation error:",
-      geminiError.message
+        ? "Groq quota exhausted — falling back"
+        : "Groq evaluation error:",
+      err.message
     );
 
     evaluation = {
@@ -245,13 +251,32 @@ export async function handleCandidateAnswer(req, res) {
         technicalDepth: 70
       },
       detectedIssues: [],
-      nextQuestion: generateFallbackQuestion(session),
+      nextQuestion: generateFallbackQuestion(
+        global.interviewSessions?.[interviewId]
+      ),
       followUpCategory: "GENERAL",
       questionRationale: isRateLimit
         ? "AI quota exhausted — fallback interview flow"
         : "Fallback due to evaluation error"
     };
+
+    res.json({
+      evaluation,
+      nextQuestion: evaluation.nextQuestion,
+      questionNumber: (global.interviewSessions?.[interviewId]?.questionsAnswered ?? 0) + 2,
+      done: false,
+      message: null
+    });
   }
+}
+
+function generateFallbackQuestion(session) {
+  const n = session?.questionsAnswered ?? 0;
+  if (n === 0) return "Can you walk me through a recent project you worked on and your role in it?";
+  if (n === 1) return "What was the reasoning behind one of the technical decisions you mentioned?";
+  if (n === 2) return "What challenges did you face in that situation, and how did you overcome them?";
+  if (n === 3) return "How would you improve the approach if you had more time?";
+  return "Can you give a concrete example from your experience to support that point?";
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -281,22 +306,23 @@ export async function generateReport(req, res) {
       return arr.length ? Math.round(arr.reduce((a, b) => a + b, 0) / arr.length) : 60;
     }
 
-    const questionScores = interview.questions
-      .filter(q => typeof q.scoreAverage === "number" && q.scoreAverage > 0);
+    const questionScores = interview.questions.filter(
+      (q) => typeof q.scoreAverage === "number" && q.scoreAverage > 0
+    );
 
-    const technicalScores = questionScores.map(q => q.evaluation?.technicalDepth || 60);
-    const clarityScores   = questionScores.map(q => q.evaluation?.clarity        || 60);
-    const relevanceScores = questionScores.map(q => q.evaluation?.relevance      || 60);
+    const technicalScores = questionScores.map((q) => q.evaluation?.technicalDepth || 60);
+    const clarityScores   = questionScores.map((q) => q.evaluation?.clarity        || 60);
+    const relevanceScores = questionScores.map((q) => q.evaluation?.relevance      || 60);
 
     const scoredQuestions = interview.questions.filter(
-      q => typeof q.scoreAverage === "number" && q.scoreAverage > 0
+      (q) => typeof q.scoreAverage === "number" && q.scoreAverage > 0
     );
 
     const overallScore =
       scoredQuestions.length > 0
         ? Math.round(
             scoredQuestions.reduce((sum, q) => sum + q.scoreAverage, 0) /
-            scoredQuestions.length
+              scoredQuestions.length
           )
         : 60;
 
@@ -308,9 +334,12 @@ export async function generateReport(req, res) {
       },
       interview: {
         date: interview.createdAt,
-        duration: interview.endedAt && interview.startedAt
-          ? Math.floor((new Date(interview.endedAt) - new Date(interview.startedAt)) / 60000)
-          : 0,
+        duration:
+          interview.endedAt && interview.startedAt
+            ? Math.floor(
+                (new Date(interview.endedAt) - new Date(interview.startedAt)) / 60000
+              )
+            : 0,
         type: interview.config.type
       },
       ratings: {
@@ -320,9 +349,7 @@ export async function generateReport(req, res) {
       },
       grammar: {
         score: average(
-          interview.issues
-            .filter(i => i.category === "GRAMMAR")
-            .map(() => 70)
+          interview.issues.filter((i) => i.category === "GRAMMAR").map(() => 70)
         )
       },
       emotions: [
@@ -336,10 +363,15 @@ export async function generateReport(req, res) {
       })),
       recommendation: {
         strengths: ["Clear communication", "Technical knowledge"],
-        areasToImprove: issues.length > 0
-          ? issues.map(i => i.description).slice(0, 3)
-          : ["Continue practicing", "Maintain consistency"],
-        actionableTips: ["Practice speaking clearly", "Prepare examples", "Review technical concepts"]
+        areasToImprove:
+          issues.length > 0
+            ? issues.map((i) => i.description).slice(0, 3)
+            : ["Continue practicing", "Maintain consistency"],
+        actionableTips: [
+          "Practice speaking clearly",
+          "Prepare examples",
+          "Review technical concepts"
+        ]
       }
     };
 
@@ -363,24 +395,26 @@ export async function getAllReports(req, res) {
         user: true,
         questions: true
       },
-      orderBy: { createdAt: 'desc' }
+      orderBy: { createdAt: "desc" }
     });
 
-    const reports = interviews.map(interview => {
-      const durationMs = interview.endedAt && interview.startedAt
-        ? new Date(interview.endedAt) - new Date(interview.startedAt)
-        : 0;
+    const reports = interviews.map((interview) => {
+      const durationMs =
+        interview.endedAt && interview.startedAt
+          ? new Date(interview.endedAt) - new Date(interview.startedAt)
+          : 0;
 
       const durationMinutes = Math.floor(durationMs / 60000);
 
-      const questionScores = interview.questions
-        .filter(q => typeof q.scoreAverage === "number" && q.scoreAverage > 0);
+      const questionScores = interview.questions.filter(
+        (q) => typeof q.scoreAverage === "number" && q.scoreAverage > 0
+      );
 
       const overall =
         questionScores.length > 0
           ? Math.round(
               questionScores.reduce((sum, q) => sum + q.scoreAverage, 0) /
-              questionScores.length
+                questionScores.length
             )
           : 60;
 
@@ -422,19 +456,19 @@ export const transcribeAudio = async (req, res) => {
     }
 
     const formData = new FormData();
-    formData.append('file', file.buffer, {
+    formData.append("file", file.buffer, {
       filename: file.originalname,
       contentType: file.mimetype
     });
-    formData.append('model_id', 'scribe_v2');
+    formData.append("model_id", "scribe_v2");
 
     const response = await axios.post(
-      'https://api.elevenlabs.io/v1/speech-to-text',
+      "https://api.elevenlabs.io/v1/speech-to-text",
       formData,
       {
         headers: {
           ...formData.getHeaders(),
-          'xi-api-key': ELEVENLABS_API_KEY,
+          "xi-api-key": ELEVENLABS_API_KEY
         }
       }
     );
@@ -466,7 +500,8 @@ export const speakText = async (req, res) => {
       return res.status(400).json({ error: "No text provided" });
     }
 
-    const VOICE_ID = process.env.ELEVENLABS_VOICE_ID || process.env.ELEVENLABS_VOICE_ID_II;
+    const VOICE_ID =
+      process.env.ELEVENLABS_VOICE_ID || process.env.ELEVENLABS_VOICE_ID_II;
     if (!VOICE_ID) {
       return res.status(500).json({ error: "ElevenLabs voice ID not configured" });
     }
@@ -504,24 +539,24 @@ export const speakText = async (req, res) => {
 export async function updateInterviewStatus(req, res) {
   try {
     const { interviewId, status } = req.body;
-    const validStatuses = ['PENDING', 'IN_PROGRESS', 'COMPLETED', 'CANCELLED'];
+    const validStatuses = ["PENDING", "IN_PROGRESS", "COMPLETED", "CANCELLED"];
 
     if (!validStatuses.includes(status)) {
-      return res.status(400).json({ error: 'Invalid status' });
+      return res.status(400).json({ error: "Invalid status" });
     }
 
     const interview = await prisma.interview.update({
       where: { id: interviewId },
       data: {
         status,
-        ...(status === 'IN_PROGRESS' && { startedAt: new Date() }),
-        ...(status === 'COMPLETED'   && { endedAt:   new Date() })
+        ...(status === "IN_PROGRESS" && { startedAt: new Date() }),
+        ...(status === "COMPLETED"   && { endedAt:   new Date() })
       }
     });
 
     res.json({ success: true, interview });
   } catch (err) {
-    console.error('Status update error:', err);
-    res.status(500).json({ error: 'Failed to update status' });
+    console.error("Status update error:", err);
+    res.status(500).json({ error: "Failed to update status" });
   }
 }

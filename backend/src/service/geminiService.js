@@ -1,112 +1,86 @@
-import { GoogleGenerativeAI } from "@google/generative-ai";
-import axios from 'axios';
+import Groq from "groq-sdk";
 import { jsonrepair } from "jsonrepair";
 
-const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
+const groq = new Groq({ apiKey: process.env.GROQ_API_KEY });
 
 /**
- * Single Gemini call: evaluate answer + generate next question
+ * Single Groq call: evaluate answer + generate next question
  * @param {InterviewSession} session - Current interview state
  * @param {string} candidateAnswer - The answer to evaluate
  * @returns {GeminiEvaluation}
  */
 export async function evaluateAndGenerateNextQuestion(session, candidateAnswer) {
-  const prompt = buildGeminiPrompt(session, candidateAnswer);
-  
-  const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
-  
+  const prompt = buildPrompt(session, candidateAnswer);
+
   try {
-    const response = await model.generateContent({
-      contents: [
+    const response = await groq.chat.completions.create({
+      model: "llama-3.1-8b-instant",
+      messages: [
+        {
+          role: "system",
+          content:
+            "You are an expert technical interviewer. You MUST respond with valid JSON only. No markdown, no explanation — raw JSON only."
+        },
         {
           role: "user",
-          parts: [{ text: prompt }]
+          content: prompt
         }
       ],
-      generationConfig: {
-        temperature: 0.7,
-        maxOutputTokens: 2048,
-        responseMimeType: "application/json",
-        responseSchema: {
-          type: "object",
-          properties: {
-            evaluation: {
-              type: "object",
-              properties: {
-                answerQuality: { type: "number" },
-                relevance: { type: "number" },
-                clarity: { type: "number" },
-                completeness: { type: "number" },
-                technicalDepth: { type: "number" }
-              },
-              required: ["answerQuality", "relevance", "clarity", "completeness", "technicalDepth"]
-            },
-            detectedIssues: {
-              type: "array",
-              items: {
-                type: "object",
-                properties: {
-                  type: { type: "string" },
-                  severity: { type: "number" },
-                  description: { type: "string" },
-                  example: { type: "string" },
-                  suggestion: { type: "string" }
-                }
-              }
-            },
-            nextQuestion: { type: "string" },
-            questionRationale: { type: "string" },
-            followUpCategory: { type: "string" }
-          },
-          required: ["evaluation", "detectedIssues", "nextQuestion", "questionRationale", "followUpCategory"]
-        }
-      }
+      temperature: 0.7,
+      max_tokens: 1024
     });
-    
-    const rawText = await response.response.text();
-    console.log("DEBUG: Raw Gemini response (first 300 chars):", rawText.substring(0, 300));
-    
+
+    const rawText = response.choices[0].message.content;
+    console.log("DEBUG: Raw Groq response (first 300 chars):", rawText.substring(0, 300));
+
     const evaluation = safeParseJSON(rawText);
-    validateGeminiResponse(evaluation, session);
-    
+    validateResponse(evaluation, session);
+
     return evaluation;
   } catch (error) {
-  const isRateLimit =
-    error?.status === 429 ||
-    error?.message?.includes("429") ||
-    error?.message?.includes("Quota");
+    const isRateLimit =
+      error?.status === 429 ||
+      error?.message?.includes("429") ||
+      error?.message?.includes("Quota") ||
+      error?.message?.includes("rate_limit");
 
-  if (isRateLimit) {
-    console.warn("Gemini rate limit hit — using fallback logic");
-    throw new Error("GEMINI_RATE_LIMIT");
+    if (isRateLimit) {
+      console.warn("Groq rate limit hit — using fallback logic");
+      throw new Error("GEMINI_RATE_LIMIT"); // keep same error string so controller fallback still works
+    }
+
+    console.error("Groq API error:", error);
+    throw new Error(`Failed to evaluate answer: ${error.message}`);
   }
-
-  console.error("Gemini API error:", error);
-  throw new Error(`Failed to evaluate answer: ${error.message}`);
-}
 }
 
 /**
- * Safely parse JSON from Gemini response
+ * Safely parse JSON from Groq response
  */
 function safeParseJSON(text) {
+  // Strip any accidental markdown fences
+  const stripped = text
+    .replace(/```json/gi, "")
+    .replace(/```/g, "")
+    .trim();
+
   try {
-    return JSON.parse(text);
+    return JSON.parse(stripped);
   } catch {
     try {
-      const repaired = jsonrepair(text);
+      const repaired = jsonrepair(stripped);
       return JSON.parse(repaired);
     } catch {
-      console.error("Gemini JSON unrecoverable:", text);
-      throw new Error("Invalid JSON from Gemini");
+      console.error("Groq JSON unrecoverable:", stripped);
+      throw new Error("Invalid JSON from Groq");
     }
   }
 }
 
 /**
- * Build Gemini prompt
+ * Build prompt — identical content to the original Gemini prompt
  */
-function buildGeminiPrompt(session, candidateAnswer) {
+function buildPrompt(session, candidateAnswer) {
   const previousQA = session.questionHistory
     .map((q, i) => {
       const answer = session.answerHistory[i]?.rawAnswer || "N/A";
@@ -114,9 +88,7 @@ function buildGeminiPrompt(session, candidateAnswer) {
     })
     .join("\n\n");
 
-  const resumeSnippet = (session.resumeText || "")
-    .substring(0, 800)
-    .trim();
+  const resumeSnippet = (session.resumeText || "").substring(0, 800).trim();
 
   return `
 INTERVIEW CONTEXT:
@@ -136,7 +108,7 @@ CURRENT ANSWER TO EVALUATE:
 "${candidateAnswer}"
 
 EVALUATION INSTRUCTIONS (FOLLOW EXACTLY):
-1. FIRST: Generate ONE specific follow-up interview question based on the candidate’s answer.
+1. FIRST: Generate ONE specific follow-up interview question based on the candidate's answer.
 2. THEN: Score the answer on relevance(0-100), clarity(0-100), completeness(0-100), and technical depth(0-100).
 3. Identify at most ONE important issue (optional).
 4. Briefly explain why you chose the follow-up question (1 sentence max).
@@ -145,9 +117,8 @@ CRITICAL RULES:
 - The follow-up question MUST always be present.
 - If unsure, ask a question that probes reasoning, decisions, or examples.
 - If no issues exist, return an empty detectedIssues array.
-- Do NOT write long issue description
-
-Return ONLY valid JSON. Keep descriptions under 200 characters each.
+- Do NOT write long issue description.
+- Return ONLY valid JSON. No markdown. No extra text.
 
 {
   "evaluation": {
@@ -170,40 +141,26 @@ Return ONLY valid JSON. Keep descriptions under 200 characters each.
   "questionRationale": "Why you chose this question",
   "followUpCategory": "TECHNICAL"
 }
-  `;
+  `.trim();
 }
 
 function normalizeSeverity(severity) {
   if (typeof severity !== "number") return 1;
   if (severity <= 1) return 1;
   if (severity === 2) return 2;
-  return 3; // clamp everything else (3,4,5,10…)
+  return 3;
 }
 
 function generateFallbackQuestion(session) {
   const n = session.questionsAnswered;
-
-  if (n === 0) {
-    return "Can you walk me through a recent project you worked on and your role in it?";
-  }
-
-  if (n === 1) {
-    return "What was the reasoning behind one of the technical decisions you mentioned?";
-  }
-
-  if (n === 2) {
-    return "What challenges did you face in that situation, and how did you overcome them?";
-  }
-
-  if (n === 3) {
-    return "How would you improve the approach if you had more time?";
-  }
-
+  if (n === 0) return "Can you walk me through a recent project you worked on and your role in it?";
+  if (n === 1) return "What was the reasoning behind one of the technical decisions you mentioned?";
+  if (n === 2) return "What challenges did you face in that situation, and how did you overcome them?";
+  if (n === 3) return "How would you improve the approach if you had more time?";
   return "Can you give a concrete example from your experience to support that point?";
 }
 
-function validateGeminiResponse(evaluation, session) {
-  // --- evaluation object ---
+function validateResponse(evaluation, session) {
   if (!evaluation.evaluation) {
     evaluation.evaluation = {
       answerQuality: 60,
@@ -223,27 +180,23 @@ function validateGeminiResponse(evaluation, session) {
     evaluation.evaluation[key] = normalizeScore(evaluation.evaluation[key]);
   });
 
-  // --- detected issues ---
   if (!Array.isArray(evaluation.detectedIssues)) {
     evaluation.detectedIssues = [];
   }
 
-  evaluation.detectedIssues = evaluation.detectedIssues.map(issue => ({
+  evaluation.detectedIssues = evaluation.detectedIssues.map((issue) => ({
     ...issue,
     severity: normalizeSeverity(issue.severity)
   }));
 
-  // --- next question (CRITICAL FIX) ---
   if (!evaluation.nextQuestion || typeof evaluation.nextQuestion !== "string") {
     evaluation.nextQuestion = generateFallbackQuestion(session);
   }
 
-  // --- follow-up category ---
   if (!evaluation.followUpCategory) {
     evaluation.followUpCategory = "GENERAL";
   }
 
-  // --- rationale ---
   if (!evaluation.questionRationale) {
     evaluation.questionRationale = "Fallback follow-up due to incomplete model output";
   }

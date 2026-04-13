@@ -1,13 +1,13 @@
 import fs from "fs";
 import path from "path";
 import mammoth from "mammoth";
-import { GoogleGenerativeAI } from "@google/generative-ai";
+import Groq from "groq-sdk";
 
-const genAI = new GoogleGenerativeAI(process.env.GEMINI_RESUME_API_KEY);
+const groq = new Groq({ apiKey: process.env.GROQ_API_KEY });
 
 export async function extractAndParseResume(file) {
   try {
-    // Extract text based on file type
+    // ── Step 1: Extract raw text based on file type ──────────────────────────
     let textExtract = "";
     const ext = path.extname(file.originalname).toLowerCase();
 
@@ -24,53 +24,54 @@ export async function extractAndParseResume(file) {
       throw new Error("Unsupported file format");
     }
 
-    // Send extracted text to Gemini for structured parsing
-    const fileBuffer = fs.readFileSync(file.path);
-    const base64Data = fileBuffer.toString("base64");
-    const mimeType = file.mimetype;
+    // ── Step 2: Send extracted text to Groq for structured parsing ───────────
+    // Groq does not support inline file uploads, so we send the extracted text.
+    const truncatedText = textExtract.substring(0, 4000); // stay within token limits
 
-    const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
+    const prompt = `Parse the following resume text into clean JSON matching this exact schema:
+{
+  "name": "",
+  "email": "",
+  "phone": "",
+  "skills": [],
+  "education": [{"degree": "", "institution": "", "year": ""}],
+  "experience": [{"title": "", "company": "", "duration": "", "description": ""}],
+  "projects": [{"name": "", "description": "", "technologies": []}]
+}
 
-    const prompt = `
-      Parse this resume into clean JSON:
-      {
-        "name": "",
-        "email": "",
-        "phone": "",
-        "skills": [],
-        "education": [{"degree": "", "institution": "", "year": ""}],
-        "experience": [{"title": "", "company": "", "duration": "", "description": ""}],
-        "projects": [{"name": "", "description": "", "technologies": []}]
-      }
+Return ONLY valid JSON. No markdown fences, no extra text.
 
-      Return ONLY JSON. No extra text.
-      `;
+RESUME TEXT:
+${truncatedText}`;
 
-    const result = await model.generateContent({
-      contents: [
+    const response = await groq.chat.completions.create({
+      model: "llama-3.1-8b-instant",
+      messages: [
+        {
+          role: "system",
+          content:
+            "You are a resume parser. Extract structured data from resume text and return only valid JSON. No markdown, no explanation."
+        },
         {
           role: "user",
-          parts: [
-            { text: prompt },
-            {
-              inlineData: {
-                mimeType: mimeType,
-                data: base64Data
-              }
-            }
-          ]
+          content: prompt
         }
-      ]
+      ],
+      temperature: 0.2,
+      max_tokens: 1024
     });
 
-    const text = await result.response.text();
-    const jsonStart = text.indexOf("{");
-    const jsonEnd = text.lastIndexOf("}");
-    const jsonString = text.slice(jsonStart, jsonEnd + 1);
+    const rawText = response.choices[0].message.content
+      .replace(/```json/gi, "")
+      .replace(/```/g, "")
+      .trim();
+
+    const jsonStart = rawText.indexOf("{");
+    const jsonEnd   = rawText.lastIndexOf("}");
+    const jsonString = rawText.slice(jsonStart, jsonEnd + 1);
     const parsedJson = JSON.parse(jsonString);
 
     return { textExtract, parsedJson };
-
   } catch (err) {
     console.warn("Resume parsing failed:", err.message);
     return {
