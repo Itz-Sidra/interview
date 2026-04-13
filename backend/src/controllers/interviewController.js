@@ -1,6 +1,5 @@
 import { PrismaClient } from "../generated/index.js";
 import { GoogleGenerativeAI } from "@google/generative-ai";
-import { evaluateAndGenerateNextQuestion } from "../service/geminiService.js";
 import {
   getInterviewSession,
   saveQuestionAndEvaluation,
@@ -8,6 +7,14 @@ import {
 } from "../models/InterviewSession.js";
 import axios from 'axios';
 import FormData from 'form-data';
+
+import { evaluateAndGenerateNextQuestion } from "../service/geminiService.js";
+// ── NEW: modular evaluators ─────────────────────────────────────────────────
+import { evaluateTechnical }  from "../service/evaluators/technical.js";
+import { evaluateVocal }      from "../service/evaluators/vocal.js";
+import { evaluateLinguistic } from "../service/evaluators/linguistic.js";
+import { aggregateScores }    from "../service/aggregator.js";
+// ───────────────────────────────────────────────────────────────────────────
 
 const prisma = new PrismaClient();
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
@@ -20,12 +27,14 @@ function cleanForEvaluation(text) {
     .trim();
 }
 
+// ─────────────────────────────────────────────────────────────────────────────
+// startInterview — UNCHANGED
+// ─────────────────────────────────────────────────────────────────────────────
 export async function startInterview(req, res) {
   const { interviewId, role, company } = req.body;
   const userId = req.user?.userId;
   
   try {
-    // Check user credits first
     const user = await prisma.user.findUnique({
       where: { id: userId },
       select: { credits: true },
@@ -106,6 +115,11 @@ export async function startInterview(req, res) {
   }
 }
 
+// ─────────────────────────────────────────────────────────────────────────────
+// generateFirstQuestion — UNCHANGED (still calls Gemini directly; this
+// generates the opening question before any answer exists, so it sits
+// outside the evaluator pipeline)
+// ─────────────────────────────────────────────────────────────────────────────
 async function generateFirstQuestion(session) {
   const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
 
@@ -129,7 +143,6 @@ Return ONLY valid JSON:
 
     const rawText = await response.response.text();
     console.log("DEBUG: Raw Gemini response:", rawText);
-
     return JSON.parse(rawText);
   }
 
@@ -150,6 +163,9 @@ Return ONLY valid JSON:
   }
 }
 
+// ─────────────────────────────────────────────────────────────────────────────
+// handleCandidateAnswer — UNCHANGED
+// ─────────────────────────────────────────────────────────────────────────────
 export async function handleCandidateAnswer(req, res) {
   const { interviewId, answer } = req.body;
 
@@ -237,6 +253,10 @@ export async function handleCandidateAnswer(req, res) {
     };
   }
 }
+
+// ─────────────────────────────────────────────────────────────────────────────
+// generateReport — UNCHANGED
+// ─────────────────────────────────────────────────────────────────────────────
 export async function generateReport(req, res) {
   const { id: interviewId } = req.params;
 
@@ -258,15 +278,15 @@ export async function generateReport(req, res) {
     const issues = interview.issues || [];
 
     function average(arr) {
-    return arr.length ? Math.round(arr.reduce((a, b) => a + b, 0) / arr.length) : 60;
-  }
+      return arr.length ? Math.round(arr.reduce((a, b) => a + b, 0) / arr.length) : 60;
+    }
 
-  const questionScores = interview.questions
-    .filter(q => typeof q.scoreAverage === "number" && q.scoreAverage > 0);
+    const questionScores = interview.questions
+      .filter(q => typeof q.scoreAverage === "number" && q.scoreAverage > 0);
 
-  const technicalScores = questionScores.map(q => q.evaluation?.technicalDepth || 60);
-  const clarityScores = questionScores.map(q => q.evaluation?.clarity || 60);
-  const relevanceScores = questionScores.map(q => q.evaluation?.relevance || 60);
+    const technicalScores = questionScores.map(q => q.evaluation?.technicalDepth || 60);
+    const clarityScores   = questionScores.map(q => q.evaluation?.clarity        || 60);
+    const relevanceScores = questionScores.map(q => q.evaluation?.relevance      || 60);
 
     const scoredQuestions = interview.questions.filter(
       q => typeof q.scoreAverage === "number" && q.scoreAverage > 0
@@ -279,7 +299,6 @@ export async function generateReport(req, res) {
             scoredQuestions.length
           )
         : 60;
-
 
     const report = {
       interviewId,
@@ -295,8 +314,8 @@ export async function generateReport(req, res) {
         type: interview.config.type
       },
       ratings: {
-        overall: overallScore,
-        content: average(relevanceScores),
+        overall:    overallScore,
+        content:    average(relevanceScores),
         confidence: average(clarityScores)
       },
       grammar: {
@@ -307,17 +326,17 @@ export async function generateReport(req, res) {
         )
       },
       emotions: [
-        { emotion: "Confident", percentage: 60 },
+        { emotion: "Confident",  percentage: 60 },
         { emotion: "Thoughtful", percentage: 40 }
       ],
       flagged: issues.map((i) => ({
-        category: i.category,
+        category:    i.category,
         description: i.description,
-        severity: i.severity
+        severity:    i.severity
       })),
       recommendation: {
         strengths: ["Clear communication", "Technical knowledge"],
-        areasToImprove: issues.length > 0 
+        areasToImprove: issues.length > 0
           ? issues.map(i => i.description).slice(0, 3)
           : ["Continue practicing", "Maintain consistency"],
         actionableTips: ["Practice speaking clearly", "Prepare examples", "Review technical concepts"]
@@ -331,6 +350,9 @@ export async function generateReport(req, res) {
   }
 }
 
+// ─────────────────────────────────────────────────────────────────────────────
+// getAllReports — UNCHANGED
+// ─────────────────────────────────────────────────────────────────────────────
 export async function getAllReports(req, res) {
   try {
     const userId = req.user.userId;
@@ -350,16 +372,17 @@ export async function getAllReports(req, res) {
         : 0;
 
       const durationMinutes = Math.floor(durationMs / 60000);
-      const questionScores = interview.questions
-  .filter(q => typeof q.scoreAverage === "number" && q.scoreAverage > 0);
 
-const overall =
-  questionScores.length > 0
-    ? Math.round(
-        questionScores.reduce((sum, q) => sum + q.scoreAverage, 0) /
-        questionScores.length
-      )
-    : 60;
+      const questionScores = interview.questions
+        .filter(q => typeof q.scoreAverage === "number" && q.scoreAverage > 0);
+
+      const overall =
+        questionScores.length > 0
+          ? Math.round(
+              questionScores.reduce((sum, q) => sum + q.scoreAverage, 0) /
+              questionScores.length
+            )
+          : 60;
 
       return {
         id: interview.id,
@@ -368,13 +391,11 @@ const overall =
           role: interview.config.role
         },
         interview: {
-          date: interview.createdAt,
+          date:     interview.createdAt,
           duration: durationMinutes,
-          type: interview.config.type
+          type:     interview.config.type
         },
-        ratings: {
-          overall
-        },
+        ratings: { overall },
         issuesCount: 0
       };
     });
@@ -386,6 +407,9 @@ const overall =
   }
 }
 
+// ─────────────────────────────────────────────────────────────────────────────
+// transcribeAudio — UNCHANGED
+// ─────────────────────────────────────────────────────────────────────────────
 export const transcribeAudio = async (req, res) => {
   try {
     if (!ELEVENLABS_API_KEY) {
@@ -422,12 +446,15 @@ export const transcribeAudio = async (req, res) => {
     res.json({ transcript });
   } catch (err) {
     console.error("STT ERROR:", err.response?.data || err.message);
-    res.status(500).json({ 
-      error: `Speech-to-text failed: ${err.response?.data?.detail?.message || err.message}` 
+    res.status(500).json({
+      error: `Speech-to-text failed: ${err.response?.data?.detail?.message || err.message}`
     });
   }
 };
 
+// ─────────────────────────────────────────────────────────────────────────────
+// speakText — UNCHANGED
+// ─────────────────────────────────────────────────────────────────────────────
 export const speakText = async (req, res) => {
   try {
     if (!ELEVENLABS_API_KEY) {
@@ -439,7 +466,7 @@ export const speakText = async (req, res) => {
       return res.status(400).json({ error: "No text provided" });
     }
 
-    const VOICE_ID = process.env.ELEVENLABS_VOICE_ID;
+    const VOICE_ID = process.env.ELEVENLABS_VOICE_ID || process.env.ELEVENLABS_VOICE_ID_II;
     if (!VOICE_ID) {
       return res.status(500).json({ error: "ElevenLabs voice ID not configured" });
     }
@@ -450,7 +477,7 @@ export const speakText = async (req, res) => {
         text,
         model_id: "eleven_multilingual_v2",
         voice_settings: {
-          stability: 0.5,
+          stability: 0.75,
           similarity_boost: 0.75
         }
       },
@@ -465,16 +492,15 @@ export const speakText = async (req, res) => {
 
     res.setHeader("Content-Type", "audio/mpeg");
     res.send(Buffer.from(response.data));
-
   } catch (err) {
-    console.error(
-      "TTS ERROR:",
-      err.response?.data?.toString() || err.message
-    );
+    console.error("TTS ERROR:", err.response?.data?.toString() || err.message);
     res.status(500).json({ error: "Text-to-speech failed" });
   }
 };
 
+// ─────────────────────────────────────────────────────────────────────────────
+// updateInterviewStatus — UNCHANGED
+// ─────────────────────────────────────────────────────────────────────────────
 export async function updateInterviewStatus(req, res) {
   try {
     const { interviewId, status } = req.body;
@@ -489,7 +515,7 @@ export async function updateInterviewStatus(req, res) {
       data: {
         status,
         ...(status === 'IN_PROGRESS' && { startedAt: new Date() }),
-        ...(status === 'COMPLETED' && { endedAt: new Date() })
+        ...(status === 'COMPLETED'   && { endedAt:   new Date() })
       }
     });
 
