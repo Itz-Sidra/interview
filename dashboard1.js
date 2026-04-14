@@ -1,133 +1,252 @@
 import { API_BASE } from "./js/config.js";
-const params = new URLSearchParams(window.location.search);
+
+/* ── 1. Read interview ID ─────────────────────────────────────────────────── */
+const params      = new URLSearchParams(window.location.search);
 const interviewId = params.get("id");
 
+console.log("[dashboard1] API_BASE   :", API_BASE);
+console.log("[dashboard1] full URL   :", window.location.href);
+console.log("[dashboard1] interviewId:", interviewId);
+
 if (!interviewId) {
-  alert("No interview ID found");
+  alert("No interview ID found in URL. Expected: dashboard1.html?id=<interviewId>");
   window.location.href = "dashboard.html";
 }
 
-/* ---------------- DOM REFS ---------------- */
-const candidateName = document.getElementById("candidateName");
-const interviewDate = document.getElementById("interviewDate");
-const overallScore = document.getElementById("overallScore");
+/* ── 2. DOM refs ─────────────────────────────────────────────────────────── */
+const candidateName     = document.getElementById("candidateName");
+const interviewDate     = document.getElementById("interviewDate");
+const overallScore      = document.getElementById("overallScore");
 const overallScoreLarge = document.getElementById("overallScoreLarge");
-const flaggedTitle = document.getElementById("flaggedTitle");
-const flaggedContainer = document.getElementById("flaggedContainer");
-const metricsGrid = document.getElementById("metricsGrid");
+const flaggedTitle      = document.getElementById("flaggedTitle");
+const flaggedContainer  = document.getElementById("flaggedContainer");
+const metricsGrid       = document.getElementById("metricsGrid");
 
-/* ---------------- METRICS ---------------- */
-
-function renderMetrics(report) {
-  metricsGrid.innerHTML = "";
-
-  const metrics = [
-    { label: "Communication", score: report.ratings?.content ?? 0 },
-    { label: "Grammar", score: report.grammar?.score ?? 0 },
-    { label: "Filler Words", score: calcFiller(report) },
-    { label: "Confidence", score: report.ratings?.confidence ?? 0 },
-    { label: "Technical", score: calcTechnical(report) },
-    { label: "Vocal", score: calcVocal(report) }
-  ];
-
-  metrics.forEach(m => {
-    const card = document.createElement("div");
-    card.className = "metric-card";
-
-    card.innerHTML = `
-      <div class="metric-header">
-        <span>${m.label}</span>
-      </div>
-      <div class="metric-bar">
-        <div class="bar-fill" style="width:${m.score}%"></div>
-      </div>
-      <div class="metric-score">${m.score}</div>
-    `;
-
-    metricsGrid.appendChild(card);
-  });
-}
-
+/* ── 3. Metric helpers ───────────────────────────────────────────────────── */
 function calcFiller(report) {
   const n = report.flagged?.filter(i => i.category === "FILLER_WORDS").length || 0;
   return Math.max(100 - n * 10, 60);
 }
-
 function calcTechnical(report) {
   const n = report.flagged?.filter(i => i.category === "TECHNICAL").length || 0;
   return Math.max(90 - n * 5, 60);
 }
-
 function calcVocal(report) {
   const n = report.flagged?.filter(i => i.category === "VOCAL").length || 0;
   return Math.max(90 - n * 5, 60);
 }
 
-/* ---------------- LOAD REPORT ---------------- */
+function renderMetrics(report) {
+  if (!metricsGrid) { console.warn("[dashboard1] metricsGrid element not found"); return; }
+  metricsGrid.innerHTML = "";
+  const metrics = [
+    { label: "Communication", score: report.ratings?.content    ?? 0 },
+    { label: "Grammar",       score: report.grammar?.score      ?? 0 },
+    { label: "Filler Words",  score: calcFiller(report)              },
+    { label: "Confidence",    score: report.ratings?.confidence ?? 0 },
+    { label: "Technical",     score: calcTechnical(report)           },
+    { label: "Vocal",         score: calcVocal(report)               },
+  ];
+  metrics.forEach(m => {
+    const card = document.createElement("div");
+    card.className = "metric-card";
+    card.innerHTML = `
+      <div class="metric-header"><span>${m.label}</span></div>
+      <div class="metric-bar">
+        <div class="bar-fill" style="width:${Math.min(m.score,100)}%"></div>
+      </div>
+      <div class="metric-score">${m.score}</div>`;
+    metricsGrid.appendChild(card);
+  });
+}
 
-async function loadReport() {
-  try {
-    const token =
-      localStorage.getItem("accessToken") ||
-      sessionStorage.getItem("accessToken");
+/* ── 4. escHtml ──────────────────────────────────────────────────────────── */
+function escHtml(str) {
+  return String(str ?? "")
+    .replace(/&/g,"&amp;").replace(/</g,"&lt;")
+    .replace(/>/g,"&gt;").replace(/"/g,"&quot;");
+}
 
-    if (!token) {
-      window.location.href = "login.html";
-      return;
-    }
+/* ── 5. Render full report ───────────────────────────────────────────────── */
+function renderReport(report) {
+  console.log("[dashboard1] renderReport:", report);
 
-    const res = await fetch(`${API_BASE}/interview/report/${interviewId}`, {
-      headers: { Authorization: `Bearer ${token}` }
+  if (candidateName)     candidateName.textContent  = report.candidate?.name ?? "—";
+  if (interviewDate)     interviewDate.textContent   = report.interview?.date
+    ? new Date(report.interview.date).toLocaleString() : "—";
+
+  const score = Math.round(report.ratings?.overall ?? 0);
+  if (overallScore)      overallScore.textContent      = score;
+  if (overallScoreLarge) overallScoreLarge.textContent = score;
+
+  const circle = document.querySelector(".score-circle");
+  if (circle) circle.style.background =
+    `conic-gradient(#3b82f6 0% ${score}%, rgba(255,255,255,0.1) ${score}% 100%)`;
+
+  renderMetrics(report);
+
+  const issues = report.flagged || [];
+  console.log("[dashboard1] issues:", issues.length);
+  if (flaggedTitle)    flaggedTitle.textContent   = `Flagged Issues (${issues.length})`;
+  if (flaggedContainer) flaggedContainer.innerHTML = "";
+
+  if (!issues.length) {
+    if (flaggedContainer)
+      flaggedContainer.innerHTML = `<p style="color:#5A6B7A;">No issues flagged 🎉</p>`;
+  } else {
+    issues.forEach(issue => {
+      const div = document.createElement("div");
+      div.className = "issue-card";
+      const borderColor = issue.severity >= 3 ? "#ef4444" : issue.severity === 2 ? "#f59e0b" : "#3b82f6";
+      div.style.cssText = `border-left:3px solid ${borderColor};background:rgba(255,255,255,0.04);
+        border-radius:8px;padding:14px;margin-bottom:12px;`;
+      div.innerHTML = `
+        <div class="issue-header" style="display:flex;justify-content:space-between;margin-bottom:8px;">
+          <span style="font-weight:600;font-size:13px;color:#e4e4e7;">${escHtml(issue.category)}</span>
+          <span style="color:#9ca3af;font-size:12px;">Severity ${issue.severity ?? 1}</span>
+        </div>
+        <p style="color:#d1d5db;font-size:13px;margin-bottom:6px;">
+          ${escHtml(issue.explanation ?? issue.description ?? "")}
+        </p>
+        ${issue.mistake    ? `<p style="color:#f87171;font-size:12px;font-style:italic;margin-bottom:4px;">❌ "${escHtml(issue.mistake)}"</p>`    : ""}
+        ${issue.correction ? `<p style="color:#34d399;font-size:12px;font-style:italic;">✅ "${escHtml(issue.correction)}"</p>` : ""}`;
+      if (flaggedContainer) flaggedContainer.appendChild(div);
     });
+  }
 
-    if (!res.ok) throw new Error(await res.text());
+  if (report.recommendation) renderRecommendations(report.recommendation);
+}
+
+/* ── 6. Recommendations ──────────────────────────────────────────────────── */
+function renderRecommendations(rec) {
+  const rightCol = document.querySelector(".right-column");
+  if (!rightCol) return;
+
+  let recSection = document.getElementById("recommendationSection");
+  if (!recSection) {
+    recSection = document.createElement("div");
+    recSection.id        = "recommendationSection";
+    recSection.className = "flagged-section";
+    recSection.style.cssText = "margin-top:20px;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.1);border-radius:12px;padding:24px;";
+    rightCol.appendChild(recSection);
+  }
+
+  const mkList = arr =>
+    (arr || []).map(i => `<li style="margin-bottom:6px;color:#d1d5db;">${escHtml(i)}</li>`).join("");
+
+  recSection.innerHTML = `
+    <h3 style="margin-bottom:16px;color:#e4e4e7;font-size:16px;">📋 Recommendations</h3>
+    ${rec.strengths?.length ? `<p style="color:#10b981;font-weight:600;margin-bottom:6px;">✅ Strengths</p>
+      <ul style="padding-left:18px;margin-bottom:16px;">${mkList(rec.strengths)}</ul>` : ""}
+    ${rec.areasToImprove?.length ? `<p style="color:#f59e0b;font-weight:600;margin-bottom:6px;">⚠️ Areas to Improve</p>
+      <ul style="padding-left:18px;margin-bottom:16px;">${mkList(rec.areasToImprove)}</ul>` : ""}
+    ${rec.actionableTips?.length ? `<p style="color:#60a5fa;font-weight:600;margin-bottom:6px;">💡 Actionable Tips</p>
+      <ul style="padding-left:18px;">${mkList(rec.actionableTips)}</ul>` : ""}`;
+}
+
+/* ── 7. setLoading ───────────────────────────────────────────────────────── */
+function setLoading(on) {
+  if (!on) return;
+  if (flaggedTitle)     flaggedTitle.textContent   = "Loading report…";
+  if (flaggedContainer) flaggedContainer.innerHTML  = `<p style="color:#6b7280;">Please wait…</p>`;
+  if (candidateName)    candidateName.textContent   = "Loading…";
+  if (overallScore)     overallScore.textContent    = "—";
+  if (overallScoreLarge) overallScoreLarge.textContent = "—";
+}
+
+/* ── 8. loadReport ───────────────────────────────────────────────────────── */
+async function loadReport() {
+  console.log("[dashboard1] loadReport() interviewId:", interviewId);
+  const token = localStorage.getItem("accessToken") || sessionStorage.getItem("accessToken");
+  console.log("[dashboard1] token present:", !!token);
+  if (!token) { window.location.href = "login.html"; return; }
+
+  setLoading(true);
+
+  const url = `${API_BASE}/interview/report/${interviewId}`;
+  console.log("[dashboard1] GET", url);
+
+  try {
+    const res = await fetch(url, { headers: { Authorization: `Bearer ${token}` } });
+    console.log("[dashboard1] response status:", res.status);
+
+    if (!res.ok) {
+      const errText = await res.text();
+      console.error("[dashboard1] error body:", errText);
+      throw new Error(`Server ${res.status}: ${errText}`);
+    }
 
     const report = await res.json();
-    console.log("REPORT:", report);
-
-    /* Header */
-    candidateName.textContent = report.candidate.name;
-    interviewDate.textContent = new Date(report.interview.date).toLocaleString();
-
-    /* Overall score */
-    overallScore.textContent = report.ratings.overall;
-    overallScoreLarge.textContent = report.ratings.overall;
-
-    /* Metrics */
-    renderMetrics(report);
-
-    /* Flagged issues */
-    const issues = report.flagged || [];
-    flaggedTitle.textContent = `Flagged Issues (${issues.length})`;
-    flaggedContainer.innerHTML = "";
-
-    if (issues.length === 0) {
-      flaggedContainer.innerHTML = `
-        <p style="color:#5A6B7A;">No issues flagged 🎉</p>
-      `;
-    } else {
-      issues.forEach(issue => {
-        const div = document.createElement("div");
-        div.className = "issue-card";
-
-        div.innerHTML = `
-          <div class="issue-header">
-            <span class="issue-title">${issue.category}</span>
-            <span class="issue-severity">Severity ${issue.severity}</span>
-          </div>
-          <div class="issue-content">
-            <p class="issue-description">${issue.description}</p>
-          </div>
-        `;
-
-        flaggedContainer.appendChild(div);
-      });
-    }
+    console.log("[dashboard1] report OK:", report);
+    renderReport(report);
 
   } catch (err) {
-    console.error("Report load failed:", err);
-    alert("Failed to load report");
+    console.error("[dashboard1] FAILED:", err);
+    if (flaggedTitle)    flaggedTitle.textContent   = "Failed to load report";
+    if (flaggedContainer) flaggedContainer.innerHTML = `
+      <p style="color:#ef4444;margin-bottom:8px;"><strong>Error:</strong> ${escHtml(err.message)}</p>
+      <p style="color:#9ca3af;font-size:13px;margin-bottom:12px;">
+        Open DevTools → Console for full details.
+      </p>
+      <button onclick="window.loadReport()"
+        style="padding:8px 16px;background:#3b82f6;color:#fff;border:none;
+               border-radius:6px;cursor:pointer;font-size:14px;">🔄 Retry</button>`;
   }
 }
 
+/* ── 9. handleGenerateReport ─────────────────────────────────────────────── */
+async function handleGenerateReport(e) {
+  const btn = e?.currentTarget;
+  console.log("[dashboard1] Generate Report clicked, interviewId:", interviewId);
+
+  const token = localStorage.getItem("accessToken") || sessionStorage.getItem("accessToken");
+  if (!token) { window.location.href = "login.html"; return; }
+
+  if (btn) { btn.disabled = true; btn.textContent = "Generating…"; }
+
+  try {
+    const r = await fetch(`${API_BASE}/interview/status`, {
+      method:  "POST",
+      headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
+      body:    JSON.stringify({ interviewId, status: "COMPLETED" }),
+    });
+    console.log("[dashboard1] status update:", r.status);
+  } catch (e2) {
+    console.warn("[dashboard1] status update failed (non-fatal):", e2.message);
+  }
+
+  await loadReport();
+  if (btn) { btn.disabled = false; btn.textContent = "Generate Report"; }
+}
+
+/* ── 10. Wire buttons + expose globals ───────────────────────────────────── */
+window.loadReport = loadReport; // needed for inline onclick="window.loadReport()"
+
+function wireButtons() {
+  document.querySelectorAll(".action-button").forEach(btn => {
+    if (btn.textContent.trim() === "Generate Report") {
+      btn.addEventListener("click", handleGenerateReport);
+      console.log("[dashboard1] ✅ Generate Report button wired");
+    }
+  });
+
+  const playButton   = document.getElementById("playButton");
+  const videoPlayer  = document.getElementById("videoPlayer");
+  const videoOverlay = document.getElementById("videoOverlay");
+  if (playButton && videoPlayer) {
+    playButton.addEventListener("click", () => {
+      videoPlayer.play();
+      videoOverlay?.classList.add("hidden");
+    });
+    videoPlayer.addEventListener("pause", () => videoOverlay?.classList.remove("hidden"));
+  }
+}
+
+if (document.readyState === "loading") {
+  document.addEventListener("DOMContentLoaded", wireButtons);
+} else {
+  wireButtons();
+}
+
+/* ── 11. Boot: load report immediately ───────────────────────────────────── */
 loadReport();

@@ -675,79 +675,85 @@ class InterviewBot {
             }
 
             async startInterview() {
-            try {
-                this.currentInterviewId = localStorage.getItem("currentInterviewId");
-
-                if (!this.currentInterviewId) {
-                    throw new Error("Interview not initialized");
-                }
-
-                // Update status to IN_PROGRESS
-                await fetch(`${API_BASE}/interview/status`, {
-                    method: "POST",
-                    headers: {
-                        "Content-Type": "application/json",
-                        "Authorization": `Bearer ${localStorage.getItem("accessToken")}`
-                    },
-                    body: JSON.stringify({
-                        interviewId: this.currentInterviewId,
-                        status: "IN_PROGRESS"
-                    })
-                });
-
-                this.isInterviewActive = true;
-                this.interviewStartTime = Date.now();
-
-                this.startBtn.disabled = true;
-                this.stopBtn.disabled = false;
-                this.askAgainBtn.disabled = false;
-
-                this.startTimer();
-
-                setTimeout(async () => {
-                    const question = await this.fetchFirstQuestion();
-                    if (question) {
-                        this.lastQuestion = question;
-                    }
-                }, 500);
-
-            } catch (err) {
-                console.error("Start interview failed:", err);
-                this.addMessage("bot", "Failed to start interview. Please try again.");
-            }
+    try {
+        // Always prefer the stored ID — covers page-refresh edge-cases
+        this.currentInterviewId =
+            this.currentInterviewId || localStorage.getItem("currentInterviewId");
+ 
+        if (!this.currentInterviewId) {
+            throw new Error("Interview not initialized. Please go back and set up a new interview.");
         }
-
-        stopInterview() {
-            this.isInterviewActive = false;
-            this.stopTimer();
-
-            // Update status to COMPLETED
-            fetch(`${API_BASE}/interview/status`, {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                    "Authorization": `Bearer ${localStorage.getItem("accessToken")}`
-                },
-                body: JSON.stringify({
-                    interviewId: this.currentInterviewId,
-                    status: "COMPLETED"
-                })
-            });
-
-            this.startBtn.disabled = false;
-            this.stopBtn.disabled = true;
-            this.askAgainBtn.disabled = true;
-            this.reportBtn.style.display = 'inline-flex';
-
-            const duration = Math.floor((Date.now() - this.interviewStartTime) / 1000);
-            const minutes = Math.floor(duration / 60);
-            const seconds = duration % 60;
-
-            this.addMessage(
-                'bot',
-                `Interview completed! Duration: ${minutes}m ${seconds}s. Click "Generate Report" to see your performance analysis.`
-            );
-        }
+ 
+        const token = localStorage.getItem("accessToken");
+ 
+        // Mark interview as IN_PROGRESS
+        await fetch(`${API_BASE}/interview/status`, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                "Authorization": `Bearer ${token}`
+            },
+            body: JSON.stringify({
+                interviewId: this.currentInterviewId,
+                status: "IN_PROGRESS"
+            })
+        });
+ 
+        this.isInterviewActive = true;
+        this.interviewStartTime = Date.now();
+ 
+        this.startBtn.disabled  = true;
+        this.stopBtn.disabled   = false;
+        this.askAgainBtn.disabled = false;
+ 
+        this.startTimer();
+ 
+        setTimeout(async () => {
+            const question = await this.fetchFirstQuestion();
+            if (question) this.lastQuestion = question;
+        }, 500);
+ 
+    } catch (err) {
+        console.error("Start interview failed:", err);
+        this.addMessage("bot", `Failed to start interview: ${err.message}`);
+    }
+}
+ 
+stopInterview() {
+    this.isInterviewActive = false;
+    this.stopTimer();
+ 
+    // Persist the id before anything async happens
+    const interviewId =
+        this.currentInterviewId || localStorage.getItem("currentInterviewId");
+ 
+    if (interviewId) {
+        const token = localStorage.getItem("accessToken");
+        fetch(`${API_BASE}/interview/status`, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                "Authorization": `Bearer ${token}`
+            },
+            body: JSON.stringify({ interviewId, status: "COMPLETED" })
+        }).catch(err => console.warn("Status update failed (non-fatal):", err.message));
+    }
+ 
+    this.startBtn.disabled    = false;
+    this.stopBtn.disabled     = true;
+    this.askAgainBtn.disabled = true;
+    this.reportBtn.style.display = "inline-flex";
+ 
+    const duration = Math.floor((Date.now() - this.interviewStartTime) / 1000);
+    const minutes  = Math.floor(duration / 60);
+    const seconds  = duration % 60;
+ 
+    this.addMessage(
+        "bot",
+        `Interview completed! Duration: ${minutes}m ${seconds}s. Click "Generate Report" to see your performance analysis.`
+    );
+}
+ 
 
             async fetchFirstQuestion() {
                 const token = localStorage.getItem("accessToken");
@@ -824,58 +830,79 @@ class InterviewBot {
             }
 
             async generateReport() {
-                if (!this.currentInterviewId) {
-                    this.addMessage('bot', "No interview data available to generate report.");
-                    return;
-                }
-
-                this.addMessage('bot', "Generating your comprehensive interview performance report...");
-                
-                const token = localStorage.getItem("accessToken");
-                
-                try {
-                    const response = await fetch(`${API_BASE}/interview/report/${this.currentInterviewId}`, {
-                        headers: {
-                            "Authorization": `Bearer ${token}`,
-                        }
-                    });
-
-                    if (!response.ok) {
-                        throw new Error("Failed to generate report");
-                    }
-
-                    const reportData = await response.json();
-                    
-                    localStorage.setItem('latestReport', JSON.stringify(reportData));
-                    sessionStorage.setItem('interviewReport', JSON.stringify(reportData));
-                    
-                    this.addMessage('bot', `
-                        **Interview Analysis Complete!**
-                        
-                        **Quick Summary:**
-                        • Overall Score: ${reportData.ratings.overall}%
-                        • Grammar Score: ${reportData.grammar.score}%
-                        • Content Relevance: ${reportData.ratings.content}%
-                        • Confidence Level: ${reportData.ratings.confidence}%
-                        
-                        ${reportData.grammar.mistakes && reportData.grammar.mistakes.length > 0 ? 
-                            `**Grammar Issues Found:** ${reportData.grammar.mistakes.length} mistakes detected` : 
-                            '**Grammar:** Excellent performance!'
-                        }
-                        
-                        **Emotions Detected:** ${reportData.emotions.map(e => e.emotion).join(', ')}
-                        
-                        **[Click here to view your detailed dashboard →](dashboard.html)**
-                    `);
-
-                    setTimeout(() => {
-                        window.location.href = 'dashboard.html';
-                    }, 4000);
-
-                } catch (err) {
-                    this.addMessage('bot', "Sorry, I couldn't generate your report right now. Please try again.");
-                }
-            }
+    // Recover the interview ID from every possible source
+    const interviewId =
+        this.currentInterviewId ||
+        localStorage.getItem("currentInterviewId");
+ 
+    if (!interviewId) {
+        this.addMessage("bot", "No interview ID found. Please complete an interview first.");
+        return;
+    }
+ 
+    const token = localStorage.getItem("accessToken");
+    if (!token) {
+        window.location.href = "login.html";
+        return;
+    }
+ 
+    this.addMessage("bot", "Generating your interview performance report...");
+ 
+    try {
+        // Step 1: make sure the interview is marked COMPLETED
+        const statusRes = await fetch(`${API_BASE}/interview/status`, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                "Authorization": `Bearer ${token}`
+            },
+            body: JSON.stringify({ interviewId, status: "COMPLETED" })
+        });
+        if (!statusRes.ok) {
+            console.warn("Status update failed (non-fatal):", await statusRes.text());
+        }
+ 
+        // Step 2: fetch the report
+        const response = await fetch(`${API_BASE}/interview/report/${interviewId}`, {
+            headers: { "Authorization": `Bearer ${token}` }
+        });
+ 
+        // Log the raw response before trying to parse it
+        const rawText = await response.text();
+        console.log("[generateReport] raw response:", rawText.substring(0, 500));
+ 
+        if (!response.ok) {
+            throw new Error(`Server ${response.status}: ${rawText}`);
+        }
+ 
+        const reportData = JSON.parse(rawText);
+ 
+        localStorage.setItem("latestReport", JSON.stringify(reportData));
+        sessionStorage.setItem("interviewReport", JSON.stringify(reportData));
+ 
+        this.addMessage("bot", `
+            <strong>Report ready!</strong><br><br>
+            Overall Score: <strong>${reportData.ratings?.overall ?? "—"}</strong>/100<br>
+            Redirecting to your dashboard in 3 seconds…
+        `);
+ 
+        setTimeout(() => {
+            window.location.href = `dashboard1.html?id=${interviewId}`;
+        }, 3000);
+ 
+    } catch (err) {
+        // Show the REAL error — not a generic message
+        console.error("[generateReport] FAILED:", err);
+        this.addMessage(
+            "bot",
+            `Report generation failed: <strong>${err.message}</strong><br>
+             Check the browser console (F12) for details, or
+             <a href="dashboard1.html?id=${interviewId}" style="color:#60a5fa">
+               open the report page directly
+             </a>.`
+        );
+    }
+}
 
             loadTheme() {
                 const savedTheme = localStorage.getItem('interview-bot-theme') || 'light';

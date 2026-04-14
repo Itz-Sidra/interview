@@ -1,125 +1,123 @@
+// ✅ FIXED: deserializeIssueDescription is now properly exported
 import { PrismaClient } from "../generated/index.js";
 
 const prisma = new PrismaClient();
 
+const CATEGORY_MAP = {
+  FILLER_WORDS:     "FILLER_WORDS",
+  LOW_CONFIDENCE:   "CONFIDENCE",
+  GRAMMAR:          "GRAMMAR",
+  MISSING_CONCEPTS: "TECHNICAL",
+  VAGUE_ANSWER:     "COMMUNICATION",
+  DEFAULT:          "COMMUNICATION",
+};
+
 /**
- * Fetch interview session (with full history)
+ * Serialize full issue detail into the `description` column as JSON.
+ * Shape: { text, example?, suggestion? }
  */
+function serializeIssueDescription(issue) {
+  const payload = {
+    text: issue.description || "No description provided",
+  };
+  if (issue.example    && issue.example.trim())    payload.example    = issue.example.trim();
+  if (issue.suggestion && issue.suggestion.trim()) payload.suggestion = issue.suggestion.trim();
+  return JSON.stringify(payload);
+}
+
+/**
+ * Deserialize a stored description back to its parts.
+ * Falls back gracefully when the value is plain text (legacy rows).
+ */
+export function deserializeIssueDescription(raw) {
+  try {
+    const parsed = JSON.parse(raw);
+    return {
+      text:       parsed.text       || raw,
+      example:    parsed.example    || null,
+      suggestion: parsed.suggestion || null,
+    };
+  } catch {
+    return { text: raw, example: null, suggestion: null };
+  }
+}
+
+// ---------------------------------------------------------------------------
+// getInterviewSession
+// ---------------------------------------------------------------------------
 export async function getInterviewSession(interviewId) {
-  const prisma = new PrismaClient();
-  
   try {
     const interview = await prisma.interview.findUnique({
-      where: { id: interviewId },
-      include: {
-        config: true,
-        questions: true,
-        issues: true
-      }
+      where:   { id: interviewId },
+      include: { config: true, questions: true, issues: true },
     });
 
-    if (!interview) {
-      return null;
-    }
+    if (!interview) return null;
 
-    // Build session structure
     return {
-      interviewId: interview.id,
-      userId: interview.userId,
-      configId: interview.configId,
+      interviewId:      interview.id,
+      userId:           interview.userId,
+      configId:         interview.configId,
       cumulativeScores: {
-        overall: interview.overallScore || 0,
-        technical: interview.overallScore || 0,
+        overall:    interview.overallScore || 0,
+        technical:  interview.overallScore || 0,
         confidence: interview.overallScore || 0,
-        grammar: interview.overallScore || 0
-      }
+        grammar:    interview.overallScore || 0,
+      },
     };
   } catch (error) {
     console.error("Get session error:", error);
     throw error;
-  } finally {
-    await prisma.$disconnect();
   }
 }
 
-/**
- * Save question and evaluation results
- */
+// ---------------------------------------------------------------------------
+// saveQuestionAndEvaluation
+// ---------------------------------------------------------------------------
 export async function saveQuestionAndEvaluation(interviewId, question, evaluation) {
-  const prisma = new PrismaClient();
-  
   try {
     const scores = evaluation.evaluation;
 
     const scoreAverage =
       (scores.answerQuality +
-      scores.relevance +
-      scores.clarity +
-      scores.completeness +
-      scores.technicalDepth) / 5;
+        scores.relevance +
+        scores.clarity +
+        scores.completeness +
+        scores.technicalDepth) / 5;
 
     const savedQuestion = await prisma.question.create({
       data: {
         interviewId,
-        prompt: question,
-        evaluation: scores,
-        scoreAverage   
-      }
+        prompt:       question,
+        evaluation:   scores,
+        scoreAverage,
+      },
     });
 
     const allScoredQuestions = await prisma.question.findMany({
-      where: {
-        interviewId,
-        scoreAverage: { not: null }
-      },
-      select: { scoreAverage: true }
+      where:  { interviewId, scoreAverage: { not: null } },
+      select: { scoreAverage: true },
     });
 
     const overallScore =
       allScoredQuestions.length > 0
-        ? allScoredQuestions.reduce(
-            (sum, q) => sum + q.scoreAverage,
-            0
-          ) / allScoredQuestions.length
+        ? allScoredQuestions.reduce((sum, q) => sum + q.scoreAverage, 0) / allScoredQuestions.length
         : null;
 
     await prisma.interview.update({
       where: { id: interviewId },
-      data: { overallScore }
+      data:  { overallScore },
     });
 
-    // Save detected issues with proper category mapping
-    if (evaluation.detectedIssues && evaluation.detectedIssues.length > 0) {
+    if (Array.isArray(evaluation.detectedIssues) && evaluation.detectedIssues.length > 0) {
       const issuePromises = evaluation.detectedIssues.map((issue) => {
-        // Map issue types to valid category enum values
-        const categoryMap = {
-          'FILLER_WORDS': 'FILLER_WORDS',
-          'LOW_CONFIDENCE': 'CONFIDENCE',
-          'GRAMMAR': 'GRAMMAR',
-          'MISSING_CONCEPTS': 'TECHNICAL',
-          'VAGUE_ANSWER': 'COMMUNICATION'
-        };
-
-        const category = categoryMap[issue.type] || 'COMMUNICATION';
-        const description = issue.description || 'No description provided';
-        const severity = issue.severity || 1;
-        const timestampMs = BigInt(Date.now()); // Convert to BigInt
-
-        console.log('Creating FlaggedIssue:', { 
-          category, 
-          description, 
-          severity, 
-          timestampMs: timestampMs.toString() 
-        });
+        const category    = CATEGORY_MAP[issue.type] || CATEGORY_MAP.DEFAULT;
+        const description = serializeIssueDescription(issue);
+        const severity    = normalizeSeverity(issue.severity);
+        const timestampMs = BigInt(Date.now());
 
         return prisma.flaggedIssue.create({
-          data: {
-            interviewId,
-            category,
-            description,
-            severity,
-            timestampMs
-          }
+          data: { interviewId, category, description, severity, timestampMs },
         });
       });
 
@@ -130,47 +128,40 @@ export async function saveQuestionAndEvaluation(interviewId, question, evaluatio
   } catch (error) {
     console.error("Save evaluation error:", error);
     throw error;
-  } finally {
-    await prisma.$disconnect();
   }
 }
 
-/**
- * Update cumulative scores
- */
+// ---------------------------------------------------------------------------
+// updateInterviewScores
+// ---------------------------------------------------------------------------
 export async function updateInterviewScores(interviewId, evaluation) {
-  const prisma = new PrismaClient();
-  
   try {
-    // Calculate average score
     const scores = evaluation.evaluation;
-    const averageScore = (
-      scores.answerQuality + 
-      scores.relevance + 
-      scores.clarity + 
-      scores.completeness + 
-      scores.technicalDepth
-    ) / 5;
+    const averageScore =
+      (scores.answerQuality +
+        scores.relevance +
+        scores.clarity +
+        scores.completeness +
+        scores.technicalDepth) / 5;
 
-    // Update interview with cumulative score
     await prisma.interview.update({
       where: { id: interviewId },
-      data: {
-        overallScore: averageScore
-      }
+      data:  { overallScore: averageScore },
     });
-
-    console.log('Updated interview scores:', { interviewId, averageScore });
   } catch (error) {
     console.error("Update scores error:", error);
     throw error;
-  } finally {
-    await prisma.$disconnect();
   }
 }
 
-export default {
-  getInterviewSession,
-  saveQuestionAndEvaluation,
-  updateInterviewScores
-};
+// ---------------------------------------------------------------------------
+// Helpers
+// ---------------------------------------------------------------------------
+function normalizeSeverity(severity) {
+  if (typeof severity !== "number") return 1;
+  if (severity <= 1) return 1;
+  if (severity === 2) return 2;
+  return 3;
+}
+
+export default { getInterviewSession, saveQuestionAndEvaluation, updateInterviewScores };
