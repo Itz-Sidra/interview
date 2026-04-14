@@ -2250,6 +2250,8 @@
 
     <!-- Auth Script -->
     <script type="module" src="js/auth.js"></script>
+    <script type="module" src="js/auth-core.js"></script>
+    <script type="module" src="js/auth.js"></script>
 
     <!-- JavaScript -->
     <script>
@@ -2519,5 +2521,10 @@
         });
       })();
     </script>
+     <script>
+    document.getElementById("mobile-menu-btn")?.addEventListener("click", () => {
+      document.getElementById("mobile-menu")?.classList.toggle("hidden");
+    });
+  </script>
   </body>
 </html>

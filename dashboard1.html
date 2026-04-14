@@ -154,5 +154,11 @@
         </div>
     </div>
     <script type="module" src="dashboard1.js"></script>
+    <script type="module" src="js/auth-core.js"></script>
+    <script type="module" src="js/auth.js"></script>
+    <script type="module">
+        import AuthCore from "./js/auth-core.js";
+        AuthCore.requireAuth();  // redirects to login.html if not logged in
+    </script>
 </body>
 </html>

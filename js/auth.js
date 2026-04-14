@@ -1,24 +1,17 @@
 /**
- * auth.js — Backwards-compatibility shim
+ * auth.js  (updated shim)
  *
- * Some HTML pages load this as a module and reference `EvalvateAuth` globally.
- * This shim re-exports authHelper functions under the old EvalvateAuth API so
- * nothing breaks during the transition. All real logic lives in authHelper.js.
+ * Pages that still reference window.EvalvateAuth (older HTML)
+ * get a compatible object backed by auth-core.js.
  *
- * Usage in HTML (no change needed):
+ * Usage:
+ *   <script type="module" src="js/auth-core.js"></script>  ← add this FIRST
  *   <script type="module" src="js/auth.js"></script>
  */
 
 import {
-  getToken,
-  setToken,
-  clearToken,
-  isLoggedIn,
-  getUser,
-  setUser,
-  getCredits,
-  setCredits,
-  logout,
+  getToken, setToken, clearToken, isLoggedIn,
+  getUser, setUser, getCredits, setCredits, logout,
 } from "./authHelper.js";
 
 const EvalvateAuth = {
@@ -27,14 +20,12 @@ const EvalvateAuth = {
   setUser,
   getCredits,
   setCredits,
+  logout,
 
-  /** @deprecated – token always in localStorage now */
   requireAuth(redirect = "login.html") {
     if (!isLoggedIn()) { window.location.href = redirect; return false; }
     return true;
   },
-
-  logout,
 
   useCredit() {
     const c = getCredits();
@@ -47,13 +38,12 @@ const EvalvateAuth = {
   getUserInitials() {
     const user = getUser();
     if (!user?.name) return "U";
-    const parts = user.name.trim().split(" ");
+    const parts = user.name.trim().split(/\s+/);
     return parts.length >= 2
       ? (parts[0][0] + parts[parts.length - 1][0]).toUpperCase()
       : user.name.substring(0, 2).toUpperCase();
   },
 
-  /** Kept for dashboard-home compatibility */
   getInterviews() {
     try { return JSON.parse(localStorage.getItem("evalvate_interviews")) || []; }
     catch { return []; }
@@ -79,7 +69,5 @@ const EvalvateAuth = {
   },
 };
 
-/* Make globally accessible for non-module scripts */
 window.EvalvateAuth = EvalvateAuth;
-
 export default EvalvateAuth;
