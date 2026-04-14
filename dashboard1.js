@@ -75,7 +75,7 @@ function renderReport(report) {
   const score = Math.round(report.ratings?.overall ?? 0);
   if (overallScore)      overallScore.textContent      = score;
   if (overallScoreLarge) overallScoreLarge.textContent = score;
-
+  renderTechnical(report);
   const circle = document.querySelector(".score-circle");
   if (circle) circle.style.background =
     `conic-gradient(#3b82f6 0% ${score}%, rgba(255,255,255,0.1) ${score}% 100%)`;
@@ -94,18 +94,22 @@ function renderReport(report) {
       const div = document.createElement("div");
       div.className = "issue-card";
       const borderColor = issue.severity >= 3 ? "#ef4444" : issue.severity === 2 ? "#f59e0b" : "#3b82f6";
-      div.style.cssText = `border-left:3px solid ${borderColor};background:rgba(255,255,255,0.04);
-        border-radius:8px;padding:14px;margin-bottom:12px;`;
-      div.innerHTML = `
-        <div style="display:flex;justify-content:space-between;margin-bottom:8px;">
-          <span style="font-weight:600;font-size:13px;color:#e4e4e7;">${escHtml(issue.category)}</span>
-          <span style="color:#9ca3af;font-size:12px;">Severity ${issue.severity ?? 1}</span>
-        </div>
-        <p style="color:#d1d5db;font-size:13px;margin-bottom:6px;">
-          ${escHtml(issue.explanation ?? issue.description ?? "")}
-        </p>
-        ${issue.mistake    ? `<p style="color:#f87171;font-size:12px;font-style:italic;margin-bottom:4px;">❌ "${escHtml(issue.mistake)}"</p>`    : ""}
-        ${issue.correction ? `<p style="color:#34d399;font-size:12px;font-style:italic;">✅ "${escHtml(issue.correction)}"</p>` : ""}`;
+     div.className = "issue-card";
+
+div.innerHTML = `
+  <div class="issue-header">
+    <span class="issue-category">${issue.category}</span>
+    <span class="issue-severity">Severity ${issue.severity}</span>
+  </div>
+
+  <p class="issue-description">
+    ${escHtml(issue.explanation || "")}
+  </p>
+
+  ${issue.mistake ? `<p class="issue-mistake">❌ "${escHtml(issue.mistake)}"</p>` : ""}
+  ${issue.correction ? `<p class="issue-correction">✅ "${escHtml(issue.correction)}"</p>` : ""}
+`;
+      
       if (flaggedContainer) flaggedContainer.appendChild(div);
     });
   }
@@ -123,7 +127,7 @@ function renderRecommendations(rec) {
     recSection = document.createElement("div");
     recSection.id = "recommendationSection";
     recSection.className = "flagged-section";
-    recSection.style.cssText = "margin-top:20px;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.1);border-radius:12px;padding:24px;";
+    recSection.style.marginTop = "20px";
     rightCol.appendChild(recSection);
   }
 
@@ -131,13 +135,37 @@ function renderRecommendations(rec) {
     (arr || []).map((i) => `<li style="margin-bottom:6px;color:#d1d5db;">${escHtml(i)}</li>`).join("");
 
   recSection.innerHTML = `
-    <h3 style="margin-bottom:16px;color:#e4e4e7;font-size:16px;">📋 Recommendations</h3>
-    ${rec.strengths?.length ? `<p style="color:#10b981;font-weight:600;margin-bottom:6px;">✅ Strengths</p>
-      <ul style="padding-left:18px;margin-bottom:16px;">${mkList(rec.strengths)}</ul>` : ""}
-    ${rec.areasToImprove?.length ? `<p style="color:#f59e0b;font-weight:600;margin-bottom:6px;">⚠️ Areas to Improve</p>
-      <ul style="padding-left:18px;margin-bottom:16px;">${mkList(rec.areasToImprove)}</ul>` : ""}
-    ${rec.actionableTips?.length ? `<p style="color:#60a5fa;font-weight:600;margin-bottom:6px;">💡 Actionable Tips</p>
-      <ul style="padding-left:18px;">${mkList(rec.actionableTips)}</ul>` : ""}`;
+  <h3 style="margin-bottom:16px;color:#0f172a;font-size:16px;">
+    📋 Recommendations
+  </h3>
+
+  ${rec.strengths?.length ? `
+    <p style="color:#16a34a;font-weight:600;margin-bottom:6px;">
+      ✅ Strengths
+    </p>
+    <ul style="padding-left:18px;margin-bottom:16px;">
+      ${rec.strengths.map(i => `<li style="margin-bottom:6px;color:#334155;">${escHtml(i)}</li>`).join("")}
+    </ul>
+  ` : ""}
+
+  ${rec.areasToImprove?.length ? `
+    <p style="color:#ea580c;font-weight:600;margin-bottom:6px;">
+      ⚠️ Areas to Improve
+    </p>
+    <ul style="padding-left:18px;margin-bottom:16px;">
+      ${rec.areasToImprove.map(i => `<li style="margin-bottom:6px;color:#334155;">${escHtml(i)}</li>`).join("")}
+    </ul>
+  ` : ""}
+
+  ${rec.actionableTips?.length ? `
+    <p style="color:#2563eb;font-weight:600;margin-bottom:6px;">
+      💡 Actionable Tips
+    </p>
+    <ul style="padding-left:18px;">
+      ${rec.actionableTips.map(i => `<li style="margin-bottom:6px;color:#334155;">${escHtml(i)}</li>`).join("")}
+    </ul>
+  ` : ""}
+`;
 }
 
 /* ── Loading state ──────────────────────────────────────────── */
@@ -185,6 +213,21 @@ async function handleGenerateReport(e) {
 
   await loadReport();
   if (btn) { btn.disabled = false; btn.textContent = "Generate Report"; }
+}
+
+function renderTechnical(report) {
+  const container = document.getElementById("technicalContainer");
+  if (!container) return;
+
+  container.innerHTML = "";
+
+  (report.technical || []).forEach(q => {
+    const div = document.createElement("div");
+    div.className = "assessment-item";
+
+
+    container.appendChild(div);
+  });
 }
 
 /* ── Wire up buttons ────────────────────────────────────────── */
