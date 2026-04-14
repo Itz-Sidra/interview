@@ -1,954 +1,470 @@
-//const API_BASE = "https://evalvate-backend-862980960928.asia-south1.run.app";
+/**
+ * interview.js — Fixed
+ *
+ * Changes from original:
+ *  - All fetch() calls replaced with authFetch() from authHelper
+ *  - Token retrieved via getToken() instead of localStorage.getItem() in each call
+ *  - requireAuth() guard at top
+ *  - No sessionStorage references
+ */
+
 import { API_BASE } from "./config.js";
+import { requireAuth, authFetch, getToken } from "./authHelper.js";
+
+requireAuth();
+
 class InterviewBot {
-            constructor() {
-                this.ttsQueue = [];
-                this.isSpeaking = false;
-
-                this.isInterviewActive = false;
-                this.interviewStartTime = null;
-                this.timerInterval = null;
-                this.selectedTimeLimit = 0; 
-                // this.uploadedResume = null;
-                this.chatHistory = [];
-                this.webcamStream = null;
-                this.isMicMuted = false;
-                this.currentInterviewId = null;
-                this.lastQuestion = null;
-                
-                this.initializeElements();
-                this.bindEvents();
-                this.initializeWebcam();
-                this.loadTheme();
-                this.addWelcomeMessage();
-            }
-            
-
-            initializeElements() {
-                this.timerDisplay = document.getElementById('timerDisplay');
-                this.timerBtns = document.querySelectorAll('.timer-btn');
-                
-                this.uploadArea = document.getElementById('uploadArea');
-                this.uploadBtn = document.getElementById('uploadBtn');
-                this.fileInput = document.getElementById('fileInput');
-                this.fileInfo = document.getElementById('fileInfo');
-                this.fileName = document.getElementById('fileName');
-                
-                this.webcamPreview = document.getElementById('webcamPreview');
-                this.webcamPlaceholder = document.getElementById('webcamPlaceholder');
-
-                this.micToggleBtn = document.getElementById('micToggleBtn');
-                this.mediaRecorder = null;
-                this.audioChunks = [];
-                
-                this.chatMessages = document.getElementById('chatMessages');
-                this.chatInputForm = document.getElementById('chatInputForm');
-                this.userInput = document.getElementById('userInput');
-                
-                this.startBtn = document.getElementById('startBtn');
-                this.askAgainBtn = document.getElementById('askAgainBtn');
-                this.stopBtn = document.getElementById('stopBtn');
-                this.reportBtn = document.getElementById('reportBtn');
-                
-                this.themeToggleBtn = document.getElementById('themeToggleBtn');
-            }
-
-            bindEvents() {
-                this.timerBtns.forEach(btn => {
-                    btn.addEventListener('click', (e) => this.setTimeLimit(e));
-                });
-
-                // this.uploadBtn.addEventListener('click', () => this.fileInput.click());
-                // this.fileInput.addEventListener('change', (e) => this.handleFileUpload(e));
-                // this.uploadArea.addEventListener('dragover', (e) => this.handleDragOver(e));
-                // this.uploadArea.addEventListener('drop', (e) => this.handleDrop(e));
-
-                this.micToggleBtn.addEventListener('click', () => this.toggleRecording());
-
-                this.chatInputForm.addEventListener('submit', (e) => this.handleChatSubmit(e));
-                this.userInput.addEventListener('input', () => this.autoResizeTextarea());
-
-                this.startBtn.addEventListener('click', () => this.startInterview());
-                this.askAgainBtn.addEventListener('click', () => this.askAgain());
-                this.stopBtn.addEventListener('click', () => this.stopInterview());
-                this.reportBtn.addEventListener('click', () => this.generateReport());
-
-                this.themeToggleBtn.addEventListener('click', () => this.toggleTheme());
-
-                document.addEventListener('keydown', (e) => this.handleKeyboardShortcuts(e));
-            }
-
-            setTimeLimit(e) {
-                const minutes = parseInt(e.target.dataset.minutes);
-                this.selectedTimeLimit = minutes;
-                
-                this.timerBtns.forEach(btn => btn.classList.remove('active'));
-                e.target.classList.add('active');
-                
-                if (minutes === 0) {
-                    this.timerDisplay.textContent = 'No Limit';
-                } else {
-                    this.timerDisplay.textContent = `${minutes}:00`;
-                }
-            }
-
-            startTimer() {
-                if (this.selectedTimeLimit === 0) {
-                    this.timerDisplay.textContent = '00:00';
-                    this.timerInterval = setInterval(() => {
-                        const elapsed = Math.floor((Date.now() - this.interviewStartTime) / 1000);
-                        const minutes = Math.floor(elapsed / 60);
-                        const seconds = elapsed % 60;
-                        this.timerDisplay.textContent = 
-                            `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
-                    }, 1000);
-                } else {
-                    let remainingTime = this.selectedTimeLimit * 60;
-                    this.timerInterval = setInterval(() => {
-                        remainingTime--;
-                        const minutes = Math.floor(remainingTime / 60);
-                        const seconds = remainingTime % 60;
-                        this.timerDisplay.textContent = 
-                            `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
-                        
-                        if (remainingTime <= 0) {
-                            this.stopInterview();
-                            this.addMessage('bot', 'Time\'s up! The interview has ended. You can now generate your performance report.');
-                        }
-                    }, 1000);
-                }
-            }
-
-            stopTimer() {
-                if (this.timerInterval) {
-                    clearInterval(this.timerInterval);
-                    this.timerInterval = null;
-                }
-            }
-
-            /*
-            handleFileUpload(e) {
-                const file = e.target.files[0];
-                if (file) {
-                    this.processUploadedFile(file);
-                }
-            }
-
-            handleDragOver(e) {
-                e.preventDefault();
-                this.uploadArea.classList.add('drag-over');
-            }
-
-            handleDrop(e) {
-                e.preventDefault();
-                this.uploadArea.classList.remove('drag-over');
-                const file = e.dataTransfer.files[0];
-                if (file) {
-                    this.processUploadedFile(file);
-                }
-            }
-
-            processUploadedFile(file) {
-                const allowedTypes = ['.pdf', '.doc', '.docx', '.txt'];
-                const fileExtension = '.' + file.name.split('.').pop().toLowerCase();
-                
-                if (!allowedTypes.includes(fileExtension)) {
-                    alert('Please upload a valid resume file (.pdf, .doc, .docx, .txt)');
-                    return;
-                }
-
-                this.uploadedResume = file;
-                this.uploadArea.classList.add('file-uploaded');
-                this.uploadArea.style.display = 'none';
-                this.fileInfo.style.display = 'block';
-                this.fileName.textContent = `${file.name} uploaded successfully!`;
-                
-                this.uploadResumeToServer(file);
-            }
-             */
-
-            enqueueTTS(text) {
-                this.ttsQueue.push(text);
-                if (!this.isSpeaking) {
-                    this.playNextInQueue();
-                }
-            }
-
-            async playNextInQueue() {
-                if (this.ttsQueue.length === 0) {
-                    this.isSpeaking = false;
-                    return;
-                }
-
-                this.isSpeaking = true;
-                const text = this.ttsQueue.shift();
-
-                try {
-                    if (text.length > 300) {
-                        const sentences = text.match(/[^.!?]+[.!?]+/g) || [text];
-                        for (let sentence of sentences) {
-                            await this.playTTSWithPromise(sentence.trim());
-                        }
-                    } else {
-                        await this.playTTSWithPromise(text);
-                    }
-                } catch (err) {
-                    console.error("Error playing TTS:", err);
-                }
-
-                this.playNextInQueue();
-            }
-
-            /*
-            async uploadResumeToServer(file) {
-                const formData = new FormData();
-                formData.append("resume", file);
-
-                const token = localStorage.getItem("accessToken");
-
-                try {
-                    const response = await fetch("http://127.0.0.1:3000/interview-config/resume", {
-                        method: "POST",
-                        headers: {
-                            Authorization: `Bearer ${token}`,
-                        },
-                        body: formData,
-                    });
-
-                    const data = await response.json();
-
-                    if (!response.ok) {
-                        const text = await response.text();
-                        throw new Error(text);
-                    }
-
-                    console.log("Resume uploaded to server:", data);
-                    this.addMessage('bot', "Your resume has been uploaded and analyzed successfully!");
-
-                } catch (err) {
-                    console.error("Upload failed:", err);
-                    this.addMessage('bot', "Sorry, there was an error uploading your resume.");
-                }
-            }
-            */    
-
-
-            async initializeWebcam() {
-                try {
-                    this.webcamStream = await navigator.mediaDevices.getUserMedia({ 
-                        video: true, 
-                        audio: true 
-                    });
-                    this.webcamPreview.srcObject = this.webcamStream;
-                    this.webcamPreview.style.display = 'block';
-                    this.webcamPlaceholder.style.display = 'none';
-                } catch (error) {
-                    console.log('Webcam access denied or not available');
-                    this.webcamPlaceholder.innerHTML = '<i class="fas fa-video-slash"></i><br><small>Camera not available</small>';
-                }
-            }
-
-            toggleMicrophone() {
-                if (this.webcamStream) {
-                    const audioTracks = this.webcamStream.getAudioTracks();
-                    audioTracks.forEach(track => {
-                        track.enabled = !track.enabled;
-                    });
-                    this.isMicMuted = !this.isMicMuted;
-                    
-                    if (this.isMicMuted) {
-                        this.micToggleBtn.classList.add('muted');
-                        this.micToggleBtn.innerHTML = '<i class="fas fa-microphone-slash"></i>';
-                    } else {
-                        this.micToggleBtn.classList.remove('muted');
-                        this.micToggleBtn.innerHTML = '<i class="fas fa-microphone"></i>';
-                    }
-                }
-            }
-
-            async toggleRecording() {
-                if (this.mediaRecorder && this.mediaRecorder.state === "recording") {
-                    this.mediaRecorder.stop();
-                    this.micToggleBtn.title = "Recording... Click to stop";
-                    this.micToggleBtn.innerHTML = '<i class="fas fa-microphone"></i>';
-                } else {
-                    this.audioChunks = [];
-
-                    const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-                    this.mediaRecorder = new MediaRecorder(stream, { mimeType: "audio/webm" });
-
-                    this.mediaRecorder.ondataavailable = e => {
-                        if (e.data.size > 0) this.audioChunks.push(e.data);
-                    };
-
-                    this.mediaRecorder.onstop = () => {
-                        const audioBlob = new Blob(this.audioChunks, { type: 'audio/webm' });
-                        this.sendAudioToTranscribe(audioBlob);
-                    };
-
-                    this.mediaRecorder.start();
-                    this.micToggleBtn.title = "Speak your answer";
-                    this.micToggleBtn.innerHTML = '<i class="fas fa-stop"></i>';
-                }
-            }
-
-            async sendAudioToTranscribe(blob) {
-                const formData = new FormData();
-                formData.append("audio", blob, "recording.webm");
-                
-                const token = localStorage.getItem("accessToken"); // ADD THIS LINE
-                
-                try {
-                    const response = await fetch(`${API_BASE}/interview/transcribe`, {
-                        method: "POST",
-                        headers: {
-                            "Authorization": `Bearer ${token}` // ADD THIS LINE
-                        },
-                        body: formData
-                    });
-                    
-                    const data = await response.json();
-                    
-                    if (!response.ok) {
-                        throw new Error(data.error || data.detail || "STT failed");
-                    }
-                    
-                    this.userInput.value = data.transcript;
-                    this.userInput.focus();
-                    this.autoResizeTextarea();
-                } catch (err) {
-                    console.error("Transcription error:", err);
-                    this.addMessage("bot", "Sorry, I couldn't understand your voice.");
-                }
-            }
-
-
-            addWelcomeMessage() {
-                const welcomeMessage = `
-                    <strong>Welcome to AI Interview Bot!</strong><br><br>
-                    I'm here to help you practice for your upcoming interview. 
-                    Ready when you are!
-                `;
-
-                this.addMessage('bot', welcomeMessage);
-            }
-
-            handleChatSubmit(e) {
-                e.preventDefault();
-                const message = this.userInput.value.trim();
-                
-                if (!message) return;
-                
-                this.addMessage('user', message);
-                this.userInput.value = '';
-                this.autoResizeTextarea();
-                
-                this.processUserMessage(message);
-            }
-
-            processUserMessage(message) {
-                this.chatHistory.push({ role: 'user', content: message });
-                
-                if (!this.isInterviewActive && this.isInterviewStartCommand(message)) {
-                    this.prepareInterview(message);
-                } else if (this.isInterviewActive) {
-                    this.handleInterviewResponse(message);
-                } else {
-                    this.handleGeneralResponse(message);
-                }
-            }
-
-            isInterviewStartCommand(message) {
-                const lowerMessage = message.toLowerCase();
-                return lowerMessage.includes('interview') && 
-                    (lowerMessage.includes('practice') || lowerMessage.includes('want to') || 
-                        lowerMessage.includes('apply') || lowerMessage.includes('role'));
-            }
-
-            prepareInterview(message) {
-                const company = this.extractCompany(message);
-                const role = this.extractRole(message);
-                
-                let response = `Excellent! I understand you want to practice for `;
-                if (role && company) {
-                    response += `a ${role} position at ${company}.`;
-                } else if (role) {
-                    response += `a ${role} position.`;
-                } else if (company) {
-                    response += `an interview at ${company}.`;
-                } else {
-                    response += `your upcoming interview.`;
-                }
-                
-                response += `\n\nI'm ready to conduct a mock interview with you. `;
-                /*
-                if (this.uploadedResume) {
-                    response += `I'll reference your uploaded resume to ask relevant questions. `;
-                }
-                */
-                response += `Click "Start Interview" when you're ready to begin!`;
-                
-                this.addMessage('bot', response);
-                this.enableInterviewStart();
-            }
-
-            extractCompany(message) {
-                const companies = ['google', 'amazon', 'microsoft', 'apple', 'facebook', 'meta', 'netflix', 'tesla', 'uber', 'airbnb'];
-                const lowerMessage = message.toLowerCase();
-                
-                for (const company of companies) {
-                    if (lowerMessage.includes(company)) {
-                        return company.charAt(0).toUpperCase() + company.slice(1);
-                    }
-                }
-                return null;
-            }
-
-            extractRole(message) {
-                const roles = ['software engineer', 'software developer', 'frontend developer', 'backend developer', 
-                            'full stack developer', 'data scientist', 'product manager', 'designer', 'devops engineer'];
-                const lowerMessage = message.toLowerCase();
-                
-                for (const role of roles) {
-                    if (lowerMessage.includes(role)) {
-                        return role;
-                    }
-                }
-                return null;
-            }
-
-            async playTTS(text) {
-                try {
-                    const token = localStorage.getItem("accessToken");
-                    const response = await fetch(`${API_BASE}/interview/speak`, {
-                        method: "POST",
-                        headers: {
-                        "Content-Type": "application/json",
-                        "Authorization": `Bearer ${token}`
-                        },
-                        body: JSON.stringify({ text })
-                    });
-
-                    if (!response.ok) {
-                        throw new Error("TTS failed");
-                    }
-
-                    const audioBlob = await response.blob();
-                    const audioUrl = URL.createObjectURL(audioBlob);
-                    const audio = new Audio(audioUrl);
-                    audio.play();
-                } catch (err) {
-                    console.error("TTS error:", err);
-                }
-            }
-
-            async playSentencesSequentially(sentences) {
-                for (let sentence of sentences) {
-                    await this.playTTSWithPromise(sentence.trim());
-                }
-            }
-
-            playTTSWithPromise(text) {
-                const token = localStorage.getItem("accessToken");
-                return new Promise((resolve, reject) => {
-                    fetch(`${API_BASE}/interview/speak`, {
-                        method: "POST",
-                        headers: {
-                        "Content-Type": "application/json",
-                        "Authorization": `Bearer ${token}`
-                        },
-                        body: JSON.stringify({ text })
-                    })
-                    .then(response => {
-                        if (!response.ok) throw new Error("TTS failed");
-                        return response.blob();
-                    })
-                    .then(blob => {
-                        const audioUrl = URL.createObjectURL(blob);
-                        const audio = new Audio(audioUrl);
-                        audio.onended = resolve;
-                        audio.onerror = reject;
-                        audio.play();
-                    })
-                    .catch(err => {
-                        console.error("TTS error:", err);
-                        resolve(); 
-                    });
-                });
-            }
-
-            async handleInterviewResponse(userAnswer) {
-                this.showTypingIndicator();
-                const token = localStorage.getItem("accessToken");
-                
-                try {
-                    const response = await fetch(`${API_BASE}/interview/answer`, {
-                        method: "POST",
-                        headers: {
-                            "Content-Type": "application/json",
-                            "Authorization": `Bearer ${token}`,
-                        },
-                        body: JSON.stringify({
-                            interviewId: this.currentInterviewId,  
-                            question: this.lastQuestion,
-                            answer: userAnswer
-                        }),
-                    });
-                    
-                    const data = await response.json();
-                    this.hideTypingIndicator();
-                    
-                    if (!response.ok) {
-                        throw new Error(data.error || data.detail || "Failed to get next question.");
-                    }
-                    
-                    if (data.done) {
-                        this.stopInterview();
-                        const message = data.message || "Interview complete! Click 'Generate Report' to see your analysis.";
-                        this.addMessage('bot', message);
-                        return;
-                    }
-                    
-                    // Check if nextQuestion exists
-                    const nextQuestion = data.nextQuestion || data.evaluation?.nextQuestion || "Could you elaborate on that?";
-                    this.addMessage('bot', nextQuestion);
-                    this.lastQuestion = nextQuestion;
-                    
-                } catch (err) {
-                    console.error("Interview follow-up failed:", err);
-                    this.hideTypingIndicator();
-                    this.addMessage('bot', "Hmm, I ran into an issue. Could you please try again?");
-                }
-            }
-
-            async ensureConfigExists() {
-                let configId = localStorage.getItem("currentConfigId");
-                if (configId) return configId;
-
-                const token = localStorage.getItem("accessToken");
-
-                const response = await fetch(`${API_BASE}/interview-config/basics`, {
-                    method: "POST",
-                    headers: {
-                    "Content-Type": "application/json",
-                    "Authorization": `Bearer ${token}`
-                    },
-                    body: JSON.stringify({
-                    durationMinutes: this.selectedTimeLimit || 10,
-                    difficulty: "intermediate",
-                    type: "technical"
-                    })
-                });
-
-                const data = await response.json();
-                if (!response.ok) {
-                    throw new Error(data.error || "Failed to create interview config");
-                }
-
-                localStorage.setItem("currentConfigId", data.configId);
-                console.log("Config created:", data.configId);
-
-                return data.configId;
-                }
-
-            handleGeneralResponse(message) {
-                this.showTypingIndicator();
-                
-                setTimeout(() => {
-                    this.hideTypingIndicator();
-                    let response = "I'm here to help you practice interviews! ";
-                    
-                    if (message.toLowerCase().includes('help')) {
-                        response = "I can help you practice for job interviews. Just tell me about the position you're applying for, like: 'I want to practice for my interview at Amazon for the role Software Developer'";
-                    } else {
-                        response += "To get started, please tell me about the position you're interviewing for.";
-                    }
-                    
-                    this.addMessage('bot', response);
-                }, 800);
-            }
-
-            generateInterviewQuestion() {
-                const questions = [
-                    "Tell me about yourself and your background.",
-                    "Why are you interested in this position?",
-                    "What are your greatest strengths?",
-                    "Describe a challenging project you've worked on.",
-                    "How do you handle working under pressure?",
-                    "Where do you see yourself in 5 years?",
-                    "Tell me about a time you had to work with a difficult team member.",
-                    "What motivates you in your work?",
-                    "Describe your problem-solving approach.",
-                    "How do you stay current with industry trends?"
-                ];
-                
-                return questions[Math.floor(Math.random() * questions.length)];
-            }
-
-            addMessage(sender, content) {
-                if (typeof content !== "string") {
-                    console.warn("addMessage received non-string content:", content);
-                    content = "Something went wrong. Please try again.";
-                }
-
-                const messageDiv = document.createElement('div');
-                messageDiv.className = `message ${sender}-message`;
-
-                const bubbleDiv = document.createElement('div');
-                bubbleDiv.className = 'message-bubble';
-                bubbleDiv.innerHTML = content;
-
-                messageDiv.appendChild(bubbleDiv);
-                this.chatMessages.appendChild(messageDiv);
-                this.chatMessages.scrollTop = this.chatMessages.scrollHeight;
-
-                if (sender === 'bot' && this.isInterviewActive) {
-                    const cleanText = content.replace(/<[^>]*>?/gm, '');
-                    this.enqueueTTS(cleanText);
-                }
-            }
-
-
-            showTypingIndicator() {
-                const typingDiv = document.createElement('div');
-                typingDiv.className = 'message bot-message typing-indicator';
-                typingDiv.id = 'typingIndicator';
-                
-                const bubbleDiv = document.createElement('div');
-                bubbleDiv.className = 'message-bubble';
-                
-                const loadingDiv = document.createElement('div');
-                loadingDiv.className = 'loading-indicator';
-                loadingDiv.innerHTML = 'AI is thinking<div class="dot"></div><div class="dot"></div><div class="dot"></div>';
-                
-                bubbleDiv.appendChild(loadingDiv);
-                typingDiv.appendChild(bubbleDiv);
-                this.chatMessages.appendChild(typingDiv);
-                
-                this.chatMessages.scrollTop = this.chatMessages.scrollHeight;
-            }
-
-            hideTypingIndicator() {
-                const typingIndicator = document.getElementById('typingIndicator');
-                if (typingIndicator) {
-                    typingIndicator.remove();
-                }
-            }
-
-            autoResizeTextarea() {
-                this.userInput.style.height = 'auto';
-                this.userInput.style.height = Math.min(this.userInput.scrollHeight, 120) + 'px';
-            }
-
-            enableInterviewStart() {
-                this.startBtn.disabled = false;
-            }
-
-            async createPendingInterview() {
-                const token = localStorage.getItem("accessToken");
-                const configId = await this.ensureConfigExists();
-
-                if (!configId) {
-                    throw new Error("configId missing. Basics step not completed.");
-                }
-
-                const response = await fetch(`${API_BASE}/interview-config/review`, {
-                    method: "POST",
-                    headers: {
-                        "Content-Type": "application/json",
-                        "Authorization": `Bearer ${token}`
-                    },
-                    body: JSON.stringify({
-                        configId,
-                        consentRecording: false
-                    })
-                });
-
-                const data = await response.json();
-
-                if (!response.ok) {
-                    throw new Error(data.error || "Failed to create interview");
-                }
-
-                this.currentInterviewId = data.interviewId;
-                localStorage.setItem("currentInterviewId", data.interviewId);
-            }
-
-            async startInterview() {
-    try {
-        // Always prefer the stored ID — covers page-refresh edge-cases
-        this.currentInterviewId =
-            this.currentInterviewId || localStorage.getItem("currentInterviewId");
- 
-        if (!this.currentInterviewId) {
-            throw new Error("Interview not initialized. Please go back and set up a new interview.");
+  constructor() {
+    this.ttsQueue           = [];
+    this.isSpeaking         = false;
+    this.isInterviewActive  = false;
+    this.interviewStartTime = null;
+    this.timerInterval      = null;
+    this.selectedTimeLimit  = 0;
+    this.chatHistory        = [];
+    this.webcamStream       = null;
+    this.isMicMuted         = false;
+    this.currentInterviewId = localStorage.getItem("currentInterviewId") || null;
+    this.lastQuestion       = null;
+    this.mediaRecorder      = null;
+    this.audioChunks        = [];
+
+    this.initializeElements();
+    this.bindEvents();
+    this.initializeWebcam();
+    this.loadTheme();
+    this.addWelcomeMessage();
+  }
+
+  /* ── DOM ─────────────────────────────────────────────────── */
+  initializeElements() {
+    this.timerDisplay  = document.getElementById("timerDisplay");
+    this.timerBtns     = document.querySelectorAll(".timer-btn");
+    this.webcamPreview = document.getElementById("webcamPreview");
+    this.webcamPlaceholder = document.getElementById("webcamPlaceholder");
+    this.micToggleBtn  = document.getElementById("micToggleBtn");
+    this.chatMessages  = document.getElementById("chatMessages");
+    this.chatInputForm = document.getElementById("chatInputForm");
+    this.userInput     = document.getElementById("userInput");
+    this.startBtn      = document.getElementById("startBtn");
+    this.askAgainBtn   = document.getElementById("askAgainBtn");
+    this.stopBtn       = document.getElementById("stopBtn");
+    this.reportBtn     = document.getElementById("reportBtn");
+    this.themeToggleBtn = document.getElementById("themeToggleBtn");
+  }
+
+  bindEvents() {
+    this.timerBtns.forEach((btn) => btn.addEventListener("click", (e) => this.setTimeLimit(e)));
+    this.micToggleBtn?.addEventListener("click",  () => this.toggleRecording());
+    this.chatInputForm?.addEventListener("submit", (e) => this.handleChatSubmit(e));
+    this.userInput?.addEventListener("input",     () => this.autoResizeTextarea());
+    this.startBtn?.addEventListener("click",      () => this.startInterview());
+    this.askAgainBtn?.addEventListener("click",   () => this.askAgain());
+    this.stopBtn?.addEventListener("click",       () => this.stopInterview());
+    this.reportBtn?.addEventListener("click",     () => this.generateReport());
+    this.themeToggleBtn?.addEventListener("click",() => this.toggleTheme());
+    document.addEventListener("keydown", (e) => this.handleKeyboardShortcuts(e));
+  }
+
+  /* ── Timer ───────────────────────────────────────────────── */
+  setTimeLimit(e) {
+    const minutes = parseInt(e.target.dataset.minutes);
+    this.selectedTimeLimit = minutes;
+    this.timerBtns.forEach((btn) => btn.classList.remove("active"));
+    e.target.classList.add("active");
+    this.timerDisplay.textContent = minutes === 0 ? "No Limit" : `${minutes}:00`;
+  }
+
+  startTimer() {
+    if (this.selectedTimeLimit === 0) {
+      this.timerDisplay.textContent = "00:00";
+      this.timerInterval = setInterval(() => {
+        const elapsed = Math.floor((Date.now() - this.interviewStartTime) / 1000);
+        const m = Math.floor(elapsed / 60), s = elapsed % 60;
+        this.timerDisplay.textContent = `${String(m).padStart(2,"0")}:${String(s).padStart(2,"0")}`;
+      }, 1000);
+    } else {
+      let remaining = this.selectedTimeLimit * 60;
+      this.timerInterval = setInterval(() => {
+        remaining--;
+        const m = Math.floor(remaining / 60), s = remaining % 60;
+        this.timerDisplay.textContent = `${String(m).padStart(2,"0")}:${String(s).padStart(2,"0")}`;
+        if (remaining <= 0) {
+          this.stopInterview();
+          this.addMessage("bot", "Time's up! The interview has ended. You can now generate your performance report.");
         }
- 
-        const token = localStorage.getItem("accessToken");
- 
-        // Mark interview as IN_PROGRESS
-        await fetch(`${API_BASE}/interview/status`, {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-                "Authorization": `Bearer ${token}`
-            },
-            body: JSON.stringify({
-                interviewId: this.currentInterviewId,
-                status: "IN_PROGRESS"
-            })
-        });
- 
-        this.isInterviewActive = true;
-        this.interviewStartTime = Date.now();
- 
-        this.startBtn.disabled  = true;
-        this.stopBtn.disabled   = false;
-        this.askAgainBtn.disabled = false;
- 
-        this.startTimer();
- 
-        setTimeout(async () => {
-            const question = await this.fetchFirstQuestion();
-            if (question) this.lastQuestion = question;
-        }, 500);
- 
-    } catch (err) {
-        console.error("Start interview failed:", err);
-        this.addMessage("bot", `Failed to start interview: ${err.message}`);
+      }, 1000);
     }
-}
- 
-stopInterview() {
+  }
+
+  stopTimer() {
+    clearInterval(this.timerInterval);
+    this.timerInterval = null;
+  }
+
+  /* ── Webcam ──────────────────────────────────────────────── */
+  async initializeWebcam() {
+    try {
+      this.webcamStream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
+      this.webcamPreview.srcObject = this.webcamStream;
+      this.webcamPreview.style.display = "block";
+      this.webcamPlaceholder.style.display = "none";
+    } catch {
+      this.webcamPlaceholder.innerHTML = '<i class="fas fa-video-slash"></i><br><small>Camera not available</small>';
+    }
+  }
+
+  /* ── Microphone / recording ──────────────────────────────── */
+  async toggleRecording() {
+    if (this.mediaRecorder && this.mediaRecorder.state === "recording") {
+      this.mediaRecorder.stop();
+      this.micToggleBtn.innerHTML = '<i class="fas fa-microphone"></i>';
+    } else {
+      this.audioChunks = [];
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      this.mediaRecorder = new MediaRecorder(stream, { mimeType: "audio/webm" });
+      this.mediaRecorder.ondataavailable = (e) => { if (e.data.size > 0) this.audioChunks.push(e.data); };
+      this.mediaRecorder.onstop = () => {
+        const blob = new Blob(this.audioChunks, { type: "audio/webm" });
+        this.sendAudioToTranscribe(blob);
+      };
+      this.mediaRecorder.start();
+      this.micToggleBtn.innerHTML = '<i class="fas fa-stop"></i>';
+    }
+  }
+
+  async sendAudioToTranscribe(blob) {
+    const formData = new FormData();
+    formData.append("audio", blob, "recording.webm");
+    try {
+      const res = await authFetch(`${API_BASE}/interview/transcribe`, {
+        method: "POST",
+        body:   formData,
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || "STT failed");
+      this.userInput.value = data.transcript;
+      this.userInput.focus();
+      this.autoResizeTextarea();
+    } catch (err) {
+      console.error("Transcription error:", err);
+      this.addMessage("bot", "Sorry, I couldn't understand your voice.");
+    }
+  }
+
+  /* ── TTS ─────────────────────────────────────────────────── */
+  enqueueTTS(text) {
+    this.ttsQueue.push(text);
+    if (!this.isSpeaking) this.playNextInQueue();
+  }
+
+  async playNextInQueue() {
+    if (!this.ttsQueue.length) { this.isSpeaking = false; return; }
+    this.isSpeaking = true;
+    const text = this.ttsQueue.shift();
+    try {
+      if (text.length > 300) {
+        for (const s of (text.match(/[^.!?]+[.!?]+/g) || [text])) {
+          await this.playTTSWithPromise(s.trim());
+        }
+      } else {
+        await this.playTTSWithPromise(text);
+      }
+    } catch (err) { console.error("TTS error:", err); }
+    this.playNextInQueue();
+  }
+
+  playTTSWithPromise(text) {
+    return new Promise((resolve) => {
+      authFetch(`${API_BASE}/interview/speak`, {
+        method: "POST",
+        body:   JSON.stringify({ text }),
+      })
+        .then((r) => { if (!r.ok) throw new Error("TTS failed"); return r.blob(); })
+        .then((blob) => {
+          const audio = new Audio(URL.createObjectURL(blob));
+          audio.onended = resolve;
+          audio.onerror = resolve;
+          audio.play();
+        })
+        .catch(() => resolve());
+    });
+  }
+
+  /* ── Chat ────────────────────────────────────────────────── */
+  addWelcomeMessage() {
+    this.addMessage("bot", "<strong>Welcome to AI Interview Bot!</strong><br><br>I'm here to help you practice for your upcoming interview. Ready when you are!");
+  }
+
+  handleChatSubmit(e) {
+    e.preventDefault();
+    const msg = this.userInput.value.trim();
+    if (!msg) return;
+    this.addMessage("user", msg);
+    this.userInput.value = "";
+    this.autoResizeTextarea();
+    this.processUserMessage(msg);
+  }
+
+  processUserMessage(message) {
+    this.chatHistory.push({ role: "user", content: message });
+    if (!this.isInterviewActive && this.isInterviewStartCommand(message)) {
+      this.prepareInterview(message);
+    } else if (this.isInterviewActive) {
+      this.handleInterviewResponse(message);
+    } else {
+      this.handleGeneralResponse(message);
+    }
+  }
+
+  isInterviewStartCommand(msg) {
+    const l = msg.toLowerCase();
+    return l.includes("interview") && (l.includes("practice") || l.includes("want to") || l.includes("apply") || l.includes("role"));
+  }
+
+  prepareInterview(message) {
+    const role    = this.extractRole(message);
+    const company = this.extractCompany(message);
+    let reply = `Excellent! I understand you want to practice for `;
+    if (role && company) reply += `a ${role} position at ${company}.`;
+    else if (role)       reply += `a ${role} position.`;
+    else if (company)    reply += `an interview at ${company}.`;
+    else                 reply += `your upcoming interview.`;
+    reply += `\n\nI'm ready to conduct a mock interview with you. Click "Start Interview" when you're ready!`;
+    this.addMessage("bot", reply);
+  }
+
+  extractCompany(msg) {
+    const companies = ["google","amazon","microsoft","apple","facebook","meta","netflix","tesla","uber","airbnb"];
+    const l = msg.toLowerCase();
+    for (const c of companies) if (l.includes(c)) return c.charAt(0).toUpperCase() + c.slice(1);
+    return null;
+  }
+
+  extractRole(msg) {
+    const roles = ["software engineer","software developer","frontend developer","backend developer","full stack developer","data scientist","product manager","designer","devops engineer"];
+    const l = msg.toLowerCase();
+    for (const r of roles) if (l.includes(r)) return r;
+    return null;
+  }
+
+  handleGeneralResponse(message) {
+    this.showTypingIndicator();
+    setTimeout(() => {
+      this.hideTypingIndicator();
+      const reply = message.toLowerCase().includes("help")
+        ? "I can help you practice for job interviews. Just tell me about the position you're applying for!"
+        : "To get started, please tell me about the position you're interviewing for.";
+      this.addMessage("bot", reply);
+    }, 800);
+  }
+
+  addMessage(sender, content) {
+    if (typeof content !== "string") content = "Something went wrong. Please try again.";
+    const msgDiv    = document.createElement("div");
+    msgDiv.className = `message ${sender}-message`;
+    const bubbleDiv  = document.createElement("div");
+    bubbleDiv.className = "message-bubble";
+    bubbleDiv.innerHTML = content;
+    msgDiv.appendChild(bubbleDiv);
+    this.chatMessages.appendChild(msgDiv);
+    this.chatMessages.scrollTop = this.chatMessages.scrollHeight;
+    if (sender === "bot" && this.isInterviewActive) {
+      this.enqueueTTS(content.replace(/<[^>]*>?/gm, ""));
+    }
+  }
+
+  showTypingIndicator() {
+    const d = document.createElement("div");
+    d.className = "message bot-message typing-indicator";
+    d.id = "typingIndicator";
+    d.innerHTML = `<div class="message-bubble"><div class="loading-indicator">AI is thinking<div class="dot"></div><div class="dot"></div><div class="dot"></div></div></div>`;
+    this.chatMessages.appendChild(d);
+    this.chatMessages.scrollTop = this.chatMessages.scrollHeight;
+  }
+
+  hideTypingIndicator() {
+    document.getElementById("typingIndicator")?.remove();
+  }
+
+  autoResizeTextarea() {
+    this.userInput.style.height = "auto";
+    this.userInput.style.height = Math.min(this.userInput.scrollHeight, 120) + "px";
+  }
+
+  /* ── Interview flow ──────────────────────────────────────── */
+  async ensureConfigExists() {
+    let configId = localStorage.getItem("currentConfigId");
+    if (configId) return configId;
+
+    const res = await authFetch(`${API_BASE}/interview-config/basics`, {
+      method: "POST",
+      body:   JSON.stringify({
+        durationMinutes: this.selectedTimeLimit || 10,
+        difficulty:      "intermediate",
+        type:            "technical",
+      }),
+    });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.error || "Failed to create interview config");
+    localStorage.setItem("currentConfigId", data.configId);
+    return data.configId;
+  }
+
+  async startInterview() {
+    try {
+      this.currentInterviewId = this.currentInterviewId || localStorage.getItem("currentInterviewId");
+      if (!this.currentInterviewId) throw new Error("Interview not initialized. Please go back and set up a new interview.");
+
+      await authFetch(`${API_BASE}/interview/status`, {
+        method: "POST",
+        body:   JSON.stringify({ interviewId: this.currentInterviewId, status: "IN_PROGRESS" }),
+      });
+
+      this.isInterviewActive  = true;
+      this.interviewStartTime = Date.now();
+      this.startBtn.disabled  = true;
+      this.stopBtn.disabled   = false;
+      this.askAgainBtn.disabled = false;
+      this.startTimer();
+
+      setTimeout(async () => {
+        const q = await this.fetchFirstQuestion();
+        if (q) this.lastQuestion = q;
+      }, 500);
+    } catch (err) {
+      console.error("Start interview failed:", err);
+      this.addMessage("bot", `Failed to start interview: ${err.message}`);
+    }
+  }
+
+  async fetchFirstQuestion() {
+    const lastMsg = this.chatHistory.find((m) => m.role === "user" && this.isInterviewStartCommand(m.content));
+    const message = lastMsg?.content || "I want to practice for a Software Engineer role";
+    const role    = this.extractRole(message) || "Software Engineer";
+    const company = this.extractCompany(message) || "";
+
+    const res  = await authFetch(`${API_BASE}/interview/start`, {
+      method: "POST",
+      body:   JSON.stringify({ interviewId: this.currentInterviewId, role, company }),
+    });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.error);
+
+    this.currentInterviewId = data.interviewId;
+    localStorage.setItem("currentInterviewId", data.interviewId);
+    this.addMessage("bot", data.question);
+    return data.question;
+  }
+
+  async handleInterviewResponse(userAnswer) {
+    this.showTypingIndicator();
+    try {
+      const res  = await authFetch(`${API_BASE}/interview/answer`, {
+        method: "POST",
+        body:   JSON.stringify({ interviewId: this.currentInterviewId, answer: userAnswer }),
+      });
+      const data = await res.json();
+      this.hideTypingIndicator();
+      if (!res.ok) throw new Error(data.error || "Failed to get next question");
+
+      if (data.done) {
+        this.stopInterview();
+        this.addMessage("bot", data.message || "Interview complete! Click 'Generate Report' to see your analysis.");
+        return;
+      }
+      const nextQ = data.nextQuestion || "Could you elaborate on that?";
+      this.addMessage("bot", nextQ);
+      this.lastQuestion = nextQ;
+    } catch (err) {
+      console.error("Interview follow-up failed:", err);
+      this.hideTypingIndicator();
+      this.addMessage("bot", "Hmm, I ran into an issue. Could you please try again?");
+    }
+  }
+
+  stopInterview() {
     this.isInterviewActive = false;
     this.stopTimer();
- 
-    // Persist the id before anything async happens
-    const interviewId =
-        this.currentInterviewId || localStorage.getItem("currentInterviewId");
- 
+
+    const interviewId = this.currentInterviewId || localStorage.getItem("currentInterviewId");
     if (interviewId) {
-        const token = localStorage.getItem("accessToken");
-        fetch(`${API_BASE}/interview/status`, {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-                "Authorization": `Bearer ${token}`
-            },
-            body: JSON.stringify({ interviewId, status: "COMPLETED" })
-        }).catch(err => console.warn("Status update failed (non-fatal):", err.message));
+      authFetch(`${API_BASE}/interview/status`, {
+        method: "POST",
+        body:   JSON.stringify({ interviewId, status: "COMPLETED" }),
+      }).catch((e) => console.warn("Status update (non-fatal):", e.message));
     }
- 
+
     this.startBtn.disabled    = false;
     this.stopBtn.disabled     = true;
     this.askAgainBtn.disabled = true;
-    this.reportBtn.style.display = "inline-flex";
- 
+    if (this.reportBtn) this.reportBtn.style.display = "inline-flex";
+
     const duration = Math.floor((Date.now() - this.interviewStartTime) / 1000);
-    const minutes  = Math.floor(duration / 60);
-    const seconds  = duration % 60;
- 
-    this.addMessage(
-        "bot",
-        `Interview completed! Duration: ${minutes}m ${seconds}s. Click "Generate Report" to see your performance analysis.`
-    );
-}
- 
+    const m = Math.floor(duration / 60), s = duration % 60;
+    this.addMessage("bot", `Interview completed! Duration: ${m}m ${s}s. Click "Generate Report" to see your performance analysis.`);
+  }
 
-            async fetchFirstQuestion() {
-                const token = localStorage.getItem("accessToken");
-                const interviewId = localStorage.getItem("currentInterviewId");
+  async askAgain() {
+    if (!this.lastQuestion) return;
+    this.addMessage("bot", "Please answer the previous question before asking for another.");
+  }
 
-                const lastMsg = this.chatHistory.find(
-                    msg => msg.role === 'user' && this.isInterviewStartCommand(msg.content)
-                );
-
-                const message = lastMsg?.content || "I want to practice for a Software Engineer role";
-                const role = this.extractRole(message) || "Software Engineer";
-                const company = this.extractCompany(message) || "";
-
-                const response = await fetch(`${API_BASE}/interview/start`, {
-                    method: "POST",
-                    headers: {
-                    "Content-Type": "application/json",
-                    "Authorization": `Bearer ${token}`
-                    },
-                    body: JSON.stringify({ interviewId, role, company })
-                });
-
-                const data = await response.json();
-                if (!response.ok) throw new Error(data.error);
-
-                this.currentInterviewId = data.interviewId;
-                localStorage.setItem("currentInterviewId", data.interviewId);
-
-                this.addMessage("bot", data.question);
-                return data.question;
-                }
-
-            async askAgain() {
-
-                if (!this.lastQuestion) return;
-                this.addMessage("bot", "Please answer the previous question before asking for another.");
-                
-                if (this.isInterviewActive && this.lastQuestion) {
-                    this.addMessage('bot', "Let me ask you a follow-up:");
-
-                    this.showTypingIndicator();
-
-                    const token = localStorage.getItem("accessToken");
-
-                    try {
-                        const response = await fetch(`${API_BASE}/interview/answer`, {
-                            method: "POST",
-                            headers: {
-                                "Content-Type": "application/json",
-                                "Authorization": `Bearer ${token}`,
-                            },
-                            body: JSON.stringify({
-                                interviewId: this.currentInterviewId,
-                                question: this.lastQuestion,
-                                answer: "", 
-                            }),
-                        });
-
-                        const data = await response.json();
-                        this.hideTypingIndicator();
-
-                        if (!response.ok) {
-                            throw new Error(data.detail || "Failed to get next question.");
-                        }
-
-                        this.addMessage('bot', data.nextquestion);
-                        this.lastQuestion = data.nextquestion;
-                    } catch (err) {
-                        console.error("Ask again failed:", err);
-                        this.addMessage('bot', "Couldn't generate another question right now.");
-                        this.hideTypingIndicator();
-                    }
-                }
-            }
-
-            async generateReport() {
-    // Recover the interview ID from every possible source
-    const interviewId =
-        this.currentInterviewId ||
-        localStorage.getItem("currentInterviewId");
- 
+  async generateReport() {
+    const interviewId = this.currentInterviewId || localStorage.getItem("currentInterviewId");
     if (!interviewId) {
-        this.addMessage("bot", "No interview ID found. Please complete an interview first.");
-        return;
+      this.addMessage("bot", "No interview ID found. Please complete an interview first.");
+      return;
     }
- 
-    const token = localStorage.getItem("accessToken");
-    if (!token) {
-        window.location.href = "login.html";
-        return;
-    }
- 
-    this.addMessage("bot", "Generating your interview performance report...");
- 
+
+    this.addMessage("bot", "Generating your interview performance report…");
+
     try {
-        // Step 1: make sure the interview is marked COMPLETED
-        const statusRes = await fetch(`${API_BASE}/interview/status`, {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-                "Authorization": `Bearer ${token}`
-            },
-            body: JSON.stringify({ interviewId, status: "COMPLETED" })
-        });
-        if (!statusRes.ok) {
-            console.warn("Status update failed (non-fatal):", await statusRes.text());
-        }
- 
-        // Step 2: fetch the report
-        const response = await fetch(`${API_BASE}/interview/report/${interviewId}`, {
-            headers: { "Authorization": `Bearer ${token}` }
-        });
- 
-        // Log the raw response before trying to parse it
-        const rawText = await response.text();
-        console.log("[generateReport] raw response:", rawText.substring(0, 500));
- 
-        if (!response.ok) {
-            throw new Error(`Server ${response.status}: ${rawText}`);
-        }
- 
-        const reportData = JSON.parse(rawText);
- 
-        localStorage.setItem("latestReport", JSON.stringify(reportData));
-        sessionStorage.setItem("interviewReport", JSON.stringify(reportData));
- 
-        this.addMessage("bot", `
-            <strong>Report ready!</strong><br><br>
-            Overall Score: <strong>${reportData.ratings?.overall ?? "—"}</strong>/100<br>
-            Redirecting to your dashboard in 3 seconds…
-        `);
- 
-        setTimeout(() => {
-            window.location.href = `dashboard1.html?id=${interviewId}`;
-        }, 3000);
- 
+      await authFetch(`${API_BASE}/interview/status`, {
+        method: "POST",
+        body:   JSON.stringify({ interviewId, status: "COMPLETED" }),
+      }).catch(() => {});
+
+      const res = await authFetch(`${API_BASE}/interview/report/${interviewId}`);
+      const raw = await res.text();
+      if (!res.ok) throw new Error(`Server ${res.status}: ${raw}`);
+
+      const reportData = JSON.parse(raw);
+      localStorage.setItem("latestReport", JSON.stringify(reportData));
+
+      this.addMessage("bot", `
+        <strong>Report ready!</strong><br><br>
+        Overall Score: <strong>${reportData.ratings?.overall ?? "—"}</strong>/100<br>
+        Redirecting to your dashboard in 3 seconds…
+      `);
+      setTimeout(() => { window.location.href = `dashboard1.html?id=${interviewId}`; }, 3000);
     } catch (err) {
-        // Show the REAL error — not a generic message
-        console.error("[generateReport] FAILED:", err);
-        this.addMessage(
-            "bot",
-            `Report generation failed: <strong>${err.message}</strong><br>
-             Check the browser console (F12) for details, or
-             <a href="dashboard1.html?id=${interviewId}" style="color:#60a5fa">
-               open the report page directly
-             </a>.`
-        );
+      console.error("[generateReport] FAILED:", err);
+      this.addMessage("bot", `Report generation failed: <strong>${err.message}</strong><br>
+        <a href="dashboard1.html?id=${interviewId}" style="color:#60a5fa">Open the report page directly</a>.`);
     }
+  }
+
+  /* ── Theme ───────────────────────────────────────────────── */
+  loadTheme() {
+    if (localStorage.getItem("interview-bot-theme") === "dark") {
+      document.body.classList.add("dark-mode");
+      if (this.themeToggleBtn) this.themeToggleBtn.innerHTML = '<i class="fas fa-sun"></i>';
+    }
+  }
+
+  toggleTheme() {
+    document.body.classList.toggle("dark-mode");
+    const isDark = document.body.classList.contains("dark-mode");
+    if (this.themeToggleBtn) this.themeToggleBtn.innerHTML = isDark ? '<i class="fas fa-sun"></i>' : '<i class="fas fa-moon"></i>';
+    localStorage.setItem("interview-bot-theme", isDark ? "dark" : "light");
+  }
+
+  handleKeyboardShortcuts(e) {
+    if ((e.ctrlKey || e.metaKey) && e.key === "Enter" && document.activeElement === this.userInput) {
+      this.chatInputForm.dispatchEvent(new Event("submit"));
+    }
+  }
 }
 
-            loadTheme() {
-                const savedTheme = localStorage.getItem('interview-bot-theme') || 'light';
-                if (savedTheme === 'dark') {
-                    document.body.classList.add('dark-mode');
-                    this.themeToggleBtn.innerHTML = '<i class="fas fa-sun"></i>';
-                }
-            }
-
-            toggleTheme() {
-                document.body.classList.toggle('dark-mode');
-                const isDark = document.body.classList.contains('dark-mode');
-                
-                this.themeToggleBtn.innerHTML = isDark ? 
-                    '<i class="fas fa-sun"></i>' : 
-                    '<i class="fas fa-moon"></i>';
-                
-                localStorage.setItem('interview-bot-theme', isDark ? 'dark' : 'light');
-            }
-
-            handleKeyboardShortcuts(e) {
-                if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
-                    if (document.activeElement === this.userInput) {
-                        this.chatInputForm.dispatchEvent(new Event('submit'));
-                    }
-                }
-                
-                if (e.key === 'Escape') {
-                    this.userInput.focus();
-                }
-            }
-        }
-
-        document.addEventListener('DOMContentLoaded', () => {
-            new InterviewBot();
-        });
-
-        function formatTime(seconds) {
-            const mins = Math.floor(seconds / 60);
-            const secs = seconds % 60;
-            return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
-        }
-
-        window.addEventListener('error', (e) => {
-            console.error('Application error:', e.error);
-        });
-
-        document.addEventListener('visibilitychange', () => {
-        });
+document.addEventListener("DOMContentLoaded", () => { new InterviewBot(); });

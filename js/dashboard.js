@@ -1,225 +1,106 @@
-class DashboardManager {
-            constructor() {
-                this.reportData = null;
-                this.loadReport();
-            }
+/**
+ * dashboard.js — Fixed
+ *
+ * Changes from original:
+ *  - Uses authHelper.authFetch() so the token is always included
+ *  - Redirects to login automatically on 401/403
+ *  - No dual localStorage/sessionStorage look-up
+ */
 
-            loadReport() {
-                let reportData = localStorage.getItem('latestReport') || 
-                                sessionStorage.getItem('interviewReport') || 
-                                localStorage.getItem('interviewReport');
+import { API_BASE } from "./js/config.js";
+import { requireAuth, authFetch } from "./js/authHelper.js";
 
-                if (reportData) {
-                    try {
-                        this.reportData = JSON.parse(reportData);
-                        this.renderDashboard();
-                    } catch (error) {
-                        console.error('Error parsing report data:', error);
-                        this.showError();
-                    }
-                } else {
-                    this.showError();
-                }
-            }
+/* ── Guard: redirect to login if not authenticated ─────────── */
+requireAuth();
 
-            renderDashboard() {
-                setTimeout(() => {
-                    document.getElementById('loadingContainer').style.display = 'none';
-                    document.getElementById('dashboardContent').style.display = 'block';
-                    
-                    this.populateCandidateInfo();
-                    this.populateScores();
-                    this.populateSkills();
-                    this.populateGrammar();
-                    this.populateEmotions();
-                    this.populateRecommendations();
-                    this.populateFlagged();
-                }, 1500);
-            }
+/* ── DOM refs ───────────────────────────────────────────────── */
+const container  = document.getElementById("interviewsContainer");
+const kpiTotal   = document.getElementById("kpiTotal");
+const kpiAvgScore = document.getElementById("kpiAvgScore");
+const kpiIssues  = document.getElementById("kpiIssues");
+const kpiDuration = document.getElementById("kpiDuration");
 
-            populateCandidateInfo() {
-                const { candidate, interview } = this.reportData;
-                
-                document.getElementById('candidatePhoto').src = candidate.photo;
-                document.getElementById('candidateName').textContent = candidate.name;
-                document.getElementById('candidateEmail').textContent = candidate.email;
-                document.getElementById('candidateRole').textContent = candidate.role;
-                document.getElementById('interviewCompany').textContent = interview.company;
-                document.getElementById('interviewDate').textContent = new Date(interview.date).toLocaleDateString();
-                document.getElementById('interviewDuration').textContent = interview.duration;
-            }
+/* ── Load dashboard ─────────────────────────────────────────── */
+async function loadDashboard() {
+  try {
+    const res = await authFetch(`${API_BASE}/interview/reports`);
 
-            populateScores() {
-                const { ratings, grammar } = this.reportData;
-                
-                this.animateScore('overallScore', ratings.overall);
-                this.animateScore('contentScore', ratings.content);
-                this.animateScore('confidenceScore', ratings.confidence);
-                this.animateScore('grammarScore', grammar.score);
-            }
+    if (!res.ok) {
+      container.innerHTML = `<p style="color:var(--color-text-danger)">Failed to load interviews (${res.status})</p>`;
+      return;
+    }
 
-            animateScore(elementId, targetScore) {
-                const element = document.getElementById(elementId);
-                let currentScore = 0;
-                const increment = targetScore / 50;
-                
-                const timer = setInterval(() => {
-                    currentScore += increment;
-                    if (currentScore >= targetScore) {
-                        currentScore = targetScore;
-                        clearInterval(timer);
-                    }
-                    element.textContent = Math.round(currentScore) + '%';
-                }, 40);
-            }
+    const { reports } = await res.json();
+    container.innerHTML = "";
 
-            populateSkills() {
-                const skillsList = document.getElementById('skillsList');
-                const { skills } = this.reportData;
-                
-                skillsList.innerHTML = skills.map(skill => `
-                    <div class="skill-item">
-                        <span class="skill-name">${skill.skill}</span>
-                        <div style="display: flex; align-items: center; gap: 10px;">
-                            <div class="progress-bar">
-                                <div class="progress-fill" style="width: ${skill.score}%"></div>
-                            </div>
-                            <span class="skill-score">${skill.score}%</span>
-                        </div>
-                    </div>
-                `).join('');
-            }
+    if (!reports || reports.length === 0) {
+      container.innerHTML = `<p style="color:#5A6B7A;padding:20px 0">No interviews yet. Start your first one!</p>`;
+      updateKPIs([]);
+      return;
+    }
 
-            populateGrammar() {
-                const { grammar } = this.reportData;
-                
-                document.getElementById('totalErrors').textContent = grammar.total_errors || grammar.mistakes?.length || 0;
-                
-                if (grammar.mistakes && grammar.mistakes.length > 0) {
-                    const mistakesContainer = document.getElementById('grammarMistakes');
-                    const mistakesList = document.getElementById('mistakesList');
-                    
-                    mistakesContainer.style.display = 'block';
-                    mistakesList.innerHTML = grammar.mistakes.map(mistake => 
-                        `<div class="mistake-item">• ${mistake}</div>`
-                    ).join('');
-                }
-                
-                if (grammar.corrections && grammar.corrections.length > 0) {
-                    const correctionsContainer = document.getElementById('grammarCorrections');
-                    const correctionsList = document.getElementById('correctionsList');
-                    
-                    correctionsContainer.style.display = 'block';
-                    correctionsList.innerHTML = grammar.corrections.map(correction => 
-                        `<div class="correction-item">• ${correction}</div>`
-                    ).join('');
-                }
-            }
+    reports.forEach((report) => {
+      const card = document.createElement("div");
+      card.className = "interview-card";
+      card.style.cursor = "pointer";
+      card.addEventListener("click", () => {
+        window.location.href = `dashboard1.html?id=${report.id}`;
+      });
 
-            populateEmotions() {
-                const { emotions, dominant_emotion } = this.reportData;
-                
-                document.getElementById('dominantEmotion').textContent = dominant_emotion;
-                
-                const emotionChart = document.getElementById('emotionChart');
-                emotionChart.innerHTML = emotions.map(emotion => `
-                    <div class="emotion-tag">
-                        <i class="fas fa-${this.getEmotionIcon(emotion.emotion)}"></i>
-                        ${emotion.emotion} (${emotion.percentage}%)
-                    </div>
-                `).join('');
-            }
+      card.innerHTML = `
+        <div class="interview-left">
+          <div class="avatar"></div>
+          <div class="interview-info">
+            <h3>${escHtml(report.candidate?.name ?? "—")}</h3>
+            <h2>${escHtml(report.candidate?.role ?? "—")}</h2>
+            <div class="interview-meta">
+              <span>${new Date(report.interview?.date).toLocaleString()}</span>
+              <span>${report.interview?.duration ?? 0} min</span>
+            </div>
+          </div>
+        </div>
+        <div class="interview-right">
+          <div class="score">
+            <div class="score-value">${report.ratings?.overall ?? "—"}</div>
+            <div class="score-label">Overall Score</div>
+          </div>
+        </div>
+      `;
 
-            getEmotionIcon(emotion) {
-                const icons = {
-                    'confident': 'smile',
-                    'nervous': 'frown',
-                    'excited': 'grin-hearts',
-                    'uncertain': 'meh',
-                    'calm': 'smile-beam',
-                    'stressed': 'tired'
-                };
-                return icons[emotion.toLowerCase()] || 'meh';
-            }
+      container.appendChild(card);
+    });
 
-            populateRecommendations() {
-                const { recommendation } = this.reportData;
-                
-                const strengthsList = document.getElementById('strengthsList');
-                strengthsList.innerHTML = recommendation.strengths.map(strength => `
-                    <li>
-                        <i class="fas fa-check rec-icon"></i>
-                        <span>${strength}</span>
-                    </li>
-                `).join('');
-                
-                const improvementsList = document.getElementById('improvementsList');
-                improvementsList.innerHTML = recommendation.areasToImprove.map(area => `
-                    <li>
-                        <i class="fas fa-arrow-up rec-improve"></i>
-                        <span>${area}</span>
-                    </li>
-                `).join('');
-                
-                const actionsList = document.getElementById('actionsList');
-                actionsList.innerHTML = recommendation.actionableTips.map(tip => `
-                    <li>
-                        <i class="fas fa-tasks" style="color: #667eea;"></i>
-                        <span>${tip}</span>
-                    </li>
-                `).join('');
-            }
+    updateKPIs(reports);
+  } catch (err) {
+    console.error("Dashboard load failed:", err);
+    if (container) {
+      container.innerHTML = `<p style="color:#ef4444">Error loading dashboard: ${escHtml(err.message)}</p>`;
+    }
+  }
+}
 
-            populateFlagged() {
-                const { flagged } = this.reportData;
-                
-                if (flagged && flagged.length > 0) {
-                    const flaggedSection = document.getElementById('flaggedSection');
-                    const flaggedList = document.getElementById('flaggedList');
-                    
-                    flaggedSection.style.display = 'block';
-                    flaggedList.innerHTML = flagged.map(item => `
-                        <div class="flagged-item">
-                            <strong>Question:</strong> ${item.question}<br>
-                            <strong>Feedback:</strong> ${item.feedback}<br>
-                            <strong>Score:</strong> ${item.score}%
-                        </div>
-                    `).join('');
-                }
-            }
+/* ── KPIs ───────────────────────────────────────────────────── */
+function updateKPIs(reports) {
+  const total = reports.length;
+  const avgScore = total > 0
+    ? Math.round(reports.reduce((s, r) => s + (r.ratings?.overall || 0), 0) / total)
+    : 0;
+  const totalDuration = reports.reduce((s, r) => s + (r.interview?.duration || 0), 0);
+  const issues = reports.reduce((s, r) => s + (r.issuesCount || 0), 0);
 
-            showError() {
-                setTimeout(() => {
-                    document.getElementById('loadingContainer').style.display = 'none';
-                    document.getElementById('errorMessage').style.display = 'block';
-                }, 1000);
-            }
-        }
+  if (kpiTotal)    kpiTotal.textContent    = total;
+  if (kpiAvgScore) kpiAvgScore.textContent = avgScore;
+  if (kpiDuration) kpiDuration.textContent = `${totalDuration}m`;
+  if (kpiIssues)   kpiIssues.textContent   = issues;
+}
 
-        document.addEventListener('DOMContentLoaded', () => {
-            new DashboardManager();
-        });
+/* ── Helpers ────────────────────────────────────────────────── */
+function escHtml(str) {
+  return String(str ?? "")
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;");
+}
 
-        function startNewInterview() {
-            localStorage.removeItem('latestReport');
-            sessionStorage.removeItem('interviewReport');
-            
-            window.location.href = 'interview.html'; 
-        }
-
-        function downloadReport() {
-            const reportData = JSON.parse(localStorage.getItem('latestReport') || sessionStorage.getItem('interviewReport'));
-            if (reportData) {
-                const dataStr = JSON.stringify(reportData, null, 2);
-                const dataBlob = new Blob([dataStr], {type: 'application/json'});
-                
-                const link = document.createElement('a');
-                link.href = URL.createObjectURL(dataBlob);
-                link.download = `interview-report-${new Date().toISOString().split('T')[0]}.json`;
-                link.click();
-            }
-        }
-
-        function goToInterview() {
-            window.location.href = 'interview.html'; 
-        }
+loadDashboard();

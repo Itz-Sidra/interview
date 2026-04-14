@@ -1,200 +1,85 @@
 /**
- * Evalvate Auth & User State Management
- * Handles user authentication state, credits, and profile data
+ * auth.js — Backwards-compatibility shim
+ *
+ * Some HTML pages load this as a module and reference `EvalvateAuth` globally.
+ * This shim re-exports authHelper functions under the old EvalvateAuth API so
+ * nothing breaks during the transition. All real logic lives in authHelper.js.
+ *
+ * Usage in HTML (no change needed):
+ *   <script type="module" src="js/auth.js"></script>
  */
 
+import {
+  getToken,
+  setToken,
+  clearToken,
+  isLoggedIn,
+  getUser,
+  setUser,
+  getCredits,
+  setCredits,
+  logout,
+} from "./authHelper.js";
+
 const EvalvateAuth = {
-  // Storage keys
-  KEYS: {
-    USER: 'evalvate_user',
-    CREDITS: 'evalvate_credits',
-    INTERVIEWS: 'evalvate_interviews',
-    IS_LOGGED_IN: 'evalvate_logged_in'
+  isLoggedIn,
+  getUser,
+  setUser,
+  getCredits,
+  setCredits,
+
+  /** @deprecated – token always in localStorage now */
+  requireAuth(redirect = "login.html") {
+    if (!isLoggedIn()) { window.location.href = redirect; return false; }
+    return true;
   },
 
-  // Default values for new users
-  DEFAULTS: {
-    CREDITS: 200,
-    PLAN: 'Free Trial'
-  },
+  logout,
 
-  /**
-   * Check if user is logged in
-   * @returns {boolean}
-   */
-  isLoggedIn() {
-  return (
-    !!localStorage.getItem('accessToken') ||
-    !!sessionStorage.getItem('accessToken')
-  );
-},
-
-  /**
-   * Get current user data
-   * @returns {Object|null}
-   */
-  getUser() {
-    const userData = localStorage.getItem(this.KEYS.USER);
-    return userData ? JSON.parse(userData) : null;
-  },
-
-  /**
-   * Set user data after login/signup
-   * @param {Object} userData - User data object
-   */
-  setUser(userData) {
-    const user = {
-      id: userData.id || Date.now(),
-      name: userData.name || 'User',
-      email: userData.email || '',
-      avatar: userData.avatar || null,
-      plan: userData.plan || this.DEFAULTS.PLAN,
-      createdAt: userData.createdAt || new Date().toISOString()
-    };
-    
-    localStorage.setItem(this.KEYS.USER, JSON.stringify(user));
-    localStorage.setItem(this.KEYS.IS_LOGGED_IN, 'true');
-    
-    // Initialize credits for new users
-    if (!localStorage.getItem(this.KEYS.CREDITS)) {
-      this.setCredits(this.DEFAULTS.CREDITS);
-    }
-    
-    // Initialize empty interviews array
-    if (!localStorage.getItem(this.KEYS.INTERVIEWS)) {
-      localStorage.setItem(this.KEYS.INTERVIEWS, JSON.stringify([]));
-    }
-    
-    return user;
-  },
-
-  /**
-   * Get remaining interview credits
-   * @returns {number}
-   */
-  getCredits() {
-    const credits = localStorage.getItem(this.KEYS.CREDITS);
-    return credits ? parseInt(credits, 10) : this.DEFAULTS.CREDITS;
-  },
-
-  /**
-   * Set credits
-   * @param {number} credits
-   */
-  setCredits(credits) {
-    localStorage.setItem(this.KEYS.CREDITS, credits.toString());
-  },
-
-  /**
-   * Deduct a credit (called when starting an interview)
-   * @returns {boolean} - True if credit was deducted, false if no credits left
-   */
   useCredit() {
-    const currentCredits = this.getCredits();
-    if (currentCredits > 0) {
-      this.setCredits(currentCredits - 1);
-      return true;
-    }
+    const c = getCredits();
+    if (c > 0) { setCredits(c - 1); return true; }
     return false;
   },
 
-  /**
-   * Add credits (for purchases or bonuses)
-   * @param {number} amount
-   */
-  addCredits(amount) {
-    const currentCredits = this.getCredits();
-    this.setCredits(currentCredits + amount);
+  addCredits(n) { setCredits(getCredits() + n); },
+
+  getUserInitials() {
+    const user = getUser();
+    if (!user?.name) return "U";
+    const parts = user.name.trim().split(" ");
+    return parts.length >= 2
+      ? (parts[0][0] + parts[parts.length - 1][0]).toUpperCase()
+      : user.name.substring(0, 2).toUpperCase();
   },
 
-  /**
-   * Get past interviews
-   * @returns {Array}
-   */
+  /** Kept for dashboard-home compatibility */
   getInterviews() {
-    const interviews = localStorage.getItem(this.KEYS.INTERVIEWS);
-    return interviews ? JSON.parse(interviews) : [];
+    try { return JSON.parse(localStorage.getItem("evalvate_interviews")) || []; }
+    catch { return []; }
   },
 
-  /**
-   * Add a new interview record
-   * @param {Object} interview
-   */
   addInterview(interview) {
-    const interviews = this.getInterviews();
-    interviews.unshift({
-      id: Date.now(),
-      date: new Date().toISOString(),
-      role: interview.role || 'General',
-      score: interview.score || null,
-      status: interview.status || 'completed',
-      duration: interview.duration || '0:00'
+    const list = this.getInterviews();
+    list.unshift({
+      id:       Date.now(),
+      date:     new Date().toISOString(),
+      role:     interview.role     || "General",
+      score:    interview.score    || null,
+      status:   interview.status   || "completed",
+      duration: interview.duration || "0:00",
     });
-    localStorage.setItem(this.KEYS.INTERVIEWS, JSON.stringify(interviews));
+    localStorage.setItem("evalvate_interviews", JSON.stringify(list));
   },
 
-  /**
-   * Logout user and clear session data (not credits/interviews)
-   */
-  logout() {
-    localStorage.removeItem(this.KEYS.IS_LOGGED_IN);
-    // Optionally keep user data for "remember me" functionality
-    // localStorage.removeItem(this.KEYS.USER);
-  },
-
-  /**
-   * Full account reset (clears everything)
-   */
-  clearAll() {
-    Object.values(this.KEYS).forEach(key => {
-      localStorage.removeItem(key);
-    });
-  },
-
-  /**
-   * Update user profile
-   * @param {Object} updates - Fields to update
-   */
   updateUser(updates) {
-    const user = this.getUser();
-    if (user) {
-      const updatedUser = { ...user, ...updates };
-      localStorage.setItem(this.KEYS.USER, JSON.stringify(updatedUser));
-      return updatedUser;
-    }
+    const user = getUser();
+    if (user) { const u = { ...user, ...updates }; setUser(u); return u; }
     return null;
   },
-
-  /**
-   * Get user initials for avatar placeholder
-   * @returns {string}
-   */
-  getUserInitials() {
-    const user = this.getUser();
-    if (user && user.name) {
-      const names = user.name.trim().split(' ');
-      if (names.length >= 2) {
-        return (names[0][0] + names[names.length - 1][0]).toUpperCase();
-      }
-      return names[0].substring(0, 2).toUpperCase();
-    }
-    return 'U';
-  },
-
-  /**
-   * Check auth and redirect if not logged in
-   * @param {string} redirectUrl - URL to redirect to if not logged in
-   */
-  requireAuth(redirectUrl = 'login.html') {
-    if (!this.isLoggedIn()) {
-      window.location.href = redirectUrl;
-      return false;
-    }
-    return true;
-  }
 };
 
-// Export for use in other files
-if (typeof module !== 'undefined' && module.exports) {
-  module.exports = EvalvateAuth;
-}
+/* Make globally accessible for non-module scripts */
+window.EvalvateAuth = EvalvateAuth;
+
+export default EvalvateAuth;

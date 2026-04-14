@@ -1,19 +1,27 @@
-import { API_BASE } from "./js/config.js";
+/**
+ * dashboard1.js — Fixed
+ *
+ * Changes from original:
+ *  - Uses authHelper.authFetch() — no manual token look-up
+ *  - requireAuth() guard at top
+ *  - No dual localStorage/sessionStorage look-up
+ */
 
-/* ── 1. Read interview ID ─────────────────────────────────────────────────── */
+import { API_BASE } from "./js/config.js";
+import { requireAuth, authFetch } from "./js/authHelper.js";
+
+requireAuth();
+
+/* ── Read interview ID from URL ─────────────────────────────── */
 const params      = new URLSearchParams(window.location.search);
 const interviewId = params.get("id");
 
-console.log("[dashboard1] API_BASE   :", API_BASE);
-console.log("[dashboard1] full URL   :", window.location.href);
-console.log("[dashboard1] interviewId:", interviewId);
-
 if (!interviewId) {
-  alert("No interview ID found in URL. Expected: dashboard1.html?id=<interviewId>");
+  alert("No interview ID found in URL. Expected: dashboard1.html?id=<id>");
   window.location.href = "dashboard.html";
 }
 
-/* ── 2. DOM refs ─────────────────────────────────────────────────────────── */
+/* ── DOM refs ───────────────────────────────────────────────── */
 const candidateName     = document.getElementById("candidateName");
 const interviewDate     = document.getElementById("interviewDate");
 const overallScore      = document.getElementById("overallScore");
@@ -22,22 +30,13 @@ const flaggedTitle      = document.getElementById("flaggedTitle");
 const flaggedContainer  = document.getElementById("flaggedContainer");
 const metricsGrid       = document.getElementById("metricsGrid");
 
-/* ── 3. Metric helpers ───────────────────────────────────────────────────── */
-function calcFiller(report) {
-  const n = report.flagged?.filter(i => i.category === "FILLER_WORDS").length || 0;
-  return Math.max(100 - n * 10, 60);
-}
-function calcTechnical(report) {
-  const n = report.flagged?.filter(i => i.category === "TECHNICAL").length || 0;
-  return Math.max(90 - n * 5, 60);
-}
-function calcVocal(report) {
-  const n = report.flagged?.filter(i => i.category === "VOCAL").length || 0;
-  return Math.max(90 - n * 5, 60);
-}
+/* ── Metrics ────────────────────────────────────────────────── */
+function calcFiller(report)    { const n = report.flagged?.filter(i => i.category === "FILLER_WORDS").length || 0; return Math.max(100 - n * 10, 60); }
+function calcTechnical(report) { const n = report.flagged?.filter(i => i.category === "TECHNICAL").length    || 0; return Math.max(90  - n * 5,  60); }
+function calcVocal(report)     { const n = report.flagged?.filter(i => i.category === "VOCAL").length        || 0; return Math.max(90  - n * 5,  60); }
 
 function renderMetrics(report) {
-  if (!metricsGrid) { console.warn("[dashboard1] metricsGrid element not found"); return; }
+  if (!metricsGrid) return;
   metricsGrid.innerHTML = "";
   const metrics = [
     { label: "Communication", score: report.ratings?.content    ?? 0 },
@@ -47,30 +46,28 @@ function renderMetrics(report) {
     { label: "Technical",     score: calcTechnical(report)           },
     { label: "Vocal",         score: calcVocal(report)               },
   ];
-  metrics.forEach(m => {
+  metrics.forEach((m) => {
     const card = document.createElement("div");
     card.className = "metric-card";
     card.innerHTML = `
       <div class="metric-header"><span>${m.label}</span></div>
       <div class="metric-bar">
-        <div class="bar-fill" style="width:${Math.min(m.score,100)}%"></div>
+        <div class="bar-fill" style="width:${Math.min(m.score, 100)}%"></div>
       </div>
       <div class="metric-score">${m.score}</div>`;
     metricsGrid.appendChild(card);
   });
 }
 
-/* ── 4. escHtml ──────────────────────────────────────────────────────────── */
+/* ── escHtml ────────────────────────────────────────────────── */
 function escHtml(str) {
   return String(str ?? "")
-    .replace(/&/g,"&amp;").replace(/</g,"&lt;")
-    .replace(/>/g,"&gt;").replace(/"/g,"&quot;");
+    .replace(/&/g, "&amp;").replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;").replace(/"/g, "&quot;");
 }
 
-/* ── 5. Render full report ───────────────────────────────────────────────── */
+/* ── Render report ──────────────────────────────────────────── */
 function renderReport(report) {
-  console.log("[dashboard1] renderReport:", report);
-
   if (candidateName)     candidateName.textContent  = report.candidate?.name ?? "—";
   if (interviewDate)     interviewDate.textContent   = report.interview?.date
     ? new Date(report.interview.date).toLocaleString() : "—";
@@ -86,7 +83,6 @@ function renderReport(report) {
   renderMetrics(report);
 
   const issues = report.flagged || [];
-  console.log("[dashboard1] issues:", issues.length);
   if (flaggedTitle)    flaggedTitle.textContent   = `Flagged Issues (${issues.length})`;
   if (flaggedContainer) flaggedContainer.innerHTML = "";
 
@@ -94,14 +90,14 @@ function renderReport(report) {
     if (flaggedContainer)
       flaggedContainer.innerHTML = `<p style="color:#5A6B7A;">No issues flagged 🎉</p>`;
   } else {
-    issues.forEach(issue => {
+    issues.forEach((issue) => {
       const div = document.createElement("div");
       div.className = "issue-card";
       const borderColor = issue.severity >= 3 ? "#ef4444" : issue.severity === 2 ? "#f59e0b" : "#3b82f6";
       div.style.cssText = `border-left:3px solid ${borderColor};background:rgba(255,255,255,0.04);
         border-radius:8px;padding:14px;margin-bottom:12px;`;
       div.innerHTML = `
-        <div class="issue-header" style="display:flex;justify-content:space-between;margin-bottom:8px;">
+        <div style="display:flex;justify-content:space-between;margin-bottom:8px;">
           <span style="font-weight:600;font-size:13px;color:#e4e4e7;">${escHtml(issue.category)}</span>
           <span style="color:#9ca3af;font-size:12px;">Severity ${issue.severity ?? 1}</span>
         </div>
@@ -117,7 +113,7 @@ function renderReport(report) {
   if (report.recommendation) renderRecommendations(report.recommendation);
 }
 
-/* ── 6. Recommendations ──────────────────────────────────────────────────── */
+/* ── Recommendations ────────────────────────────────────────── */
 function renderRecommendations(rec) {
   const rightCol = document.querySelector(".right-column");
   if (!rightCol) return;
@@ -125,14 +121,14 @@ function renderRecommendations(rec) {
   let recSection = document.getElementById("recommendationSection");
   if (!recSection) {
     recSection = document.createElement("div");
-    recSection.id        = "recommendationSection";
+    recSection.id = "recommendationSection";
     recSection.className = "flagged-section";
     recSection.style.cssText = "margin-top:20px;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.1);border-radius:12px;padding:24px;";
     rightCol.appendChild(recSection);
   }
 
-  const mkList = arr =>
-    (arr || []).map(i => `<li style="margin-bottom:6px;color:#d1d5db;">${escHtml(i)}</li>`).join("");
+  const mkList = (arr) =>
+    (arr || []).map((i) => `<li style="margin-bottom:6px;color:#d1d5db;">${escHtml(i)}</li>`).join("");
 
   recSection.innerHTML = `
     <h3 style="margin-bottom:16px;color:#e4e4e7;font-size:16px;">📋 Recommendations</h3>
@@ -144,89 +140,60 @@ function renderRecommendations(rec) {
       <ul style="padding-left:18px;">${mkList(rec.actionableTips)}</ul>` : ""}`;
 }
 
-/* ── 7. setLoading ───────────────────────────────────────────────────────── */
-function setLoading(on) {
-  if (!on) return;
+/* ── Loading state ──────────────────────────────────────────── */
+function setLoading() {
+  if (candidateName)    candidateName.textContent  = "Loading…";
   if (flaggedTitle)     flaggedTitle.textContent   = "Loading report…";
-  if (flaggedContainer) flaggedContainer.innerHTML  = `<p style="color:#6b7280;">Please wait…</p>`;
-  if (candidateName)    candidateName.textContent   = "Loading…";
-  if (overallScore)     overallScore.textContent    = "—";
+  if (flaggedContainer) flaggedContainer.innerHTML = `<p style="color:#6b7280;">Please wait…</p>`;
+  if (overallScore)     overallScore.textContent   = "—";
   if (overallScoreLarge) overallScoreLarge.textContent = "—";
 }
 
-/* ── 8. loadReport ───────────────────────────────────────────────────────── */
+/* ── Load report ────────────────────────────────────────────── */
 async function loadReport() {
-  console.log("[dashboard1] loadReport() interviewId:", interviewId);
-  const token = localStorage.getItem("accessToken") || sessionStorage.getItem("accessToken");
-  console.log("[dashboard1] token present:", !!token);
-  if (!token) { window.location.href = "login.html"; return; }
-
-  setLoading(true);
-
-  const url = `${API_BASE}/interview/report/${interviewId}`;
-  console.log("[dashboard1] GET", url);
-
+  setLoading();
   try {
-    const res = await fetch(url, { headers: { Authorization: `Bearer ${token}` } });
-    console.log("[dashboard1] response status:", res.status);
-
+    const res = await authFetch(`${API_BASE}/interview/report/${interviewId}`);
     if (!res.ok) {
-      const errText = await res.text();
-      console.error("[dashboard1] error body:", errText);
-      throw new Error(`Server ${res.status}: ${errText}`);
+      const text = await res.text();
+      throw new Error(`Server ${res.status}: ${text}`);
     }
-
     const report = await res.json();
-    console.log("[dashboard1] report OK:", report);
     renderReport(report);
-
   } catch (err) {
     console.error("[dashboard1] FAILED:", err);
     if (flaggedTitle)    flaggedTitle.textContent   = "Failed to load report";
     if (flaggedContainer) flaggedContainer.innerHTML = `
       <p style="color:#ef4444;margin-bottom:8px;"><strong>Error:</strong> ${escHtml(err.message)}</p>
-      <p style="color:#9ca3af;font-size:13px;margin-bottom:12px;">
-        Open DevTools → Console for full details.
-      </p>
-      <button onclick="window.loadReport()"
+      <button onclick="loadReport()"
         style="padding:8px 16px;background:#3b82f6;color:#fff;border:none;
-               border-radius:6px;cursor:pointer;font-size:14px;">🔄 Retry</button>`;
+               border-radius:6px;cursor:pointer;font-size:14px;">Retry</button>`;
   }
 }
 
-/* ── 9. handleGenerateReport ─────────────────────────────────────────────── */
+/* ── Generate report button ─────────────────────────────────── */
 async function handleGenerateReport(e) {
   const btn = e?.currentTarget;
-  console.log("[dashboard1] Generate Report clicked, interviewId:", interviewId);
-
-  const token = localStorage.getItem("accessToken") || sessionStorage.getItem("accessToken");
-  if (!token) { window.location.href = "login.html"; return; }
-
   if (btn) { btn.disabled = true; btn.textContent = "Generating…"; }
 
   try {
-    const r = await fetch(`${API_BASE}/interview/status`, {
-      method:  "POST",
-      headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
-      body:    JSON.stringify({ interviewId, status: "COMPLETED" }),
+    await authFetch(`${API_BASE}/interview/status`, {
+      method: "POST",
+      body:   JSON.stringify({ interviewId, status: "COMPLETED" }),
     });
-    console.log("[dashboard1] status update:", r.status);
-  } catch (e2) {
-    console.warn("[dashboard1] status update failed (non-fatal):", e2.message);
-  }
+  } catch { /* non-fatal */ }
 
   await loadReport();
   if (btn) { btn.disabled = false; btn.textContent = "Generate Report"; }
 }
 
-/* ── 10. Wire buttons + expose globals ───────────────────────────────────── */
-window.loadReport = loadReport; // needed for inline onclick="window.loadReport()"
+/* ── Wire up buttons ────────────────────────────────────────── */
+window.loadReport = loadReport; // for inline onclick in error state
 
 function wireButtons() {
-  document.querySelectorAll(".action-button").forEach(btn => {
+  document.querySelectorAll(".action-button").forEach((btn) => {
     if (btn.textContent.trim() === "Generate Report") {
       btn.addEventListener("click", handleGenerateReport);
-      console.log("[dashboard1] ✅ Generate Report button wired");
     }
   });
 
@@ -248,5 +215,4 @@ if (document.readyState === "loading") {
   wireButtons();
 }
 
-/* ── 11. Boot: load report immediately ───────────────────────────────────── */
 loadReport();
